@@ -15,7 +15,13 @@ export const editDocument = (id: number, body: any) => {
     .Put(`/document/${id}`, body)
 };
 
-export const detailDocument = (id: number) => {
+export const detailDocument = (id: any) => {
   return alovaInstance
     .Get(`/document/${id}`)
 };
+
+export const deleteDocument = (docId: any) => {
+  return alovaInstance
+    .Delete(`/document/${docId}`)
+};
+

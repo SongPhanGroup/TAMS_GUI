@@ -91,20 +91,32 @@ const inventoryTabsData = [
 
 const description = ref("");
 const file = ref<any>();
+const title = ref("");
+const course = ref("");
 
 const createDocument = async () => {
   const formData = new FormData();
 
-  formData.append('file', file.value[0]);
-  formData.append('description', description.value);
-  
-  postDocument(formData).then(res=>{
-    
-  });
+  formData.append("file", file.value[0]);
+  formData.append("description", description.value);
+  formData.append("title", title.value);
+  formData.append("course", course.value);
+
+  postDocument(formData)
+    .then((res: any) => {
+      if (res.status !== "error") {
+        showMessage("Tạo mới tài liệu thành công!", "success");
+        window.location.replace("/document/list");
+      } else {
+        showMessage("Tạo mới tài liệu thất bại!", "error");
+      }
+    })
+    .catch((error) => {
+      showMessage("Có lỗi xảy ra!", "error");
+    });
 
   // fetchInvoices()
 };
-
 </script>
 
 <template>
@@ -113,37 +125,59 @@ const createDocument = async () => {
       class="d-flex flex-wrap justify-start justify-sm-space-between gap-y-4 gap-x-6 mb-6"
     >
       <div class="d-flex flex-column justify-center">
-        <h4 class="text-h4 font-weight-medium">Add a new product</h4>
-        <div class="text-body-1">Orders placed across your store</div>
+        <h4 class="text-h4 font-weight-medium">Thêm tài liệu</h4>
       </div>
     </div>
 
     <VRow>
       <VCol md="8">
         <!-- 👉 Product Information -->
-        <VCard class="mb-6" title="Product Information">
+        <VCard class="mb-6" title="Thông tin tài liệu">
           <VCardText>
-            <VForm @submit.prevent="(e) => {createDocument()}">
+            <VForm
+              @submit.prevent="
+                (e) => {
+                  createDocument();
+                }
+              "
+            >
               <VRow>
                 <VCol cols="12">
-                  <AppTextarea v-model="description" label="Default" placeholder="Placeholder Text" />
+                  <VTextField
+                    v-model="title"
+                    label="Tiêu đề"
+                    placeholder="Nhập tiêu đề"
+                  />
+                </VCol>
+                <VCol cols="12">
+                  <VTextField
+                    v-model="course"
+                    label="Tên khóa học"
+                    placeholder="Nhập khóa học"
+                  />
                 </VCol>
 
                 <VCol cols="12">
                   <VFileInput
-                  v-model="file"
+                    v-model="file"
                     :rules="[requiredValidator, ...rules]"
                     label="File"
                     accept="application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                     placeholder="Pick an avatar"
                   />
                 </VCol>
-
+                <VCol cols="12">
+                  <AppTextarea
+                    v-model="description"
+                    label="Mô tả"
+                    placeholder="Nhập mô tả"
+                  />
+                </VCol>
                 <VCol cols="12" class="d-flex gap-4">
-                  <VBtn type="submit"> Submit </VBtn>
+                  <VBtn type="submit"> Thêm mới </VBtn>
 
                   <VBtn type="reset" color="secondary" variant="tonal">
-                    Reset
+                    Khôi phục dữ liệu
                   </VBtn>
                 </VCol>
               </VRow>

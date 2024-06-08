@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getDocument } from "@/services/document.service";
+import { getDocument, deleteDocument } from "@/services/document.service";
 import { useWatcher } from "alova";
 
 type invoiceStatus =
@@ -16,8 +16,8 @@ const selectedStatus = ref<invoiceStatus>(null);
 const selectedRows = ref<string[]>([]);
 
 // Data table options
-const itemsPerPage = ref(10);
-const page = ref(1);
+const pageSize = ref("10");
+const page = ref("1");
 const sortBy = ref();
 const orderBy = ref();
 
@@ -45,16 +45,24 @@ const headers = [
 
 // 👉 Fetch Invoices
 const { loading, data } = useWatcher(
-  () =>
-    getDocument({
-      q: searchQuery.value,
-      status: selectedStatus.value,
-      itemsPerPage: itemsPerPage.value,
+  () => {
+    // Tạo đối tượng tham số với điều kiện
+    const params: any = {
       page: page.value,
+      pageSize: pageSize.value,
+      search: searchQuery.value,
+      status: selectedStatus.value,
       sortBy: sortBy.value,
       orderBy: orderBy.value,
-    }),
-  [searchQuery, selectedStatus, itemsPerPage, page, sortBy, orderBy],
+    };
+
+    // if (searchQuery.value) {
+    //   params.search = searchQuery.value;
+    // }
+
+    return getDocument(params);
+  },
+  [searchQuery, selectedStatus, pageSize, page, sortBy, orderBy],
   {
     debounce: [500],
     immediate: true,
@@ -98,10 +106,20 @@ const computedMoreList = computed(() => {
 });
 
 // 👉 Delete Invoice
-const deleteInvoice = async (id: number) => {
-  await $api(`/apps/invoice/${id}`, { method: "DELETE" });
-
-  // fetchInvoices()
+const handleDeleteDocument = async (id: string) => {
+  // await $api(`/apps/invoice/${id}`, { method: "DELETE" });
+  deleteDocument(id)
+    .then((res: any) => {
+      if (res.status !== "error") {
+        showMessage("Xóa tài liệu thành công!", "success");
+        window.location.reload();
+      } else {
+        showMessage("Xóa tài liệu thất bại!", "error");
+      }
+    })
+    .catch((error) => {
+      showMessage("Có lỗi xảy ra!", "error");
+    });
 };
 </script>
 
@@ -117,7 +135,7 @@ const deleteInvoice = async (id: number) => {
           <div class="d-flex align-center gap-2">
             <span>Show</span>
             <AppSelect
-              :model-value="itemsPerPage"
+              :model-value="pageSize"
               :items="[
                 { value: 10, title: '10' },
                 { value: 25, title: '25' },
@@ -126,7 +144,7 @@ const deleteInvoice = async (id: number) => {
                 { value: -1, title: 'All' },
               ]"
               style="inline-size: 5.5rem"
-              @update:model-value="itemsPerPage = parseInt($event, 10)"
+              @update:model-value="pageSize = parseInt($event, 10)"
             />
           </div>
           <!-- 👉 Create invoice -->
@@ -166,7 +184,7 @@ const deleteInvoice = async (id: number) => {
       <!-- SECTION Datatable -->
       <VDataTableServer
         v-model="selectedRows"
-        v-model:items-per-page="itemsPerPage"
+        v-model:items-per-page="pageSize"
         v-model:page="page"
         show-select
         :items-length="data?.pagination?.totalRecords"
@@ -187,9 +205,9 @@ const deleteInvoice = async (id: number) => {
         <template #item.name="{ item }">
           <div class="d-flex align-center gap-x-4">
             <div class="d-flex flex-column">
-              <span class="text-body-1 font-weight-medium text-high-emphasis">{{
-                item?.name
-              }}</span>
+              <span class="text-body-1 font-weight-medium text-high-emphasis"
+                >#{{ item?.name }}</span
+              >
             </div>
           </div>
         </template>
@@ -204,13 +222,15 @@ const deleteInvoice = async (id: number) => {
         </template>
 
         <template #item.createdBy="{ item }">
-          <span class="text-body-1 text-high-emphasis">{{
-            item?.fullName
-          }}</span>
+          <span class="text-body-1 text-high-emphasis"
+            >#{{ item?.fullName }}</span
+          >
         </template>
 
         <template #item.actions="{ item }">
-          <IconBtn :to="{ name: 'document-preview-id', params: { id: item.id } }">
+          <IconBtn
+            :to="{ name: 'document-preview-id', params: { id: item.id } }"
+          >
             <VIcon icon="tabler-eye" />
           </IconBtn>
 
@@ -218,16 +238,16 @@ const deleteInvoice = async (id: number) => {
             <VIcon icon="tabler-edit" />
           </IconBtn>
 
-          <IconBtn @click="deleteInvoice(item.id)">
-                  <VIcon icon="tabler-trash" />
-                </IconBtn>
+          <IconBtn @click="handleDeleteDocument(item.id)">
+            <VIcon icon="tabler-trash" />
+          </IconBtn>
         </template>
 
         <!-- pagination -->
         <template #bottom>
           <TablePagination
             v-model:page="page"
-            :items-per-page="itemsPerPage"
+            :items-per-page="pageSize"
             :total-items="data?.pagination?.totalRecords"
           />
         </template>

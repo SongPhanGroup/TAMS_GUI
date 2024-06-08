@@ -24,10 +24,16 @@ const fileData = ref<FileData[]>([]);
 const { onChange } = useFileDialog({ accept: "image/*" });
 
 const description = ref("");
+const title = ref("");
+const course = ref("");
+const fileName = ref("");
 const file = ref<any>();
 
-detailDocument(route.params.id).then((res: any) => {
+detailDocument(route?.params?.id).then((res: any) => {
   description.value = res.data.description;
+  title.value = res.data.title;
+  course.value = res.data.course;
+  fileName.value = res.data.name;
 });
 
 function onDrop(DroppedFiles: File[] | null) {
@@ -67,7 +73,7 @@ const content = ref(
 
 const activeTab = ref("Restock");
 const isTaxChargeToProduct = ref(true);
-const isDialogVisible = ref(false)
+const isDialogVisible = ref(false);
 
 const shippingList = [
   {
@@ -100,24 +106,37 @@ const inventoryTabsData = [
   { icon: "tabler-lock", title: "Advanced", value: "Advanced" },
 ];
 
-const handleEditDocument = async () => {
-  editDocument(route.params.id, { description: description.value }).then(
-    (res) => {
-      console.log(res);
-    }
-  );
+const handleFileChange = (event: any) => {
+  fileName.value = event.target.files[0].name;
+};
 
+const handleEditDocument = async () => {
+  const formData = new FormData();
+  formData.append("description", description.value);
+  formData.append("title", title.value);
+  formData.append("course", course.value);
+
+  editDocument(route.params.id, formData)
+    .then((res: any) => {
+      if (res.status !== "error") {
+        showMessage("Cập nhật tài liệu thành công!", "success");
+        window.location.replace("/document/list");
+      } else {
+        showMessage("Cập nhật tài liệu thất bại!", "error");
+      }
+    })
+    .catch((error) => {
+      showMessage("Có lỗi xảy ra!", "error");
+    });
   // fetchInvoices()
 };
 
 const handleExtractDocument = async () => {
   isDialogVisible.value = true;
-  extractDocument(route.params.id).then(
-    (res) => {
-      console.log(res);
-      isDialogVisible.value = false;
-    }
-  );
+  extractDocument(route?.params?.id).then((res) => {
+    console.log(res);
+    isDialogVisible.value = false;
+  });
 
   // fetchInvoices()
 };
@@ -129,15 +148,14 @@ const handleExtractDocument = async () => {
       class="d-flex flex-wrap justify-start justify-sm-space-between gap-y-4 gap-x-6 mb-6"
     >
       <div class="d-flex flex-column justify-center">
-        <h4 class="text-h4 font-weight-medium">Add a new product</h4>
-        <div class="text-body-1">Orders placed across your store</div>
+        <h4 class="text-h3 font-weight-medium">Cập nhật tài liệu</h4>
       </div>
     </div>
 
     <VRow>
       <VCol md="8">
         <!-- 👉 Product Information -->
-        <VCard class="mb-6" title="Product Information">
+        <VCard class="mb-6" title="Thông tin tài liệu">
           <VCardText>
             <VForm
               @submit.prevent="
@@ -148,6 +166,20 @@ const handleExtractDocument = async () => {
             >
               <VRow>
                 <VCol cols="12">
+                  <VTextField
+                    v-model="title"
+                    label="Tiêu đề"
+                    placeholder="Nhập tiêu đề"
+                  />
+                </VCol>
+                <VCol cols="12">
+                  <VTextField
+                    v-model="course"
+                    label="Tên khóa học"
+                    placeholder="Nhập khóa học"
+                  />
+                </VCol>
+                <VCol cols="12">
                   <AppTextarea
                     v-model="description"
                     label="Default"
@@ -156,20 +188,26 @@ const handleExtractDocument = async () => {
                 </VCol>
 
                 <VCol cols="12">
-                  <VFileInput
-                    v-model="file"
-                    label="File"
-                    accept="application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                    placeholder="Pick an avatar"
+                  <VTextField
+                    v-model="fileName"
+                    label="Tên file"
+                    placeholder="Nhập file"
+                    disabled="true"
                   />
                 </VCol>
 
                 <VCol cols="12" class="d-flex gap-4">
-                  <VBtn type="submit"> Submit </VBtn>
-                  <VBtn type="button" color="info" @click="handleExtractDocument()"> Xử lý </VBtn>
+                  <VBtn type="submit"> Cập nhật </VBtn>
+                  <VBtn
+                    type="button"
+                    color="info"
+                    @click="handleExtractDocument()"
+                  >
+                    Xử lý
+                  </VBtn>
 
                   <VBtn type="reset" color="secondary" variant="tonal">
-                    Reset
+                    Khôi phục dữ liệu
                   </VBtn>
                 </VCol>
               </VRow>
@@ -179,15 +217,8 @@ const handleExtractDocument = async () => {
       </VCol>
     </VRow>
   </div>
-  <VDialog
-    v-model="isDialogVisible"
-    persistent
-    width="300"
-  >
-    <VCard
-      color="primary"
-      width="300"
-    >
+  <VDialog v-model="isDialogVisible" persistent width="300">
+    <VCard color="primary" width="300">
       <VCardText class="pt-3">
         Please stand by
         <VProgressLinear

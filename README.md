@@ -1,35 +1,58 @@
-# vue
+# Hệ thống phát hiện sao chép tài liệu - TAMSV3
 
-This template should help get you started developing with Vue 3 in Vite.
+### Công nghệ sử dụng
 
-## Recommended IDE Setup
+- [VueJS] Xây dựng web app
+- Node version: 18.17.1
 
-[VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) (and disable Vetur).
+### Chạy dự án trên local
 
-## Type Support for `.vue` Imports in TS
-
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates.
-
-However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can run `Volar: Switch TS Plugin on/off` from VS Code command palette.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
+- Cài đặt dự án
 
 ```sh
+// Bước 1: Di chuyển vào thư mục làm việc
+cd TAMV3
+
+// Bước 2: cài đặt package thư viện
 npm install
-```
 
-### Compile and Hot-Reload for Development
-
-```sh
+// Bước 3: chạy ứng dụng
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+- local app: http://localhost:5173
 
+
+### Các scripts 
 ```sh
-npm run build
+"scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview --port 5050",
+    "typecheck": "vue-tsc --noEmit",
+    "lint": "eslint . -c .eslintrc.cjs --fix --ext .ts,.js,.cjs,.vue,.tsx,.jsx",
+    "build:icons": "tsx src/plugins/iconify/build-icons.ts",
+    "msw:init": "msw init public/ --save",
+    "postinstall": "npm run build:icons && npm run msw:init"
+  },
+// Khởi chạy app
+npm run dev
+### Sửa lỗi
+
+### Cấu trúc dự án
+#### Thư mục gốc
+- Chứa code frontend
+
+### Quy tắc khi viết code
 ```
+Sau đây là một số quy chuẩn đặt tên thường dùng trong dự án:
+- Tên lớp đặt theo PascalCase, ví dụ: UserClass, CategoryClass…
+- Tên hàm và phương thức sử dụng camelCase, ví dụ getUser, getCategory…
+- Tên biến cũng sử dụng camelCase loginUser, categoryList…
+- Tên hằng số thì đặc biệt, viết hoa hết và cách nhau bởi dấu gạch dưới LIST_SUBJECTS,...
+```
+#### Vuejs 
+Gợi ý code vuejs: https://github.com/vuejs/awesome-vue
+
+#### Copyright and license
+ Code and Docs released under the MIT License.

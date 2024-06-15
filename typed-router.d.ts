@@ -43,6 +43,7 @@ declare module 'vue-router/auto/routes' {
     '$error': RouteRecordInfo<'$error', '/:error(.*)', { error: ParamValue<true> }, { error: ParamValue<false> }>,
     'checking-document-add': RouteRecordInfo<'checking-document-add', '/checking-document/add', Record<never, never>, Record<never, never>>,
     'checking-document-list': RouteRecordInfo<'checking-document-list', '/checking-document/list', Record<never, never>, Record<never, never>>,
+    'checking-sentence-upload': RouteRecordInfo<'checking-sentence-upload', '/checking-sentence/upload', Record<never, never>, Record<never, never>>,
     'document-add': RouteRecordInfo<'document-add', '/document/add', Record<never, never>, Record<never, never>>,
     'document-list': RouteRecordInfo<'document-list', '/document/list', Record<never, never>, Record<never, never>>,
     'document-preview-id': RouteRecordInfo<'document-preview-id', '/document/preview/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,

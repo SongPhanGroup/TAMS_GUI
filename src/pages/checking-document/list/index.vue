@@ -1,208 +1,280 @@
 <script setup lang="ts">
-import type { ECommerceProduct } from '@db/apps/ecommerce/types'
+import {
+  getCheckingDocument,
+  deleteCheckingDocument,
+} from "@/services/checking_document.service";
+import { useWatcher } from "alova";
 
-const headers = [
-  { title: 'Product', key: 'product' },
-  { title: 'Category', key: 'category' },
-  { title: 'Stock', key: 'stock', sortable: false },
-  { title: 'SKU', key: 'sku' },
-  { title: 'Price', key: 'price' },
-  { title: 'QTY', key: 'qty' },
-  { title: 'Status', key: 'status' },
-  { title: 'Actions', key: 'actions', sortable: false },
-]
+type invoiceStatus =
+  | "Downloaded"
+  | "Draft"
+  | "Paid"
+  | "Sent"
+  | "Partial Payment"
+  | "Past Due"
+  | null;
 
-const selectedStatus = ref()
-const selectedCategory = ref()
-const selectedStock = ref<boolean | undefined>()
-const searchQuery = ref('')
-
-const status = ref([
-  { title: 'Scheduled', value: 'Scheduled' },
-  { title: 'Publish', value: 'Published' },
-  { title: 'Inactive', value: 'Inactive' },
-])
-
-const categories = ref([
-  { title: 'Accessories', value: 'Accessories' },
-  { title: 'Home Decor', value: 'Home Decor' },
-  { title: 'Electronics', value: 'Electronics' },
-  { title: 'Shoes', value: 'Shoes' },
-  { title: 'Office', value: 'Office' },
-  { title: 'Games', value: 'Games' },
-])
-
-const stockStatus = ref([
-  { title: 'In Stock', value: true },
-  { title: 'Out of Stock', value: false },
-])
+const searchQuery = ref("");
+const selectedStatus = ref<invoiceStatus>(null);
+const selectedRows = ref<string[]>([]);
 
 // Data table options
-const itemsPerPage = ref(10)
-const page = ref(1)
-const sortBy = ref()
-const orderBy = ref()
+const pageSize = ref("10");
+const page = ref("1");
+const sortBy = ref();
+const orderBy = ref();
 
 // Update data table options
 const updateOptions = (options: any) => {
-  sortBy.value = options.sortBy[0]?.key
-  orderBy.value = options.sortBy[0]?.order
-}
+  sortBy.value = options.sortBy[0]?.key;
+  orderBy.value = options.sortBy[0]?.order;
+};
 
-const resolveCategory = (category: string) => {
-  if (category === 'Accessories')
-    return { color: 'error', icon: 'tabler-device-watch' }
-  if (category === 'Home Decor')
-    return { color: 'info', icon: 'tabler-home' }
-  if (category === 'Electronics')
-    return { color: 'primary', icon: 'tabler-device-imac' }
-  if (category === 'Shoes')
-    return { color: 'success', icon: 'tabler-shoe' }
-  if (category === 'Office')
-    return { color: 'warning', icon: 'tabler-briefcase' }
-  if (category === 'Games')
-    return { color: 'primary', icon: 'tabler-device-gamepad-2' }
-}
+const widgetData = ref([
+  { title: "Clients", value: 24, icon: "tabler-user" },
+  { title: "Invoices", value: 165, icon: "tabler-file-invoice" },
+  { title: "Paid", value: "$2.46k", icon: "tabler-checks" },
+  { title: "Unpaid", value: "$876", icon: "tabler-circle-off" },
+]);
 
-const resolveStatus = (statusMsg: string) => {
-  if (statusMsg === 'Scheduled')
-    return { text: 'Scheduled', color: 'warning' }
-  if (statusMsg === 'Published')
-    return { text: 'Publish', color: 'success' }
-  if (statusMsg === 'Inactive')
-    return { text: 'Inactive', color: 'error' }
-}
+// 👉 headers
+const headers = [
+  { title: "Tên tập tin", key: "name" },
+  { title: "Trạng thái", key: "status" },
+  { title: "Người tải lên", key: "createdBy" },
+  { title: "Ngày tải", key: "createdAt" },
+  { title: "Hành động", key: "actions", sortable: false },
+];
 
-const { data: productsData, execute: fetchProducts } = await useApi<any>(createUrl('/apps/ecommerce/products',
-  {
-    query: {
-      q: searchQuery,
-      stock: selectedStock,
-      category: selectedCategory,
-      status: selectedStatus,
-      page,
-      itemsPerPage,
-      sortBy,
-      orderBy,
-    },
+// 👉 Fetch Invoices
+const { loading, data } = useWatcher(
+  () => {
+    // Tạo đối tượng tham số với điều kiện
+    const params: any = {
+      page: page.value,
+      pageSize: pageSize.value,
+      search: searchQuery.value,
+      status: selectedStatus.value,
+      sortBy: sortBy.value,
+      orderBy: orderBy.value,
+    };
+
+    // if (searchQuery.value) {
+    //   params.search = searchQuery.value;
+    // }
+
+    return getCheckingDocument(params);
   },
-))
+  [searchQuery, selectedStatus, pageSize, page, sortBy, orderBy],
+  {
+    debounce: [500],
+    immediate: true,
+  }
+);
 
-const products = computed((): ECommerceProduct[] => productsData.value.products)
-const totalProduct = computed(() => productsData.value.total)
+// 👉 Invoice balance variant resolver
+const resolveInvoiceBalanceVariant = (
+  balance: string | number,
+  total: number
+) => {
+  if (balance === total) return { status: "Unpaid", chip: { color: "error" } };
 
-const deleteProduct = async (id: number) => {
-  await $api(`apps/ecommerce/products/${id}`, {
-    method: 'DELETE',
-  })
+  if (balance === 0) return { status: "Paid", chip: { color: "success" } };
 
-  fetchProducts()
-}
+  return { status: balance, chip: { variant: "text" } };
+};
+
+// 👉 Invoice status variant resolver
+const resolveStatus = (statusMsg: number) => {
+  if (statusMsg === 0) return { text: "Chưa xử lý", color: "warning" };
+  else if (statusMsg === 1) return { text: "Đã xử lý", color: "success" };
+  else return { text: "Lỗi", color: "error" };
+};
+
+const computedMoreList = computed(() => {
+  return (paramId: number) => [
+    { title: "Download", value: "download", prependIcon: "tabler-download" },
+    {
+      title: "Edit",
+      value: "edit",
+      prependIcon: "tabler-pencil",
+      to: { name: "apps-invoice-edit-id", params: { id: paramId } },
+    },
+    {
+      title: "Duplicate",
+      value: "duplicate",
+      prependIcon: "tabler-layers-intersect",
+    },
+  ];
+});
+
+// 👉 Delete Invoice
+const handleDeleteDocument = async (id: string) => {
+  // await $api(`/apps/invoice/${id}`, { method: "DELETE" });
+  deleteCheckingDocument(id)
+    .then((res: any) => {
+      if (res.status !== "error") {
+        showMessage("Xóa tài liệu thành công!", "success");
+      } else {
+        showMessage("Xóa tài liệu thất bại!", "error");
+      }
+    })
+    .catch((error) => {
+      showMessage("Có lỗi xảy ra!", "error");
+    });
+};
 </script>
 
 <template>
-  <div>
-    <!-- 👉 products -->
-    <VCard title="Filters" class="mb-6">
-      <VCardText>
-        <VRow>
-          <VCol cols="12" sm="3">
-            <div class="d-flex align-center">
-              <!-- 👉 Search  -->
-              <AppTextField v-model="searchQuery" placeholder="Search Product" style="inline-size: 200px;"
-                class="me-3" />
-            </div>
-          </VCol>
+  <section v-if="!loading">
+    <!-- 👉 Invoice Widgets -->
 
-          <!-- 👉 Select Status -->
-          <VCol cols="12" sm="3">
-            <AppSelect v-model="selectedStatus" placeholder="Status" :items="status" clearable clear-icon="tabler-x" />
-          </VCol>
+    <VCard id="invoice-list">
+      <VCardText
+        class="d-flex justify-space-between align-center flex-wrap gap-4"
+      >
+        <div class="d-flex gap-4 align-center flex-wrap">
+          <div class="d-flex align-center gap-2">
+            <span>Show</span>
+            <AppSelect
+              :model-value="pageSize"
+              :items="[
+                { value: 10, title: '10' },
+                { value: 25, title: '25' },
+                { value: 50, title: '50' },
+                { value: 100, title: '100' },
+                { value: -1, title: 'All' },
+              ]"
+              style="inline-size: 5.5rem"
+              @update:model-value="pageSize = parseInt($event, 10)"
+            />
+          </div>
+          <!-- 👉 Create invoice -->
+          <VBtn
+            prepend-icon="tabler-plus"
+            :to="{ name: 'checking-document-add' }"
+          >
+            Create invoice
+          </VBtn>
+        </div>
 
-          <!-- 👉 Select Category -->
+        <div class="d-flex align-center flex-wrap gap-4">
+          <!-- 👉 Search  -->
+          <div class="invoice-list-filter">
+            <AppTextField v-model="searchQuery" placeholder="Search Invoice" />
+          </div>
 
-          <!-- 👉 Select Stock Status -->
-          <VCol cols="12" sm="6">
-            <div class="d-flex gap-4 flex-wrap align-center">
-              <AppSelect v-model="itemsPerPage" :items="[5, 10, 20, 25, 50]" />
-              <!-- 👉 Export button -->
-              <VBtn variant="tonal" color="secondary" prepend-icon="tabler-upload">
-                Export
-              </VBtn>
-
-              <VBtn color="primary" prepend-icon="tabler-plus" @click="$router.push('/apps/ecommerce/product/add')">
-                Add Product
-              </VBtn>
-            </div>
-          </VCol>
-        </VRow>
+          <!-- 👉 Select status -->
+          <div class="invoice-list-filter">
+            <AppSelect
+              v-model="selectedStatus"
+              placeholder="Invoice Status"
+              clearable
+              clear-icon="tabler-x"
+              single-line
+              :items="[
+                'Downloaded',
+                'Draft',
+                'Sent',
+                'Paid',
+                'Partial Payment',
+                'Past Due',
+              ]"
+            />
+          </div>
+        </div>
       </VCardText>
-
       <VDivider />
 
-      <!-- 👉 Datatable  -->
-      <VDataTableServer v-model:items-per-page="itemsPerPage" v-model:page="page" :headers="headers" show-select
-        :items="products" :items-length="totalProduct" class="text-no-wrap" @update:options="updateOptions">
-        <!-- product  -->
-        <template #item.product="{ item }">
+      <!-- SECTION Datatable -->
+      <VDataTableServer
+        v-model="selectedRows"
+        v-model:items-per-page="pageSize"
+        v-model:page="page"
+        show-select
+        :items-length="data?.pagination?.totalRecords"
+        :headers="headers"
+        :items="data?.data"
+        item-value="id"
+        class="text-no-wrap"
+        @update:options="updateOptions"
+      >
+        <!-- id -->
+        <template #item.id="{ item }">
+          <RouterLink :to="{ name: 'document-add', params: { id: item.id } }">
+            #{{ item.id }}
+          </RouterLink>
+        </template>
+
+        <!-- client -->
+        <template #item.name="{ item }">
           <div class="d-flex align-center gap-x-4">
-            <VAvatar v-if="item.image" size="38" variant="tonal" rounded :image="item.image" />
             <div class="d-flex flex-column">
-              <span class="text-body-1 font-weight-medium text-high-emphasis">{{ item.productName }}</span>
-              <span class="text-body-2">{{ item.productBrand }}</span>
+              <span class="text-body-1 font-weight-medium text-high-emphasis"
+                >#{{ item?.name }}</span
+              >
             </div>
           </div>
         </template>
 
-        <!-- category -->
-        <template #item.category="{ item }">
-          <VAvatar size="30" variant="tonal" :color="resolveCategory(item.category)?.color" class="me-4">
-            <VIcon :icon="resolveCategory(item.category)?.icon" size="18" />
-          </VAvatar>
-          <span class="text-body-1 text-high-emphasis">{{ item.category }}</span>
-        </template>
-
-        <!-- stock -->
-        <template #item.stock="{ item }">
-          <VSwitch :model-value="item.stock" />
-        </template>
-
-        <!-- status -->
         <template #item.status="{ item }">
-          <VChip v-bind="resolveStatus(item.status)" density="default" label size="small" />
+          <VChip
+            v-bind="resolveStatus(item.status)"
+            density="default"
+            label
+            size="small"
+          />
         </template>
 
-        <!-- Actions -->
+        <template #item.createdBy="{ item }">
+          <span class="text-body-1 text-high-emphasis"
+            >#{{ item?.fullName }}</span
+          >
+        </template>
+
         <template #item.actions="{ item }">
+          <IconBtn
+            :to="{ name: 'document-preview-id', params: { id: item.id } }"
+          >
+            <VIcon icon="tabler-eye" />
+          </IconBtn>
+
           <IconBtn>
             <VIcon icon="tabler-edit" />
           </IconBtn>
 
-          <IconBtn>
-            <VIcon icon="tabler-dots-vertical" />
-            <VMenu activator="parent">
-              <VList>
-                <VListItem value="download" prepend-icon="tabler-download">
-                  Download
-                </VListItem>
-
-                <VListItem value="delete" prepend-icon="tabler-trash" @click="deleteProduct(item.id)">
-                  Delete
-                </VListItem>
-
-                <VListItem value="duplicate" prepend-icon="tabler-copy">
-                  Duplicate
-                </VListItem>
-              </VList>
-            </VMenu>
+          <IconBtn @click="handleDeleteDocument(item.id)">
+            <VIcon icon="tabler-trash" />
           </IconBtn>
         </template>
 
         <!-- pagination -->
         <template #bottom>
-          <TablePagination v-model:page="page" :items-per-page="itemsPerPage" :total-items="totalProduct" />
+          <TablePagination
+            v-model:page="page"
+            :items-per-page="pageSize"
+            :total-items="data?.pagination?.totalRecords"
+          />
         </template>
       </VDataTableServer>
+      <!-- !SECTION -->
     </VCard>
-  </div>
+  </section>
+  <section v-else>
+    <VCard>
+      <VCardTitle>No Invoice Found</VCardTitle>
+    </VCard>
+  </section>
 </template>
+
+<style lang="scss">
+#invoice-list {
+  .invoice-list-actions {
+    inline-size: 8rem;
+  }
+
+  .invoice-list-filter {
+    inline-size: 12rem;
+  }
+}
+</style>

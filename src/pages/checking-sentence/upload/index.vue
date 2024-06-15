@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { postCheckingDocument } from "@/services/checking_document.service";
+import { uploadCheckingSentence } from "@/services/checking_sentence.service";
 import { ref } from "vue";
 
 const optionCounter = ref(1);
@@ -94,7 +94,7 @@ const file = ref<any>();
 const title = ref("");
 const course = ref("");
 
-const createCheckingDocument = async () => {
+const createCheckingSentence = async () => {
   const formData = new FormData();
 
   formData.append("file", file.value[0]);
@@ -102,11 +102,10 @@ const createCheckingDocument = async () => {
   formData.append("title", title.value);
   formData.append("course", course.value);
 
-  postCheckingDocument(formData)
+  uploadCheckingSentence(formData)
     .then((res: any) => {
       if (res.status !== "error") {
         showMessage("Tạo mới tài liệu thành công!", "success");
-        window.location.replace("/checking-document/list");
       } else {
         showMessage("Tạo mới tài liệu thất bại!", "error");
       }
@@ -137,7 +136,7 @@ const createCheckingDocument = async () => {
             <VForm
               @submit.prevent="
                 (e) => {
-                  createCheckingDocument();
+                  createCheckingSentence();
                 }
               "
             >

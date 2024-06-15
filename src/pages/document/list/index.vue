@@ -55,7 +55,6 @@ const { loading, data } = useWatcher(
       sortBy: sortBy.value,
       orderBy: orderBy.value,
     };
-
     // if (searchQuery.value) {
     //   params.search = searchQuery.value;
     // }
@@ -106,13 +105,12 @@ const computedMoreList = computed(() => {
 });
 
 // 👉 Delete Invoice
-const handleDeleteDocument = async (id: string) => {
+const handleDeleteCheckingDocument = async (id: string) => {
   // await $api(`/apps/invoice/${id}`, { method: "DELETE" });
   deleteDocument(id)
     .then((res: any) => {
       if (res.status !== "error") {
         showMessage("Xóa tài liệu thành công!", "success");
-        window.location.reload();
       } else {
         showMessage("Xóa tài liệu thất bại!", "error");
       }
@@ -238,7 +236,7 @@ const handleDeleteDocument = async (id: string) => {
             <VIcon icon="tabler-edit" />
           </IconBtn>
 
-          <IconBtn @click="handleDeleteDocument(item.id)">
+          <IconBtn @click="handleDeleteCheckingDocument(item.id)">
             <VIcon icon="tabler-trash" />
           </IconBtn>
         </template>

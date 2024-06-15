@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { postDocument } from "@/services/document.service";
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 
 const optionCounter = ref(1);
+const router = useRouter();
 
 const dropZoneRef = ref<HTMLDivElement>();
 interface FileData {
@@ -106,10 +108,10 @@ const createDocument = async () => {
     .then((res: any) => {
       if (res.status !== "error") {
         showMessage("Tạo mới tài liệu thành công!", "success");
-        window.location.replace("/document/list");
       } else {
         showMessage("Tạo mới tài liệu thất bại!", "error");
       }
+      router.push("/document/list");
     })
     .catch((error) => {
       showMessage("Có lỗi xảy ra!", "error");
@@ -130,7 +132,7 @@ const createDocument = async () => {
     </div>
 
     <VRow>
-      <VCol md="8">
+      <VCol md="12">
         <!-- 👉 Product Information -->
         <VCard class="mb-6" title="Thông tin tài liệu">
           <VCardText>

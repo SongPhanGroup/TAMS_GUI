@@ -4,6 +4,7 @@ import {
   deleteCheckingDocument,
 } from "@/services/checking_document.service";
 import { useWatcher } from "alova";
+import { toDateString } from "@/utils/utilities";
 
 type invoiceStatus =
   | "Downloaded"
@@ -23,6 +24,7 @@ const pageSize = ref("10");
 const page = ref("1");
 const sortBy = ref();
 const orderBy = ref();
+const deleteTrigger = ref(0);
 
 // Update data table options
 const updateOptions = (options: any) => {
@@ -41,7 +43,7 @@ const widgetData = ref([
 const headers = [
   { title: "Tên tập tin", key: "name" },
   { title: "Trạng thái", key: "status" },
-  { title: "Người tải lên", key: "createdBy" },
+  { title: "Tiêu đề", key: "title" },
   { title: "Ngày tải", key: "createdAt" },
   { title: "Hành động", key: "actions", sortable: false },
 ];
@@ -65,7 +67,7 @@ const { loading, data } = useWatcher(
 
     return getCheckingDocument(params);
   },
-  [searchQuery, selectedStatus, pageSize, page, sortBy, orderBy],
+  [searchQuery, selectedStatus, pageSize, page, sortBy, orderBy, deleteTrigger],
   {
     debounce: [500],
     immediate: true,
@@ -114,6 +116,7 @@ const handleDeleteDocument = async (id: string) => {
   deleteCheckingDocument(id)
     .then((res: any) => {
       if (res.status !== "error") {
+        deleteTrigger.value++;
         showMessage("Xóa tài liệu thành công!", "success");
       } else {
         showMessage("Xóa tài liệu thất bại!", "error");
@@ -154,7 +157,7 @@ const handleDeleteDocument = async (id: string) => {
             prepend-icon="tabler-plus"
             :to="{ name: 'checking-document-add' }"
           >
-            Create invoice
+            Thêm mới
           </VBtn>
         </div>
 
@@ -210,9 +213,9 @@ const handleDeleteDocument = async (id: string) => {
         <template #item.name="{ item }">
           <div class="d-flex align-center gap-x-4">
             <div class="d-flex flex-column">
-              <span class="text-body-1 font-weight-medium text-high-emphasis"
-                >#{{ item?.name }}</span
-              >
+              <span class="text-body-1 font-weight-medium text-high-emphasis">{{
+                item?.name
+              }}</span>
             </div>
           </div>
         </template>
@@ -226,10 +229,10 @@ const handleDeleteDocument = async (id: string) => {
           />
         </template>
 
-        <template #item.createdBy="{ item }">
-          <span class="text-body-1 text-high-emphasis"
-            >#{{ item?.fullName }}</span
-          >
+        <template #item.createdAt="{ item }">
+          <span class="text-body-1 text-high-emphasis">{{
+            toDateString(item?.createdAt)
+          }}</span>
         </template>
 
         <template #item.actions="{ item }">
@@ -239,9 +242,9 @@ const handleDeleteDocument = async (id: string) => {
             <VIcon icon="tabler-eye" />
           </IconBtn>
 
-          <IconBtn>
+          <!-- <IconBtn>
             <VIcon icon="tabler-edit" />
-          </IconBtn>
+          </IconBtn> -->
 
           <IconBtn @click="handleDeleteDocument(item.id)">
             <VIcon icon="tabler-trash" />

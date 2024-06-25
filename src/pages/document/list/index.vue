@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { getDocument, deleteDocument } from "@/services/document.service";
 import { useWatcher } from "alova";
+import { toDateString } from '@/utils/utilities'
 
 type invoiceStatus =
   | "Downloaded"
@@ -38,7 +39,7 @@ const widgetData = ref([
 const headers = [
   { title: "Tên tập tin", key: "name" },
   { title: "Trạng thái", key: "status" },
-  { title: "Người tải lên", key: "createdBy" },
+  { title: "Tiêu đề", key: "title" },
   { title: "Ngày tải", key: "createdAt" },
   { title: "Hành động", key: "actions", sortable: false },
 ];
@@ -147,7 +148,7 @@ const handleDeleteCheckingDocument = async (id: string) => {
           </div>
           <!-- 👉 Create invoice -->
           <VBtn prepend-icon="tabler-plus" :to="{ name: 'document-add' }">
-            Create invoice
+            Thêm mới
           </VBtn>
         </div>
 
@@ -204,7 +205,7 @@ const handleDeleteCheckingDocument = async (id: string) => {
           <div class="d-flex align-center gap-x-4">
             <div class="d-flex flex-column">
               <span class="text-body-1 font-weight-medium text-high-emphasis"
-                >#{{ item?.name }}</span
+                >{{ item?.name }}</span
               >
             </div>
           </div>
@@ -219,9 +220,9 @@ const handleDeleteCheckingDocument = async (id: string) => {
           />
         </template>
 
-        <template #item.createdBy="{ item }">
+        <template #item.createdAt="{ item }">
           <span class="text-body-1 text-high-emphasis"
-            >#{{ item?.fullName }}</span
+            >{{ toDateString(item?.createdAt) }}</span
           >
         </template>
 
@@ -232,9 +233,9 @@ const handleDeleteCheckingDocument = async (id: string) => {
             <VIcon icon="tabler-eye" />
           </IconBtn>
 
-          <IconBtn>
+          <!-- <IconBtn>
             <VIcon icon="tabler-edit" />
-          </IconBtn>
+          </IconBtn> -->
 
           <IconBtn @click="handleDeleteCheckingDocument(item.id)">
             <VIcon icon="tabler-trash" />

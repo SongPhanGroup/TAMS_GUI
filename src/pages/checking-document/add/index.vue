@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { postCheckingDocument } from "@/services/checking_document.service";
+import { uploadCheckingSentence } from "@/services/checking_sentence.service";
 import { ref } from "vue";
 
 const optionCounter = ref(1);
@@ -93,6 +94,11 @@ const description = ref("");
 const file = ref<any>();
 const title = ref("");
 const course = ref("");
+const actionType = ref("");
+
+const setAction = (action: any) => {
+  actionType.value = action;
+};
 
 const createCheckingDocument = async () => {
   const formData = new FormData();
@@ -102,18 +108,33 @@ const createCheckingDocument = async () => {
   formData.append("title", title.value);
   formData.append("course", course.value);
 
-  postCheckingDocument(formData)
-    .then((res: any) => {
-      if (res.status !== "error") {
-        showMessage("Tạo mới tài liệu thành công!", "success");
-        window.location.replace("/checking-document/list");
-      } else {
-        showMessage("Tạo mới tài liệu thất bại!", "error");
-      }
-    })
-    .catch((error) => {
-      showMessage("Có lỗi xảy ra!", "error");
-    });
+  if (actionType.value === "add") {
+    postCheckingDocument(formData)
+      .then((res: any) => {
+        if (res.status !== "error") {
+          showMessage("Tạo mới tài liệu thành công!", "success");
+          window.location.replace("/checking-document/list");
+        } else {
+          showMessage("Tạo mới tài liệu thất bại!", "error");
+        }
+      })
+      .catch((error) => {
+        showMessage("Có lỗi xảy ra!", "error");
+      });
+  } else {
+    uploadCheckingSentence(formData)
+      .then((res: any) => {
+        if (res.status !== "error") {
+          showMessage("Tách câu tài liệu thành công!", "success");
+          window.location.replace("/checking-document/list");
+        } else {
+          showMessage("Tách câu tài liệu thất bại!", "error");
+        }
+      })
+      .catch((error) => {
+        showMessage("Có lỗi xảy ra!", "error");
+      });
+  }
 
   // fetchInvoices()
 };
@@ -174,7 +195,12 @@ const createCheckingDocument = async () => {
                   />
                 </VCol>
                 <VCol cols="12" class="d-flex gap-4">
-                  <VBtn type="submit"> Thêm mới </VBtn>
+                  <VBtn type="submit" @click="setAction('add')">
+                    Thêm mới
+                  </VBtn>
+                  <VBtn type="submit" color="success" @click="setAction('extract')">
+                    Tách câu
+                  </VBtn>
 
                   <VBtn type="reset" color="secondary" variant="tonal">
                     Khôi phục dữ liệu

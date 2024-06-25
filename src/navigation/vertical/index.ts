@@ -3,4 +3,4 @@ import checking_sentence from "./checking-sentence";
 import document from "./document";
 import home from "./home";
 
-export default [...home, ...document, ...checking_document, ...checking_sentence];
+export default [...home, ...document, ...checking_document];

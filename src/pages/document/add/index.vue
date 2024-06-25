@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { postDocument } from "@/services/document.service";
+import { extractFromFileUpload } from "@/services/sentenceDoc.service";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 
@@ -95,6 +96,11 @@ const description = ref("");
 const file = ref<any>();
 const title = ref("");
 const course = ref("");
+const actionType = ref("");
+
+const setAction = (action: any) => {
+  actionType.value = action;
+};
 
 const createDocument = async () => {
   const formData = new FormData();
@@ -104,18 +110,32 @@ const createDocument = async () => {
   formData.append("title", title.value);
   formData.append("course", course.value);
 
-  postDocument(formData)
-    .then((res: any) => {
-      if (res.status !== "error") {
-        showMessage("Tạo mới tài liệu thành công!", "success");
-      } else {
-        showMessage("Tạo mới tài liệu thất bại!", "error");
-      }
-      router.push("/document/list");
-    })
-    .catch((error) => {
-      showMessage("Có lỗi xảy ra!", "error");
-    });
+  if (actionType.value === "add") {
+    postDocument(formData)
+      .then((res: any) => {
+        if (res.status !== "error") {
+          showMessage("Tạo mới tài liệu thành công!", "success");
+        } else {
+          showMessage("Tạo mới tài liệu thất bại!", "error");
+        }
+        router.push("/document/list");
+      })
+      .catch((error) => {
+        showMessage("Có lỗi xảy ra!", "error");
+      });
+  } else {
+    extractFromFileUpload(formData).then((res: any) => {
+        if (res.status !== "error") {
+          showMessage("Tách câu tài liệu thành công!", "success");
+        } else {
+          showMessage("Tách câu tài liệu thất bại!", "error");
+        }
+        router.push("/document/list");
+      })
+      .catch((error) => {
+        showMessage("Có lỗi xảy ra!", "error");
+      });
+  }
 
   // fetchInvoices()
 };
@@ -176,7 +196,16 @@ const createDocument = async () => {
                   />
                 </VCol>
                 <VCol cols="12" class="d-flex gap-4">
-                  <VBtn type="submit"> Thêm mới </VBtn>
+                  <VBtn type="submit" @click="setAction('add')">
+                    Thêm mới
+                  </VBtn>
+                  <VBtn
+                    color="success"
+                    type="submit"
+                    @click="setAction('extract')"
+                  >
+                    Tách câu
+                  </VBtn>
 
                   <VBtn type="reset" color="secondary" variant="tonal">
                     Khôi phục dữ liệu

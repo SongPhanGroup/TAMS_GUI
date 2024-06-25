@@ -3,7 +3,7 @@
 ### Công nghệ sử dụng
 
 - [VueJS] Xây dựng web app
-- Node version: 18.17.1
+- Node version: 16.15.0
 
 ### Chạy dự án trên local
 
@@ -11,32 +11,31 @@
 
 ```sh
 // Bước 1: Di chuyển vào thư mục làm việc
-cd TAMV3
+cd TAMS_GUI
 
 // Bước 2: cài đặt package thư viện
 npm install
 
 // Bước 3: chạy ứng dụng
-npm run dev
+npm start
 ```
 
-- local app: http://localhost:5173
+- local app: http://localhost:3000
 
 
 ### Các scripts 
 ```sh
 "scripts": {
-    "dev": "vite dev",
-    "build": "vite build",
-    "preview": "vite preview --port 5050",
-    "typecheck": "vue-tsc --noEmit",
-    "lint": "eslint . -c .eslintrc.cjs --fix --ext .ts,.js,.cjs,.vue,.tsx,.jsx",
-    "build:icons": "tsx src/plugins/iconify/build-icons.ts",
-    "msw:init": "msw init public/ --save",
-    "postinstall": "npm run build:icons && npm run msw:init"
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
+    "eject": "react-scripts eject",
+    "format": "prettier --write \"src/**/*.js\"",
+    "lint": "eslint src/**/*.js src/**/*.js",
+    "lint:fix": "eslint src/**/*.js --fix"
   },
 // Khởi chạy app
-npm run dev
+npm start
 ### Sửa lỗi
 
 ### Cấu trúc dự án
@@ -51,8 +50,8 @@ Sau đây là một số quy chuẩn đặt tên thường dùng trong dự án:
 - Tên biến cũng sử dụng camelCase loginUser, categoryList…
 - Tên hằng số thì đặc biệt, viết hoa hết và cách nhau bởi dấu gạch dưới LIST_SUBJECTS,...
 ```
-#### Vuejs 
-Gợi ý code vuejs: https://github.com/vuejs/awesome-vue
+#### Reactjs 
+Gợi ý code reactjs: https://github.com/airbnb/javascript/tree/master/react
 
 #### Copyright and license
  Code and Docs released under the MIT License.

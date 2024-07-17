@@ -24,10 +24,9 @@ import Select from 'react-select'
 import '@styles/react/libs/react-select/_react-select.scss'
 import Swal from 'sweetalert2'
 import { useEffect, useState } from "react"
-import { detailCheckingDocument, editCheckingDocument } from "../../../../api/checking_document"
-import { getCourse } from "../../../../api/course"
+import { editCheckingDocumentVersion } from "../../../../api/checking_document_version"
 
-const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
+const EditCheckingDocumentVersion = ({ open, handleEditModal, dataEdit, getData }) => {
     // ** States
     const [dataDetail, setDataDetail] = useState()
 
@@ -40,10 +39,8 @@ const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
     }, [dataEdit?.id])
     console.log(dataDetail)
 
-    const EditCheckingDocumentSchema = yup.object().shape({
-        title: yup.string().required("Yêu cầu nhập tiêu đề"),
-        author: yup.string().required("Yêu cầu nhập tác giả"),
-        course: yup.object().required("Yêu cầu nhập khóa học"),
+    const EditCheckingDocumentVersionSchema = yup.object().shape({
+        file: yup.mixed().required("Yêu cầu nhập file"),
         description: yup.string().required("Yêu cầu nhập mô tả")
     })
 
@@ -54,15 +51,16 @@ const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
         formState: { errors }
     } = useForm({
         mode: 'onChange',
-        resolver: yupResolver(EditCheckingDocumentSchema)
+        resolver: yupResolver(EditCheckingDocumentVersionSchema)
     })
 
-    const [listCourse, setListCourse] = useState([])
+    const [file, setFile] = useState()
+    const [listCheckingDocument, setListCheckingDocument] = useState([])
 
     const getAllDataPromises = async () => {
-        const coursePromise = getCourse({ params: { page: 1, perPage: 10, search: '' } })
+        const checkingDocumentPromise = getCheckingDocument({ params: { page: 1, perPage: 10, search: '' } })
 
-        const promises = [coursePromise]
+        const promises = [checkingDocumentPromise]
         const results = await Promise.allSettled(promises)
         const responseData = promises.reduce((acc, promise, index) => {
             if (results[index].status === 'fulfilled') {
@@ -73,19 +71,19 @@ const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
             return acc
         }, [])
 
-        const courseRes = responseData[0]
+        const checkingDocumentRes = responseData[0]
         results.map((res) => {
             if (res.status !== 'fulfilled') {
-                setListCourse(null)
+                setListCheckingDocument(null)
             }
         })
-        const courses = courseRes?.data?.map((res) => {
+        const checkingDocuments = checkingDocumentRes?.data?.map((res) => {
             return {
                 value: res.id,
-                label: `${res.name}`
+                label: `${res.title}`
             }
         })
-        setListCourse(courses)
+        setListCheckingDocument(checkingDocuments)
     }
 
     const handleCloseModal = () => {
@@ -97,14 +95,18 @@ const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
             getAllDataPromises()
         }
     }, [open])
+
+    const handleChangeFile = (event) => {
+        const file = event.target.files[0]
+        setFile(file)
+    }
     
     const onSubmit = (data) => {
-        editCheckingDocument(dataEdit?.id, {
-            title: data.title,
-            author: data.author,
-            courseId: data.course.value,
-            description: data.description
-        }).then(result => {
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('description', data.description)
+        formData.append('checkingDocumentId', data.checkingDocument.value)
+        editCheckingDocumentVersion(dataEdit?.id, formData).then(result => {
             if (result.status === 'success') {
                 Swal.fire({
                     title: "Cập nhật kiểm tra tài liệu thành công",
@@ -139,54 +141,19 @@ const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
                     <p>Danh sách tài liệu</p>
                 </div>
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
+                    
                     <Col xs={12}>
-                        <Label className='form-label' for='title'>
-                            Tiêu đề
+                        <Label className='form-label' for='checkingDocument'>
+                            Kiểm tra tài liệu
                         </Label>
                         <Controller
-                            defaultValue={dataEdit?.title}
-                            control={control}
-                            name='title'
-                            render={({ field }) => {
-                                return (
-                                    <Input
-                                        
-                                        {...field}
-                                        id='title'
-                                        placeholder='Nhập tiêu đề'
-                                        invalid={errors.title && true}
-                                    />
-                                )
-                            }}
-                        />
-                        {errors.title && <FormFeedback>{errors.title.message}</FormFeedback>}
-                    </Col>
-                    <Col xs={12}>
-                        <Label className='form-label' for='course'>
-                            Khóa học
-                        </Label>
-                        <Controller
-                            name='course'
+                            name='checkingDocument'
                             control={control}
                             render={({ field }) => (
-                                <Select {...field} id='course' placeholder='Chọn khóa học' invalid={errors.course && true} options={listCourse} />
+                                <Select {...field} id='checkingDocument' placeholder='Chọn kiểm tra tài liệu' invalid={errors.checkingDocument && true} options={listCheckingDocument} />
                             )}
                         />
-                        {errors.course && <FormFeedback>{errors.course.message}</FormFeedback>}
-                    </Col>
-                    <Col xs={12}>
-                        <Label className='form-label' for='author'>
-                            Tác giả
-                        </Label>
-                        <Controller
-                            defaultValue={dataEdit?.author}
-                            name='author'
-                            control={control}
-                            render={({ field }) => (
-                                <Input  {...field} id='author' placeholder='Nhập mô tả' invalid={errors.author && true} />
-                            )}
-                        />
-                        {errors.author && <FormFeedback>{errors.author.message}</FormFeedback>}
+                        {errors.checkingDocument && <FormFeedback>{errors.checkingDocument.message}</FormFeedback>}
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='description'>
@@ -202,7 +169,7 @@ const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
                         />
                         {errors.description && <FormFeedback>{errors.description.message}</FormFeedback>}
                     </Col>
-                    {/* <Col xs={12}>
+                    <Col xs={12}>
                         <Label className='form-label' for='file'>
                             Tài liệu
                         </Label>
@@ -211,11 +178,11 @@ const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
                             name='file'
                             control={control}
                             render={({ field }) => (
-                                <Input  {...field} id='file' placeholder='Chọn tài liệu' invalid={errors.file && true} />
+                                <Input  {...field} id='file' placeholder='Chọn tài liệu' invalid={errors.file && true} onChange={handleChangeFile} />
                             )}
                         />
                         {errors.file && <FormFeedback>{errors.file.message}</FormFeedback>}
-                    </Col> */}
+                    </Col>
                     <Col xs={12} className='text-center mt-2 pt-50'>
                         <Button type='submit' className='me-1' color='primary'>
                             Cập nhật
@@ -230,4 +197,4 @@ const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
     )
 }
 
-export default EditCheckingDocument
+export default EditCheckingDocumentVersion

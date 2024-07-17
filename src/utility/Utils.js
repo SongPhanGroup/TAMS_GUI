@@ -88,6 +88,21 @@ export const toDateString = date => {
 
   return `${dd}/${mm}/${yyyy}`
 }
+
+export const toDateStringv2 = date => {
+  const today = new Date(date)
+  const dd = String(today.getDate()).padStart(2, "0")
+  const mm = String(today.getMonth() + 1).padStart(2, "0")
+  const yyyy = today.getFullYear()
+
+  return `${yyyy}-${mm}-${dd}`
+}
+
+export const convertDateString = (dateString) => {
+  const date = new Date(dateString)
+  return date
+}
+
 export const toDateStringViet = date => {
   const today = new Date(date)
   const dd = String(today.getDate()).padStart(2, "0")

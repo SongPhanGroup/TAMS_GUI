@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState } from "react"
+import { useState, useEffect } from "react"
 // ** Reactstrap Imports
 import {
     Col,
@@ -26,13 +26,18 @@ import '@styles/react/libs/react-select/_react-select.scss'
 import Swal from 'sweetalert2'
 import { postDocument } from "../../../../api/document"
 import { extractingFromFileUpload } from "../../../../api/sentence_doc"
+import { getCourse } from "../../../../api/course"
+import { Loader } from "react-feather"
+import { getMajor } from "../../../../api/major"
+import { getTypeChecking } from "../../../../api/type_checking"
 
 const AddNewDocument = ({ open, handleAddModal, getData }) => {
     // ** States
     const AddNewDocumentSchema = yup.object().shape({
         file: yup.mixed().required("Yêu cầu chọn file"),
         title: yup.string().required("Yêu cầu nhập tiêu đề"),
-        course: yup.string().required("Yêu cầu nhập khóa học"),
+        course: yup.object().required("Yêu cầu nhập khóa học"),
+        author: yup.string().required("Yêu cầu nhập tác giả"),
         description: yup.string().required("Yêu cầu nhập mô tả")
     })
 
@@ -49,6 +54,46 @@ const AddNewDocument = ({ open, handleAddModal, getData }) => {
 
     // ** State
     const [file, setFile] = useState()
+    const [listCourse, setListCourse] = useState([])
+    const [loadingAdd, setLoadingAdd] = useState(false)
+    const [loadingExtract, setLoadingExtract] = useState(false)
+
+    const getAllDataPromises = async () => {
+        const coursePromise = getCourse({ params: { page: 1, perPage: 10, search: '' } })
+        const majorPromise = getMajor({ params: { page: 1, perPage: 10, search: '' } })
+        const typeCheckingPromise = getTypeChecking({ params: { page: 1, perPage: 10, search: '' } })
+
+        const promises = [coursePromise, majorPromise, typeCheckingPromise]
+        const results = await Promise.allSettled(promises)
+        const responseData = promises.reduce((acc, promise, index) => {
+            if (results[index].status === 'fulfilled') {
+                acc[index] = results[index].value
+            } else {
+                acc[index] = { error: results[index].reason }
+            }
+            return acc
+        }, [])
+
+        const courseRes = responseData[0]
+        results.map((res) => {
+            if (res.status !== 'fulfilled') {
+                setListCourse(null)
+            }
+        })
+        const courses = courseRes?.data?.map((res) => {
+            return {
+                value: res.id,
+                label: `${res.name}`
+            }
+        })
+        setListCourse(courses)
+    }
+
+    useEffect(() => {
+        if (open) {
+            getAllDataPromises()
+        }
+    }, [open])
 
     const handleCloseModal = () => {
         handleAddModal()
@@ -67,8 +112,10 @@ const AddNewDocument = ({ open, handleAddModal, getData }) => {
         formData.append("file", file)
         formData.append("description", data.description)
         formData.append("title", data.title)
-        formData.append("course", data.course)
+        formData.append("courseId", data.course.value)
+        formData.append("author", data.author)
         if (action === "add") {
+            setLoadingAdd(true)
             postDocument(formData).then(result => {
                 if (!result.errors) {
                     Swal.fire({
@@ -85,8 +132,11 @@ const AddNewDocument = ({ open, handleAddModal, getData }) => {
                 getData()
             }).catch(error => {
                 console.log(error)
+            }).finally(() => {
+                setLoadingAdd(false)
             })
         } else {
+            setLoadingExtract(true)
             extractingFromFileUpload(formData).then(result => {
                 if (!result.errors) {
                     Swal.fire({
@@ -103,6 +153,8 @@ const AddNewDocument = ({ open, handleAddModal, getData }) => {
                 getData()
             }).catch(error => {
                 console.log(error)
+            }).finally(() => {
+                setLoadingExtract(false)
             })
         }
     }
@@ -143,10 +195,23 @@ const AddNewDocument = ({ open, handleAddModal, getData }) => {
                             name='course'
                             control={control}
                             render={({ field }) => (
-                                <Input {...field} id='course' placeholder='Nhập khóa học' invalid={errors.course && true} />
+                                <Select {...field} id='course' placeholder='Chọn khóa học' invalid={errors.course && true} options={listCourse} />
                             )}
                         />
                         {errors.course && <FormFeedback>{errors.course.message}</FormFeedback>}
+                    </Col>
+                    <Col xs={12}>
+                        <Label className='form-label' for='author'>
+                            Tác giả
+                        </Label>
+                        <Controller
+                            name='author'
+                            control={control}
+                            render={({ field }) => (
+                                <Input {...field} id='author' placeholder='Nhập tác giả' invalid={errors.author && true} />
+                            )}
+                        />
+                        {errors.author && <FormFeedback>{errors.author.message}</FormFeedback>}
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='description'>
@@ -168,18 +233,25 @@ const AddNewDocument = ({ open, handleAddModal, getData }) => {
                         <Controller
                             name='file'
                             control={control}
-                            render={() => (
-                                <Input id='file' type='file' placeholder='Chọn tài liệu' invalid={errors.file && true} onChange={handleChangeFile} />
+                            render={({ field }) => (
+                                <Input id='file' type='file' placeholder='Chọn tài liệu' invalid={errors.file && true} onChange={(event) => {
+                                    handleChangeFile(event)
+                                    field.onChange(event)
+                                }} />
                             )}
                         />
                         {errors.file && <FormFeedback>{errors.file.message}</FormFeedback>}
                     </Col>  
                     <Col xs={12} className='text-center mt-2 pt-50'>
                         <Button type='submit' name="add" className='me-1' color='primary'>
-                            Thêm
+                            {
+                                loadingAdd === true ? <Loader color="#fff" size="16px" /> : 'Thêm'
+                            }
                         </Button>
                         <Button type='submit' name="extract" className='me-1' color='success'>
-                            Tách câu
+                            {
+                                loadingExtract === true ? <Loader color="#fff" size="16px" /> : 'Tách câu'
+                            }
                         </Button>
                         <Button type='reset' color='secondary' outline onClick={handleCloseModal}>
                             Hủy

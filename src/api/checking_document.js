@@ -1,5 +1,4 @@
 import { API } from "./API"
-import { API_FormData } from "./API_FormData"
 
 export const getCheckingDocument = async (query) => {
   const uri = `/checking-document`
@@ -9,7 +8,13 @@ export const getCheckingDocument = async (query) => {
 
 export const postCheckingDocument = async (body) => {
   const uri = `/checking-document`
-  const res = await API_FormData.post(uri, body)
+  const res = await API.post(uri, body)
+  return res
+}
+
+export const editCheckingDocument = async (id, body) => {
+  const uri = `/checking-document/${id}`
+  const res = await API.put(uri, body)
   return res
 }
 

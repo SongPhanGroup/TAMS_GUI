@@ -1,5 +1,5 @@
 // ** React Imports
-import React, { Fragment, useState, forwardRef, useEffect, useRef, useContext } from 'react'
+import React, { Fragment, useState, forwardRef, useEffect, useContext } from 'react'
 // imprt thư viện của bảng
 import ReactPaginate from 'react-paginate'
 import DataTable from 'react-data-table-component'
@@ -20,6 +20,7 @@ import Swal from 'sweetalert2'
 // import withReactContent from 'sweetalert2-react-content'
 import { AbilityContext } from '@src/utility/context/Can'
 import WaitingModal from '../../../views/ui-elements/waiting-modals'
+import Select from 'react-select'
 // ** Reactstrap Import
 import {
     Row,
@@ -43,6 +44,9 @@ import AddNewDocument from './modal/AddNewModal'
 import EditDocument from './modal/EditModal'
 import { toDateString } from '../../../utility/Utils'
 import { extractingFromAllDoc, extractingFromDoc } from '../../../api/sentence_doc'
+import { getCourse } from '../../../api/course'
+import { getDocumentType } from '../../../api/document_type'
+import { getMajor } from '../../../api/major'
 
 // ** Bootstrap Checkbox Component
 const BootstrapCheckbox = forwardRef((props, ref) => (
@@ -53,13 +57,15 @@ const BootstrapCheckbox = forwardRef((props, ref) => (
 
 const Document = () => {
     const ability = useContext(AbilityContext)
-    const inputFile = useRef(null)
     // ** States
     const [loading, setLoading] = useState(true)
     const [modalAddNew, setModalAddNew] = useState(false)
     const [modalEdit, setModalEdit] = useState(false)
     const [currentPage, setCurrentPage] = useState(1)
     const [searchValue, setSearchValue] = useState('')
+    const [courseId, setCourseId] = useState()
+    const [typeId, setTypeId] = useState()
+    const [majorId, setMajorId] = useState()
     // const [filteredData, setFilteredData] = useState([])
     const [perPage, setPerPage] = useState(10)
     const [data, setData] = useState([])
@@ -70,12 +76,69 @@ const Document = () => {
         setDataEdit(data)
         setModalEdit(!modalEdit)
     }
+
+    const [listCourse, setListCourse] = useState([])
+    const [listDocumentType, setListDocumentType] = useState([])
+    const [listMajor, setListMajor] = useState([])
+
+    const getAllDataPromises = async () => {
+        const coursePromise = getCourse({ params: { page: 1, perPage: 10, search: '' } })
+        const documentTypePromise = getDocumentType({ params: { page: 1, perPage: 10, search: '' } })
+        const majorPromise = getMajor({ params: { page: 1, perPage: 10, search: '' } })
+
+        const promises = [coursePromise, documentTypePromise, majorPromise]
+        const results = await Promise.allSettled(promises)
+        const responseData = promises.reduce((acc, promise, index) => {
+            if (results[index].status === 'fulfilled') {
+                acc[index] = results[index].value
+            } else {
+                acc[index] = { error: results[index].reason }
+            }
+            return acc
+        }, [])
+
+        const courseRes = responseData[0]
+        const documentTypeRes = responseData[1]
+        const majorRes = responseData[2]
+        results.map((res) => {
+            if (res.status !== 'fulfilled') {
+                setListCourse(null)
+                setListDocumentType(null)
+                setListMajor(null)
+            }
+        })
+        const courses = courseRes?.data?.map((res) => {
+            return {
+                value: res.id,
+                label: `${res.name}`
+            }
+        })
+        const documentTypes = documentTypeRes?.data?.map((res) => {
+            return {
+                value: res.id,
+                label: `${res.name}`
+            }
+        })
+        const majors = majorRes?.data?.map((res) => {
+            return {
+                value: res.id,
+                label: `${res.name}`
+            }
+        })
+        setListCourse(courses)
+        setListDocumentType(documentTypes)
+        setListMajor(majors)
+    }
+
     const fetchDocument = () => {
         getDocument({
             params: {
                 page: currentPage,
                 pageSize: perPage,
-                search: searchValue || ""
+                search: searchValue || "",
+                courseId,
+                typeId,
+                majorId
             }
         }).then(res => {
             setData(res?.data)
@@ -88,7 +151,8 @@ const Document = () => {
 
     useEffect(() => {
         fetchDocument()
-    }, [currentPage, searchValue, perPage])
+        getAllDataPromises()
+    }, [currentPage, searchValue, perPage, courseId, typeId, majorId])
 
     const handleAddModal = () => {
         setModalAddNew(!modalAddNew)
@@ -288,12 +352,12 @@ const Document = () => {
             minWidth: "200px",
             selector: row => row.name
         },
-        {
-            name: "Link",
-            center: true,
-            minWidth: "400px",
-            selector: row => row.link
-        },
+        // {
+        //     name: "Link",
+        //     center: true,
+        //     minWidth: "400px",
+        //     selector: row => row.link
+        // },
         {
             name: "Ngày tạo mới",
             center: true,
@@ -312,9 +376,9 @@ const Document = () => {
             minWidth: "150px",
             cell: (row) => {
                 if (row.status === 1) {
-                    return <Badge color='light-success'>Tài liệu đã được xử lý</Badge>
+                    return <Badge color='light-success'>Đã xử lý</Badge>
                 } else {
-                    return <Badge color='light-danger'>Tài liệu chưa được xử lý</Badge>
+                    return <Badge color='light-danger'>Chưa được xử lý</Badge>
                 }
             }
         },
@@ -373,6 +437,30 @@ const Document = () => {
         setPerPage(perPage)
     }
 
+    const handleChangeCourse = (value) => {
+        if (value) {
+            setCourseId(value?.value)
+        } else {
+            setCourseId()
+        }
+    }
+
+    const handleChangeDocumentType = (value) => {
+        if (value) {
+            setTypeId(value?.value)
+        } else {
+            setTypeId()
+        }
+    }
+
+    const handleChangeMajor = (value) => {
+        if (value) {
+            setMajorId(value?.value)
+        } else {
+            setMajorId()
+        }
+    }
+
     // ** Custom Pagination
     // const CustomPagination = () => (
     //     <ReactPaginate
@@ -400,7 +488,6 @@ const Document = () => {
 
     return (
         <Fragment>
-            <input type='file' id='file' ref={inputFile} style={{ display: 'none' }} onChange={e => handleImportFile(e)} />
             <Card style={{ backgroundColor: 'white' }}>
                 <CardHeader className='flex-md-row flex-column align-md-items-center align-items-start border-bottom'>
                     <CardTitle tag='h4'>Danh sách tài liệu</CardTitle>
@@ -441,27 +528,34 @@ const Document = () => {
                     </div>
                 </CardHeader>
                 <Row className='justify-content-end mx-0'>
-                    <Col className='d-flex align-items-center justify-content-end mt-1' md='6' sm='12' style={{ paddingRight: '20px' }}>
-                        <Label className='me-1' for='search-input'>
-                            Tìm kiếm
-                        </Label>
-                        <Input
-                            className='dataTable-filter mb-50'
-                            type='text'
-                            bsSize='sm'
-                            id='search-input'
-                            onChange={(e) => {
-                                if (e.target.value === "") {
-                                    setSearchValue('')
-                                }
-                            }}
-                            onKeyPress={(e) => {
-                                if (e.key === "Enter") {
-                                    setSearchValue(e.target.value)
-                                    setCurrentPage(1)
-                                }
-                            }}
-                        />
+                    <Col className='d-flex align-items-center justify-content-between mt-1' md='12' sm='12' style={{ padding: '0 20px' }}>
+                        <div className='d-flex align-items-center gap-2'>
+                            <Select placeholder="Chọn khóa học" className='mb-50 select-custom' options={listCourse} isClearable onChange={(value) => handleChangeCourse(value)} />
+                            <Select placeholder="Chọn loại tài liệu" className='mb-50 select-custom' options={listDocumentType} isClearable onChange={(value) => handleChangeDocumentType(value)} />
+                            <Select placeholder="Chọn chuyên ngành" className='mb-50 select-custom' options={listMajor} isClearable onChange={(value) => handleChangeMajor(value)} />
+                        </div>
+                        <div className='d-flex align-items-center'>
+                            <Label className='me-1' for='search-input' style={{ minWidth: '80px' }}>
+                                Tìm kiếm
+                            </Label>
+                            <Input
+                                className='dataTable-filter mb-50'
+                                type='text'
+                                bsSize='sm'
+                                id='search-input'
+                                onChange={(e) => {
+                                    if (e.target.value === "") {
+                                        setSearchValue('')
+                                    }
+                                }}
+                                onKeyPress={(e) => {
+                                    if (e.key === "Enter") {
+                                        setSearchValue(e.target.value)
+                                        setCurrentPage(1)
+                                    }
+                                }}
+                            />
+                        </div>
                     </Col>
                 </Row>
                 <div className='react-dataTable react-dataTable-selectable-rows' style={{ marginRight: '20px', marginLeft: '20px' }}>

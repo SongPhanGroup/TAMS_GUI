@@ -48,13 +48,13 @@ const VerticalMenuHeader = props => {
 
   return (
     <div className='navbar-header'>
-      <ul className='nav navbar-nav flex-row'>
+      <ul className='nav navbar-nav flex-row flex-nowrap'>
         <li className='nav-item me-auto'>
           <NavLink to={user ? getHomeRouteForLoggedInUser(user.role) : '/'} className='navbar-brand'>
             <span className='brand-logo'>
-              <img src={themeConfig.app.appLogoImage} alt='logo' />
+              <img style={{scale: 2}} src={themeConfig.app.appLogoImage} alt='logo' />
             </span>
-            <h2 className='brand-text mb-0'>{themeConfig.app.appName}</h2>
+            <h2 style={{whiteSpace: 'break-spaces', fontSize: '16px'}} className='brand-text mb-0'>{themeConfig.app.appName}</h2>
           </NavLink>
         </li>
         <li className='nav-item nav-toggle'>

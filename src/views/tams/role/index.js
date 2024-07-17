@@ -1,11 +1,11 @@
 // ** React Imports
-import React, { Fragment, useState, forwardRef, useEffect, useRef, useContext } from 'react'
+import React, { Fragment, useState, forwardRef, useEffect, useContext } from 'react'
 // imprt thư viện của bảng
 import ReactPaginate from 'react-paginate'
 import DataTable from 'react-data-table-component'
 
 //import icon
-import { ChevronDown, Share, Printer, FileText, File, Grid, Copy, Plus, MoreVertical, Trash, Edit, Search, BarChart, CheckSquare } from 'react-feather'
+import { ChevronDown, Share, Printer, FileText, File, Grid, Copy, Plus, MoreVertical, Trash, Edit, Search, Divide, Command, MinusCircle } from 'react-feather'
 
 //import css
 import '@styles/react/libs/tables/react-dataTable-component.scss'
@@ -21,9 +21,6 @@ import Swal from 'sweetalert2'
 import { AbilityContext } from '@src/utility/context/Can'
 import WaitingModal from '../../../views/ui-elements/waiting-modals'
 import Select from 'react-select'
-import Flatpickr from "react-flatpickr"
-import { Vietnamese } from "flatpickr/dist/l10n/vn.js"
-import "@styles/react/libs/flatpickr/flatpickr.scss"
 // ** Reactstrap Import
 import {
     Row,
@@ -42,11 +39,10 @@ import {
     Badge,
     UncontrolledTooltip
 } from 'reactstrap'
-import { toDateTimeString } from '../../../utility/Utils'
-import { deleteCheckingDocument, detailCheckingDocument, getCheckingDocument } from '../../../api/checking_document'
-import AddNewCheckingDocument from './modal/AddNewModal'
-import EditCheckingDocument from './modal/EditModal'
-import { getCourse } from '../../../api/course'
+import { toDateString } from '../../../utility/Utils'
+import { deleteRole, getRole } from '../../../api/role'
+import AddNewRole from './modal/AddNewModal'
+import EditRole from './modal/EditModal'
 
 // ** Bootstrap Checkbox Component
 const BootstrapCheckbox = forwardRef((props, ref) => (
@@ -55,19 +51,17 @@ const BootstrapCheckbox = forwardRef((props, ref) => (
     </div>
 ))
 
-const CheckingDocument = () => {
+const Role = () => {
     const ability = useContext(AbilityContext)
-    const inputFile = useRef(null)
     // ** States
     const [loading, setLoading] = useState(true)
     const [modalAddNew, setModalAddNew] = useState(false)
     const [modalEdit, setModalEdit] = useState(false)
     const [currentPage, setCurrentPage] = useState(1)
     const [searchValue, setSearchValue] = useState('')
-    const [courseId, setCourseId] = useState()
     // const [filteredData, setFilteredData] = useState([])
     const [perPage, setPerPage] = useState(10)
-    const [dataCheckingDocument, setDataCheckingDocument] = useState([])
+    const [data, setData] = useState([])
     const [totalCount, setTotalCount] = useState()
     const [dataEdit, setDataEdit] = useState()
     // const [infoDelete, setInfoDelete] = useState()
@@ -75,48 +69,15 @@ const CheckingDocument = () => {
         setDataEdit(data)
         setModalEdit(!modalEdit)
     }
-
-    const [listCourse, setListCourse] = useState([])
-
-    const getAllDataPromises = async () => {
-        const coursePromise = getCourse({ params: { page: 1, perPage: 10, search: '' } })
-
-        const promises = [coursePromise]
-        const results = await Promise.allSettled(promises)
-        const responseData = promises.reduce((acc, promise, index) => {
-            if (results[index].status === 'fulfilled') {
-                acc[index] = results[index].value
-            } else {
-                acc[index] = { error: results[index].reason }
-            }
-            return acc
-        }, [])
-
-        const courseRes = responseData[0]
-        results.map((res) => {
-            if (res.status !== 'fulfilled') {
-                setListCourse(null)
-            }
-        })
-        const courses = courseRes?.data?.map((res) => {
-            return {
-                value: res.id,
-                label: `${res.name}`
-            }
-        })
-        setListCourse(courses)
-    }
-
-    const fetchCheckingDocument = () => {
-        getCheckingDocument({
+    const fetchRole = () => {
+        getRole({
             params: {
-                page: currentPage.toString(),
-                pageSize: perPage.toString(),
-                search: searchValue || "",
-                courseId
+                page: currentPage,
+                pageSize: perPage,
+                search: searchValue || ""
             }
         }).then(res => {
-            setDataCheckingDocument(res.data)
+            setData(res?.data)
             setTotalCount(res?.pagination?.totalRecords)
             setLoading(false)
         }).catch(error => {
@@ -125,21 +86,17 @@ const CheckingDocument = () => {
     }
 
     useEffect(() => {
-        getAllDataPromises()
-    }, [])
-
-    useEffect(() => {
-        fetchCheckingDocument()
-    }, [currentPage, searchValue, perPage, courseId])
+        fetchRole()
+    }, [currentPage, searchValue, perPage])
 
     const handleAddModal = () => {
         setModalAddNew(!modalAddNew)
     }
 
-    const handleDeleteCheckingDocument = (data) => {
+    const handleDeleteRole = (data) => {
         return Swal.fire({
             title: '',
-            text: 'Bạn có muốn xóa tài liệu kiểm tra này không?',
+            text: 'Bạn có muốn xóa vai trò này không?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Xóa',
@@ -151,11 +108,11 @@ const CheckingDocument = () => {
             buttonsStyling: false
         }).then((result) => {
             if (result.value) {
-                deleteCheckingDocument(data).then(result => {
+                deleteRole(data).then(result => {
                     if (result.status === 'success') {
                         Swal.fire({
                             icon: 'success',
-                            title: 'Xóa tài liệu kiểm tra thành công!',
+                            title: 'Xóa vai trò thành công!',
                             text: 'Yêu cầu đã được phê duyệt',
                             customClass: {
                                 confirmButton: 'btn btn-success'
@@ -164,21 +121,21 @@ const CheckingDocument = () => {
                     } else {
                         Swal.fire({
                             icon: 'error',
-                            title: 'Xóa tài liệu kiểm tra thất bại!',
+                            title: 'Xóa vai trò thất bại!',
                             text: 'Yêu cầu chưa được phê duyệt',
                             customClass: {
                                 confirmButton: 'btn btn-danger'
                             }
                         })
                     }
-                    fetchCheckingDocument()
+                    fetchRole()
                 }).catch(error => {
                     console.log(error)
                 })
             } else {
                 Swal.fire({
                     title: 'Hủy bỏ!',
-                    text: 'Không xóa tài liệu kiểm tra!',
+                    text: 'Không xóa vai trò!',
                     icon: 'error',
                     customClass: {
                         confirmButton: 'btn btn-success'
@@ -187,6 +144,7 @@ const CheckingDocument = () => {
             }
         })
     }
+
     const columns = [
         {
             name: "STT",
@@ -195,32 +153,16 @@ const CheckingDocument = () => {
             cell: (row, index) => <span>{((currentPage - 1) * perPage) + index + 1}</span>
         },
         {
-            name: "Tên tài liệu",
-            center: true,
-            minWidth: "500px",
-            selector: row => <span style={{
-                whiteSpace: 'break-spaces'
-            }}>{row.title}</span>
-        },
-        {
-            name: "Khóa học",
+            name: "Tên vai trò",
             center: true,
             minWidth: "50px",
-            selector: row => row.courseId
+            selector: row => row.name
         },
         {
-            name: "Tác giả",
+            name: "Ngày tạo mới",
             center: true,
-            minWidth: "200px",
-            selector: row => <span style={{
-                whiteSpace: 'break-spaces'
-            }}>{row.author}</span>
-        },
-        {
-            name: "Ngày kiểm tra",
-            center: true,
-            minWidth: "100px",
-            cell: (row) => <span style={{ textAlign: 'center' }}>{toDateTimeString(row.createdAt)}</span>
+            minWidth: "50px",
+            cell: (row) => <span>{toDateString(row.createdAt)}</span>
         },
         {
             name: 'Mô tả',
@@ -229,63 +171,37 @@ const CheckingDocument = () => {
             selector: row => row.description
         },
         {
-            name: 'Trùng lặp (%)',
-            center: true,
-            minWidth: '100px',
-            selector: row => row.percentage
-        },
-        {
             name: 'Tác vụ',
-            minWidth: "100px",
+            minWidth: "110px",
             center: true,
             cell: (row) => {
                 return (
                     <div className="column-action d-flex align-items-center">
                         {ability.can('update', 'nguoidung') &&
-                            <div id="tooltip_edit" style={{ marginRight: '1rem' }} onClick={() => handleEditModal(row)}>
+                            <div id="tooltip_edit" onClick={() => handleEditModal(row)}>
                                 <Edit
                                     size={15}
                                     style={{ cursor: "pointer", stroke: '#09A863' }}
                                 />
                                 <UncontrolledTooltip placement='top' target='tooltip_edit'>
-                                    Sửa tài liệu kiểm tra
+                                    Chi tiết vai trò
                                 </UncontrolledTooltip>
                             </div>}
                         {ability.can('delete', 'nguoidung') &&
-                            <div id="tooltip_trash" style={{ marginRight: '1rem' }} onClick={() => handleDeleteCheckingDocument(row.id)}>
+                            <div id="tooltip_trash" style={{ marginRight: '1rem', marginLeft: '1rem' }} onClick={() => handleDeleteRole(row.id)}>
                                 <Trash
                                     size={15}
                                     style={{ cursor: "pointer", stroke: "red" }}
                                 />
                                 <UncontrolledTooltip placement='top' target='tooltip_trash'>
-                                    Xóa tài liệu
+                                    Xóa vai trò
                                 </UncontrolledTooltip>
                             </div>}
-                            <div id="tooltip_result" onClick={() => handleDeleteCheckingDocument(row.id)}>
-                                <CheckSquare
-                                    size={15}
-                                    style={{ cursor: "pointer", stroke: "blue" }}
-                                />
-                                <UncontrolledTooltip placement='top' target='tooltip_result'>
-                                    Kết quả kiểm tra
-                                </UncontrolledTooltip>
-                            </div>
                     </div>
                 )
             }
         }
     ]
-
-    const customStyles = {
-        rows: {
-            style: {
-                minHeight: '50px',
-                alignItems: 'center' // chiều cao tối thiểu của hàng
-            }
-        }
-    }
-
-
     // ** Function to handle modalThemNND toggle
     // const handleModalThemNND = () => setModalThemNND(!modalThemNND)
     // const handleModalSuaNND = () => setModalSuaNND(!modalSuaNND)
@@ -298,14 +214,6 @@ const CheckingDocument = () => {
     const handlePerRowsChange = (perPage, page) => {
         setCurrentPage(page)
         setPerPage(perPage)
-    }
-
-    const handleChangeCourse = (value) => {
-        if (value) {
-            setCourseId(value?.value)
-        } else {
-            setCourseId()
-        }
     }
 
     // ** Custom Pagination
@@ -333,98 +241,11 @@ const CheckingDocument = () => {
     //     />
     // )
 
-    const subColumns = [
-        {
-            name: "STT",
-            center: true,
-            width: '100px',
-            cell: (row, index) => <span>{((currentPage - 1) * perPage) + index + 1}</span>
-        },
-        {
-            name: "Mã tài liệu",
-            center: true,
-            width: '100px',
-            selector: row => row.id
-        },
-        {
-            name: "Tên tài liệu",
-            center: true,
-            minWidth: "200px",
-            selector: row => <span style={{
-                whiteSpace: 'break-spaces'
-            }}>{row.name}</span>
-        },
-        {
-            name: "Khóa học",
-            center: true,
-            minWidth: "50px",
-            selector: row => row.courseId
-        },
-        {
-            name: "Tên tác giả",
-            center: true,
-            minWidth: "200px"
-            // selector: row => <span style={{
-            //     whiteSpace: 'break-spaces'
-            // }}>{row.name}</span>
-        },
-        {
-            name: "Phần trăm trùng",
-            center: true,
-            minWidth: "50px",
-            selector: row => row.percentage
-        }
-    ]
-
-    const ExpandedComponent = ({ data }) => {
-        const [dataDetailById, setDataDetailById] = useState([])
-
-        useEffect(() => {
-            detailCheckingDocument(data?.id).then((result) => {
-                const documentResult = result?.data?.documentResult
-                if (Array.isArray(documentResult)) {
-                    setDataDetailById(documentResult)
-                } else {
-                    console.error('Unexpected data format:', documentResult)
-                }
-            }).catch(error => {
-                console.log(error)
-            })
-        }, [data?.id])
-
-        return (
-            <>
-                {loading ? <WaitingModal /> : <DataTable
-                    noHeader
-                    // pagination
-                    columns={subColumns}
-                    // paginationPerPage={perPage}
-                    className='react-dataTable'
-                    sortIcon={<ChevronDown size={10} />}
-                    selectableRowsComponent={BootstrapCheckbox}
-                    // data={searchValue.length ? filteredData.data : data.data}
-                    data={dataDetailById}
-                    // paginationServer
-                    // paginationTotalRows={totalCount}
-                    // paginationComponentOptions={{
-                    //     rowsPerPageText: 'Số hàng trên 1 trang:'
-                    // }}
-                    // onChangeRowsPerPage={handlePerRowsChange}
-                    // onChangePage={handlePagination}
-                    customStyles={customStyles}
-                />}
-            </>
-        )
-    }
-
-    // const ExpandedComponent = ({ data }) => <pre>{JSON.stringify(data, null, 2)}</pre>
-
     return (
         <Fragment>
-            <input type='file' id='file' ref={inputFile} style={{ display: 'none' }} onChange={e => handleImportFile(e)} />
             <Card style={{ backgroundColor: 'white' }}>
                 <CardHeader className='flex-md-row flex-column align-md-items-center align-items-start border-bottom'>
-                    <CardTitle tag='h4'>Danh sách tài liệu kiểm tra</CardTitle>
+                    <CardTitle tag='h4'>Danh sách vai trò</CardTitle>
                     <div className='d-flex mt-md-0 mt-1'>
                         {/* <UncontrolledButtonDropdown>
                             <DropdownToggle color='secondary' caret outline>
@@ -458,13 +279,12 @@ const CheckingDocument = () => {
                     </div>
                 </CardHeader>
                 <Row className='justify-content-end mx-0'>
-                    <Col className='d-flex align-items-center justify-content-start mt-1 gap-2' md='12' sm='12' style={{ paddingRight: '20px' }}>
+                    <Col className='d-flex align-items-center justify-content-end mt-1' md='12' sm='12' style={{ padding: '0 20px' }}>
                         <div className='d-flex align-items-center'>
-                            <Label className='' for='search-input' style={{ minWidth: '65px' }}>
+                            <Label className='me-1' for='search-input' style={{ minWidth: '80px' }}>
                                 Tìm kiếm
                             </Label>
                             <Input
-                                style={{ width: '500px' }}
                                 className='dataTable-filter mb-50'
                                 type='text'
                                 bsSize='sm'
@@ -482,23 +302,6 @@ const CheckingDocument = () => {
                                 }}
                             />
                         </div>
-                        <Select placeholder="Chọn đợt kiểm tra" className='mb-50 select-custom' options={listCourse} isClearable onChange={(value) => handleChangeCourse(value)} />
-                        <div className='d-flex align-items-center'>
-                            <Label className='' for='search-input' style={{ minWidth: '100px' }}>
-                                Ngày kiểm tra
-                            </Label>
-                            <Flatpickr
-                                className="form-control invoice-edit-input date-picker mb-50"
-                                options={{
-                                    dateFormat: "d-m-Y", // format ngày giờ
-                                    locale: {
-                                        ...Vietnamese
-                                    },
-                                    defaultDate: new Date()
-                                }}
-                                placeholder="dd/mm/yyyy"
-                            />
-                        </div>
                     </Col>
                 </Row>
                 <div className='react-dataTable react-dataTable-selectable-rows' style={{ marginRight: '20px', marginLeft: '20px' }}>
@@ -511,7 +314,7 @@ const CheckingDocument = () => {
                         sortIcon={<ChevronDown size={10} />}
                         selectableRowsComponent={BootstrapCheckbox}
                         // data={searchValue.length ? filteredData.data : data.data}
-                        data={dataCheckingDocument}
+                        data={data}
                         paginationServer
                         paginationTotalRows={totalCount}
                         paginationComponentOptions={{
@@ -519,17 +322,13 @@ const CheckingDocument = () => {
                         }}
                         onChangeRowsPerPage={handlePerRowsChange}
                         onChangePage={handlePagination}
-                        customStyles={customStyles}
-                        expandableRows
-                        expandableRowsComponent={ExpandedComponent}
-                        expandOnRowClicked
                     />}
                 </div>
             </Card >
-            <AddNewCheckingDocument open={modalAddNew} handleAddModal={handleAddModal} getData={fetchCheckingDocument} />
-            {dataEdit && <EditCheckingDocument open={modalEdit} handleEditModal={handleEditModal} getData={fetchCheckingDocument} dataEdit={dataEdit} />}
+            <AddNewRole open={modalAddNew} handleAddModal={handleAddModal} getData={fetchRole} />
+            {dataEdit && <EditRole open={modalEdit} handleEditModal={handleEditModal} getData={fetchRole} dataEdit={dataEdit} />}
         </Fragment >
     )
 }
 
-export default CheckingDocument
+export default Role

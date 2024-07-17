@@ -16,19 +16,24 @@ import {
 import { useForm, Controller } from 'react-hook-form'
 import * as yup from "yup"
 import { yupResolver } from '@hookform/resolvers/yup'
+import Select from 'react-select'
 
 // ** Utils
 
 // ** Styles
 import '@styles/react/libs/react-select/_react-select.scss'
 import Swal from 'sweetalert2'
-import { editDocument } from "../../../../api/document"
+import { detailDocument, editDocument } from "../../../../api/document"
+import { useEffect, useState } from "react"
+import { getCourse } from "../../../../api/course"
+import { Loader } from "react-feather"
 
 const EditDocument = ({ open, handleEditModal, dataEdit, getData }) => {
     // ** States
     const EditDocumentSchema = yup.object().shape({
         title: yup.string().required("Đây là trường bắt buộc"),
-        course: yup.string().required("Đây là trường bắt buộc"),
+        course: yup.object().required("Đây là trường bắt buộc"),
+        author: yup.string().required("Đây là trường bắt buộc"),
         description: yup.string().required("Đây là trường bắt buộc")
     })
 
@@ -45,11 +50,58 @@ const EditDocument = ({ open, handleEditModal, dataEdit, getData }) => {
     const handleCloseModal = () => {
         handleEditModal()
     }
+
+    const [listCourse, setListCourse] = useState([])
+    const [loadingEdit, setLoadingEdit] = useState()
+    // const [dataDetail, setDataDetail] = useState()
+    
+    const getAllDataPromises = async () => {
+        const coursePromise = getCourse({ params: { page: 1, perPage: 10, search: '' } })
+
+        const promises = [coursePromise]
+        const results = await Promise.allSettled(promises)
+        const responseData = promises.reduce((acc, promise, index) => {
+            if (results[index].status === 'fulfilled') {
+                acc[index] = results[index].value
+            } else {
+                acc[index] = { error: results[index].reason }
+            }
+            return acc
+        }, [])
+
+        const courseRes = responseData[0]
+        results.map((res) => {
+            if (res.status !== 'fulfilled') {
+                setListCourse(null)
+            }
+        })
+        const courses = courseRes?.data?.map((res) => {
+            return {
+                value: res.id,
+                label: `${res.name}`
+            }
+        })
+        setListCourse(courses)
+    }
+
+    const getDataDetail = () => {
+        detailDocument(dataEdit?.id).then((res) => {
+            console.log(res)
+        })
+    }
+
+    useEffect(() => {
+        if (open) {
+            getAllDataPromises()
+        }
+        getDataDetail()
+    }, [open])
     
     const onSubmit = data => {
+        setLoadingEdit(true)
         editDocument(dataEdit?.id, {
             title: data.title,
-            course: data.course,
+            course: data.course.value,
             description: data.description
         }).then(result => {
             if (!result.error) {
@@ -67,6 +119,8 @@ const EditDocument = ({ open, handleEditModal, dataEdit, getData }) => {
             getData()
         }).catch(error => {
             console.log(error)
+        }).finally(() => {
+            setLoadingEdit(false)
         })
     }
     return (
@@ -83,7 +137,7 @@ const EditDocument = ({ open, handleEditModal, dataEdit, getData }) => {
                             Tiêu đề
                         </Label>
                         <Controller
-                            defaultValue={dataEdit?.title}
+                            defaultValue={dataEdit?.title ?? ''}
                             control={control}
                             name='title'
                             render={({ field }) => {
@@ -104,21 +158,35 @@ const EditDocument = ({ open, handleEditModal, dataEdit, getData }) => {
                             Khóa học
                         </Label>
                         <Controller
-                            defaultValue={dataEdit?.course}
+                            defaultValue={{value: dataEdit.courseId, label: '2'}}
                             name='course'
                             control={control}
                             render={({ field }) => (
-                                <Input {...field} id='course' placeholder='NHập khóa học' invalid={errors.course && true} />
+                                <Select {...field} id='course' placeholder='Chọn khóa học' invalid={errors.course && true} options={listCourse} />
                             )}
                         />
                         {errors.course && <FormFeedback>{errors.course.message}</FormFeedback>}
+                    </Col>
+                    <Col xs={12}>
+                        <Label className='form-label' for='author'>
+                            Tác giả
+                        </Label>
+                        <Controller
+                            defaultValue={dataEdit?.author ?? ''}
+                            name='author'
+                            control={control}
+                            render={({ field }) => (
+                                <Input {...field} id='author' placeholder='Nhập mô tả' invalid={errors.author && true} />
+                            )}
+                        />
+                        {errors.author && <FormFeedback>{errors.author.message}</FormFeedback>}
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='description'>
                             Mô tả
                         </Label>
                         <Controller
-                            defaultValue={dataEdit?.description}
+                            defaultValue={dataEdit?.description ?? ''}
                             name='description'
                             control={control}
                             render={({ field }) => (
@@ -143,7 +211,9 @@ const EditDocument = ({ open, handleEditModal, dataEdit, getData }) => {
                     </Col>
                     <Col xs={12} className='text-center mt-2 pt-50'>
                         <Button type='submit' className='me-1' color='primary'>
-                            Cập nhật
+                            {
+                                loadingEdit === true ? <Loader color="#fff" size="16px" /> : 'Cập nhật'
+                            }
                         </Button>
                         <Button type='reset' color='secondary' outline onClick={handleCloseModal}>
                             Hủy

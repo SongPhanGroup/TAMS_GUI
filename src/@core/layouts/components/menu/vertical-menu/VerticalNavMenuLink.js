@@ -35,7 +35,7 @@ const VerticalNavMenuLink = ({ item, activeItem }) => {
               to: item.navLink || '/',
               className: ({ isActive }) => {
                 if (isActive && !item.disabled) {
-                  return 'd-flex align-items-center active'
+                  return 'd-flex align-items-center active color-bg'
                 }
               }
             })}

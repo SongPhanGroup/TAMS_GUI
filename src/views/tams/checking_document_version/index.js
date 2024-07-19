@@ -20,6 +20,7 @@ import Swal from 'sweetalert2'
 // import withReactContent from 'sweetalert2-react-content'
 import { AbilityContext } from '@src/utility/context/Can'
 import WaitingModal from '../../../views/ui-elements/waiting-modals'
+import Select from 'react-select'
 // ** Reactstrap Import
 import {
     Row,
@@ -42,6 +43,8 @@ import { toDateString } from '../../../utility/Utils'
 import { deleteCheckingDocumentVersion, detailCheckingDocumentVersion, getCheckingDocumentVersion } from '../../../api/checking_document_version'
 import AddNewCheckingDocumentVersion from './modal/AddNewModal'
 import EditCheckingDocumentVersion from './modal/EditModal'
+import { getCourse } from '../../../api/course'
+import { getCheckingDocument } from '../../../api/checking_document'
 
 // ** Bootstrap Checkbox Component
 const BootstrapCheckbox = forwardRef((props, ref) => (
@@ -59,6 +62,8 @@ const CheckingDocumentVersion = () => {
     const [modalEdit, setModalEdit] = useState(false)
     const [currentPage, setCurrentPage] = useState(1)
     const [searchValue, setSearchValue] = useState('')
+    const [courseId, setCourseId] = useState()
+    const [checkingDocumentId, setCheckingDocumentId] = useState()
     // const [filteredData, setFilteredData] = useState([])
     const [perPage, setPerPage] = useState(10)
     const [dataCheckingDocumentVersion, setDataCheckingDocumentVersion] = useState([])
@@ -70,12 +75,56 @@ const CheckingDocumentVersion = () => {
         setModalEdit(!modalEdit)
     }
 
+    const [listCourse, setListCourse] = useState([])
+    const [listCheckingDocument, setListCheckingDocument] = useState([])
+
+    const getAllDataPromises = async () => {
+        const coursePromise = getCourse({ params: { page: 1, perPage: 10, search: '' } })
+        const checkingDocumentPromise = getCheckingDocument({ params: { page: 1, perPage: 10, search: '' } })
+
+        const promises = [coursePromise, checkingDocumentPromise]
+        const results = await Promise.allSettled(promises)
+        const responseData = promises.reduce((acc, promise, index) => {
+            if (results[index].status === 'fulfilled') {
+                acc[index] = results[index].value
+            } else {
+                acc[index] = { error: results[index].reason }
+            }
+            return acc
+        }, [])
+
+        const courseRes = responseData[0]
+        const checkingDocumentRes = responseData[1]
+        results.map((res) => {
+            if (res.status !== 'fulfilled') {
+                setListCourse(null)
+                setListCheckingDocument(null)
+            }
+        })
+        const courses = courseRes?.data?.map((res) => {
+            return {
+                value: res.id,
+                label: `${res.name}`
+            }
+        })
+        const checkingDocuments = checkingDocumentRes?.data?.map((res) => {
+            return {
+                value: res.id,
+                label: `${res.title}`
+            }
+        })
+        setListCourse(courses)
+        setListCheckingDocument(checkingDocuments)
+    }
+
     const fetchCheckingDocumentVersion = () => {
         getCheckingDocumentVersion({
             params: {
                 page: currentPage.toString(),
                 perPage: perPage.toString(),
-                search: searchValue || ""
+                search: searchValue || "",
+                courseId,
+                checkingDocumentId
             }
         }).then(res => {
             setDataCheckingDocumentVersion(res.data)
@@ -88,7 +137,8 @@ const CheckingDocumentVersion = () => {
 
     useEffect(() => {
         fetchCheckingDocumentVersion()
-    }, [currentPage, searchValue, perPage])
+        getAllDataPromises()
+    }, [currentPage, searchValue, perPage, courseId, checkingDocumentId])
 
     const handleAddModal = () => {
         setModalAddNew(!modalAddNew)
@@ -97,7 +147,7 @@ const CheckingDocumentVersion = () => {
     const handleDeleteCheckingDocumentVersion = (data) => {
         return Swal.fire({
             title: '',
-            text: 'Bạn có muốn xóa kiểm tra tài liệu này không?',
+            text: 'Bạn có muốn xóa phiên bản tài liệu kiểm tra này không?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Xóa',
@@ -113,7 +163,7 @@ const CheckingDocumentVersion = () => {
                     if (result.status === 'success') {
                         Swal.fire({
                             icon: 'success',
-                            title: 'Xóa kiểm tra tài liệu thành công!',
+                            title: 'Xóa phiên bản tài liệu kiểm tra thành công!',
                             text: 'Yêu cầu đã được phê duyệt',
                             customClass: {
                                 confirmButton: 'btn btn-success'
@@ -122,7 +172,7 @@ const CheckingDocumentVersion = () => {
                     } else {
                         Swal.fire({
                             icon: 'error',
-                            title: 'Xóa kiểm tra tài liệu thất bại!',
+                            title: 'Xóa phiên bản tài liệu kiểm tra thất bại!',
                             text: 'Yêu cầu chưa được phê duyệt',
                             customClass: {
                                 confirmButton: 'btn btn-danger'
@@ -136,7 +186,7 @@ const CheckingDocumentVersion = () => {
             } else {
                 Swal.fire({
                     title: 'Hủy bỏ!',
-                    text: 'Không xóa kiểm tra tài liệu!',
+                    text: 'Không xóa phiên bản tài liệu kiểm tra!',
                     icon: 'error',
                     customClass: {
                         confirmButton: 'btn btn-success'
@@ -155,34 +205,28 @@ const CheckingDocumentVersion = () => {
         {
             name: "Tên tài liệu",
             center: true,
-            minWidth: "50px",
-            selector: row => row.title
-        },
-        {
-            name: "Khóa học",
-            center: true,
-            minWidth: "50px"
-            // selector: row => <span>{JSON.parse(row.course.name)}</span>
-        },
-        {
-            name: "Tác giả",
-            center: true,
             minWidth: "200px",
             selector: row => <span style={{
                 whiteSpace: 'break-spaces'
-            }}>{row.author}</span>
+            }}>{row.fileName}</span>
+        },
+        {
+            name: "Đợt kiểm tra",
+            center: true,
+            minWidth: "50px",
+            selector: row => row.courseId
+        },
+        {
+            name: "Kiểm tra tài liệu",
+            center: true,
+            minWidth: "200px",
+            selector: row => row.checkingDocumentId
         },
         {
             name: "Ngày kiểm tra",
             center: true,
             minWidth: "100px",
             cell: (row) => <span>{toDateString(row.createdAt)}</span>
-        },
-        {
-            name: "Ngôn ngữ",
-            center: true,
-            minWidth: "100px",
-            cell: (row) => row.language
         },
         {
             name: 'Mô tả',
@@ -204,7 +248,7 @@ const CheckingDocumentVersion = () => {
                                     style={{ cursor: "pointer", stroke: '#09A863' }}
                                 />
                                 <UncontrolledTooltip placement='top' target='tooltip_edit'>
-                                    Sửa kiểm tra tài liệu
+                                    Sửa phiên bản tài liệu kiểm tra
                                 </UncontrolledTooltip>
                             </div>}
                         {ability.can('delete', 'nguoidung') &&
@@ -245,6 +289,22 @@ const CheckingDocumentVersion = () => {
         setPerPage(perPage)
     }
 
+    const handleChangeCourse = (value) => {
+        if (value) {
+            setCourseId(value.value)
+        } else {
+            setCourseId()
+        }
+    }
+
+    const handleChangeCheckingDocument = (value) => {
+        if (value) {
+            setCheckingDocumentId(value.value)
+        } else {
+            setCheckingDocumentId()
+        }
+    }
+
     // ** Custom Pagination
     // const CustomPagination = () => (
     //     <ReactPaginate
@@ -278,40 +338,26 @@ const CheckingDocumentVersion = () => {
             cell: (row, index) => <span>{((currentPage - 1) * perPage) + index + 1}</span>
         },
         {
-            name: "Mã tài liệu",
+            name: "Mã kết quả",
             center: true,
             width: '100px',
             selector: row => row.id
         },
         {
-            name: "Tên tài liệu",
+            name: "Loại kiểm tra",
             center: true,
             minWidth: "200px",
-            selector: row => row.name
+            selector: row => row.type_checking_id
         },
         {
-            name: "Khóa học",
-            center: true,
-            minWidth: "50px"
-            // selector: row => row.course
-        },
-        {
-            name: "Tên tác giả",
-            center: true,
-            minWidth: "200px"
-            // selector: row => <span style={{
-            //     whiteSpace: 'break-spaces'
-            // }}>{row.name}</span>
-        },
-        {
-            name: "Phần trăm trùng",
+            name: "Tổng số câu trùng",
             center: true,
             minWidth: "50px",
-            selector: row => row.percentage
+            selector: row => row.similarity_total
         }
     ]
 
-    const ExpandedComponent = ({data}) => {
+    const ExpandedComponent = ({ data }) => {
         const [dataDetailById, setDataDetailById] = useState([])
 
         useEffect(() => {
@@ -359,7 +405,7 @@ const CheckingDocumentVersion = () => {
             <input type='file' id='file' ref={inputFile} style={{ display: 'none' }} onChange={e => handleImportFile(e)} />
             <Card style={{ backgroundColor: 'white' }}>
                 <CardHeader className='flex-md-row flex-column align-md-items-center align-items-start border-bottom'>
-                    <CardTitle tag='h4'>Danh sách tài liệu</CardTitle>
+                    <CardTitle tag='h4'>Danh sách phiên bản tài liệu kiểm tra</CardTitle>
                     <div className='d-flex mt-md-0 mt-1'>
                         {/* <UncontrolledButtonDropdown>
                             <DropdownToggle color='secondary' caret outline>
@@ -393,12 +439,13 @@ const CheckingDocumentVersion = () => {
                     </div>
                 </CardHeader>
                 <Row className='justify-content-end mx-0'>
-                    <Col className='d-flex align-items-center justify-content-between mt-1' md='12' sm='12' style={{ paddingRight: '20px' }}>
+                    <Col className='d-flex align-items-center justify-content-start mt-1 gap-2' md='12' sm='12' style={{ paddingRight: '20px' }}>
                         <div className='d-flex align-items-center'>
-                            <Label className='me-1' for='search-input'>
+                            <Label className='' for='search-input' style={{ minWidth: '65px' }}>
                                 Tìm kiếm
                             </Label>
                             <Input
+                                style={{width: '300px'}}
                                 className='dataTable-filter mb-50'
                                 type='text'
                                 bsSize='sm'
@@ -415,6 +462,10 @@ const CheckingDocumentVersion = () => {
                                     }
                                 }}
                             />
+                        </div>
+                        <div className='d-flex align-items-center gap-2'>
+                            <Select placeholder="Chọn khóa học" className='mb-50 select-custom' options={listCourse} isClearable onChange={(value) => handleChangeCourse(value)} />
+                            <Select placeholder="Chọn KT tài liệu theo đợt" className='mb-50 select-custom' options={listCheckingDocument} isClearable onChange={(value) => handleChangeCheckingDocument(value)} />
                         </div>
                     </Col>
                 </Row>

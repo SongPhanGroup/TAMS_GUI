@@ -96,7 +96,7 @@ const Course = () => {
     const handleDeleteCourse = (data) => {
         return Swal.fire({
             title: '',
-            text: 'Bạn có muốn xóa khóa học này không?',
+            text: 'Bạn có muốn xóa đợt kiểm tra này không?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Xóa',
@@ -112,7 +112,7 @@ const Course = () => {
                     if (result.status === 'success') {
                         Swal.fire({
                             icon: 'success',
-                            title: 'Xóa khóa học thành công!',
+                            title: 'Xóa đợt kiểm tra thành công!',
                             text: 'Yêu cầu đã được phê duyệt',
                             customClass: {
                                 confirmButton: 'btn btn-success'
@@ -121,7 +121,7 @@ const Course = () => {
                     } else {
                         Swal.fire({
                             icon: 'error',
-                            title: 'Xóa khóa học thất bại!',
+                            title: 'Xóa đợt kiểm tra thất bại!',
                             text: 'Yêu cầu chưa được phê duyệt',
                             customClass: {
                                 confirmButton: 'btn btn-danger'
@@ -135,7 +135,7 @@ const Course = () => {
             } else {
                 Swal.fire({
                     title: 'Hủy bỏ!',
-                    text: 'Không xóa khóa học!',
+                    text: 'Không xóa đợt kiểm tra!',
                     icon: 'error',
                     customClass: {
                         confirmButton: 'btn btn-success'
@@ -153,13 +153,13 @@ const Course = () => {
             cell: (row, index) => <span>{((currentPage - 1) * perPage) + index + 1}</span>
         },
         {
-            name: "Tên khóa học",
+            name: "Tên đợt kiểm tra",
             center: true,
             minWidth: "50px",
             selector: row => row.name
         },
         {
-            name: "Thời gian khóa học",
+            name: "Thời gian đợt kiểm tra",
             center: true,
             minWidth: "50px",
             cell: (row) => <span>{toDateString(row.date)}</span>
@@ -184,7 +184,7 @@ const Course = () => {
                                     style={{ cursor: "pointer", stroke: '#09A863' }}
                                 />
                                 <UncontrolledTooltip placement='top' target='tooltip_edit'>
-                                    Chi tiết khóa học
+                                    Chi tiết đợt kiểm tra
                                 </UncontrolledTooltip>
                             </div>}
                         {ability.can('delete', 'nguoidung') &&
@@ -194,7 +194,7 @@ const Course = () => {
                                     style={{ cursor: "pointer", stroke: "red" }}
                                 />
                                 <UncontrolledTooltip placement='top' target='tooltip_trash'>
-                                    Xóa khóa học
+                                    Xóa đợt kiểm tra
                                 </UncontrolledTooltip>
                             </div>}
                     </div>
@@ -245,7 +245,7 @@ const Course = () => {
         <Fragment>
             <Card style={{ backgroundColor: 'white' }}>
                 <CardHeader className='flex-md-row flex-column align-md-items-center align-items-start border-bottom'>
-                    <CardTitle tag='h4'>Danh sách khóa học</CardTitle>
+                    <CardTitle tag='h4'>Danh sách đợt kiểm tra</CardTitle>
                     <div className='d-flex mt-md-0 mt-1'>
                         {/* <UncontrolledButtonDropdown>
                             <DropdownToggle color='secondary' caret outline>

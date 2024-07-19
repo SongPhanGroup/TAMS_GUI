@@ -29,15 +29,23 @@ import { extractingFromFileUpload } from "../../../../api/sentence_doc"
 import { getCourse } from "../../../../api/course"
 import { Loader } from "react-feather"
 import { getMajor } from "../../../../api/major"
-import { getTypeChecking } from "../../../../api/type_checking"
+import { getDocumentType } from "../../../../api/document_type"
 
 const AddNewDocument = ({ open, handleAddModal, getData }) => {
     // ** States
     const AddNewDocumentSchema = yup.object().shape({
         file: yup.mixed().required("Yêu cầu chọn file"),
         title: yup.string().required("Yêu cầu nhập tiêu đề"),
-        course: yup.object().required("Yêu cầu nhập khóa học"),
+        source: yup.string().required("Yêu cầu nhập nguồn tài liệu"),
+        course: yup.object({
+            value: yup.string().required(),
+            label: yup.string().required()
+        }).required("Yêu cầu chọn khóa học").nullable(),
+        documentType: yup.object().required("Yêu cầu chọn loại tài liệu"),
+        major: yup.object().required("Yêu cầu chọn chuyên ngành"),
         author: yup.string().required("Yêu cầu nhập tác giả"),
+        coAuthor: yup.string().required("Yêu cầu nhập đồng tác giả"),
+        supervisor: yup.string().required("Yêu cầu nhập người giám sát"),
         description: yup.string().required("Yêu cầu nhập mô tả")
     })
 
@@ -55,15 +63,17 @@ const AddNewDocument = ({ open, handleAddModal, getData }) => {
     // ** State
     const [file, setFile] = useState()
     const [listCourse, setListCourse] = useState([])
+    const [listDocumentType, setListDocumentType] = useState([])
+    const [listMajor, setListMajor] = useState([])
     const [loadingAdd, setLoadingAdd] = useState(false)
-    const [loadingExtract, setLoadingExtract] = useState(false)
+    // const [loadingExtract, setLoadingExtract] = useState(false)
 
     const getAllDataPromises = async () => {
         const coursePromise = getCourse({ params: { page: 1, perPage: 10, search: '' } })
         const majorPromise = getMajor({ params: { page: 1, perPage: 10, search: '' } })
-        const typeCheckingPromise = getTypeChecking({ params: { page: 1, perPage: 10, search: '' } })
+        const documentTypePromise = getDocumentType({ params: { page: 1, perPage: 10, search: '' } })
 
-        const promises = [coursePromise, majorPromise, typeCheckingPromise]
+        const promises = [coursePromise, documentTypePromise, majorPromise]
         const results = await Promise.allSettled(promises)
         const responseData = promises.reduce((acc, promise, index) => {
             if (results[index].status === 'fulfilled') {
@@ -75,9 +85,13 @@ const AddNewDocument = ({ open, handleAddModal, getData }) => {
         }, [])
 
         const courseRes = responseData[0]
+        const documentTypeRes = responseData[1]
+        const majorRes = responseData[2]
         results.map((res) => {
             if (res.status !== 'fulfilled') {
                 setListCourse(null)
+                setListDocumentType(null)
+                setListMajor(null)
             }
         })
         const courses = courseRes?.data?.map((res) => {
@@ -86,7 +100,21 @@ const AddNewDocument = ({ open, handleAddModal, getData }) => {
                 label: `${res.name}`
             }
         })
+        const documentTypes = documentTypeRes?.data?.map((res) => {
+            return {
+                value: res.id,
+                label: `${res.name}`
+            }
+        })
+        const majors = majorRes?.data?.map((res) => {
+            return {
+                value: res.id,
+                label: `${res.name}`
+            }
+        })
         setListCourse(courses)
+        setListDocumentType(documentTypes)
+        setListMajor(majors)
     }
 
     useEffect(() => {
@@ -112,8 +140,13 @@ const AddNewDocument = ({ open, handleAddModal, getData }) => {
         formData.append("file", file)
         formData.append("description", data.description)
         formData.append("title", data.title)
+        formData.append("source", data.source)
         formData.append("courseId", data.course.value)
+        formData.append("majorId", data.major.value)
+        formData.append("typeId", data.documentType.value)
         formData.append("author", data.author)
+        formData.append("coAuthor", data.coAuthor)
+        formData.append("supervisor", data.supervisor)
         if (action === "add") {
             setLoadingAdd(true)
             postDocument(formData).then(result => {
@@ -167,7 +200,7 @@ const AddNewDocument = ({ open, handleAddModal, getData }) => {
                     <p>Danh sách tài liệu</p>
                 </div>
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
-                    <Col xs={12}>
+                    <Col sm={6} xs={12}>
                         <Label className='form-label' for='title'>
                             Tiêu đề
                         </Label>
@@ -187,33 +220,128 @@ const AddNewDocument = ({ open, handleAddModal, getData }) => {
                         />
                         {errors.title && <FormFeedback>{errors.title.message}</FormFeedback>}
                     </Col>
-                    <Col xs={12}>
+                    <Col sm={6} xs={12}>
+                        <Label className='form-label' for='supervisor'>
+                            Người giám sát
+                        </Label>
+                        <Controller
+                            control={control}
+                            name='supervisor'
+                            render={({ field }) => {
+                                return (
+                                    <Input
+                                        {...field}
+                                        id='supervisor'
+                                        placeholder='Nhập người giám sát'
+                                        invalid={errors.supervisor && true}
+                                    />
+                                )
+                            }}
+                        />
+                        {errors.supervisor && <FormFeedback>{errors.supervisor.message}</FormFeedback>}
+                    </Col>
+                    <Col sm={6} xs={12}>
+                        <Label className='form-label' for='source'>
+                            Nguồn tài liệu
+                        </Label>
+                        <Controller
+                            control={control}
+                            name='source'
+                            render={({ field }) => {
+                                return (
+                                    <Input
+                                        {...field}
+                                        id='source'
+                                        placeholder='Nhập tiêu đề'
+                                        invalid={errors.source && true}
+                                    />
+                                )
+                            }}
+                        />
+                        {errors.source && <FormFeedback>{errors.source.message}</FormFeedback>}
+                    </Col>
+                    <Col sm={6} xs={12}>
+                        <Label className='form-label' for='author'>
+                            Tác giả
+                        </Label>
+                        <Controller
+                            control={control}
+                            name='author'
+                            render={({ field }) => {
+                                return (
+                                    <Input
+                                        {...field}
+                                        id='author'
+                                        placeholder='Nhập tác giả'
+                                        invalid={errors.author && true}
+                                    />
+                                )
+                            }}
+                        />
+                        {errors.author && <FormFeedback>{errors.author.message}</FormFeedback>}
+                    </Col>
+                    <Col sm={6} xs={12}>
+                        <Label className='form-label' for='coAuthor'>
+                            Đồng tác giả
+                        </Label>
+                        <Controller
+                            control={control}
+                            name='coAuthor'
+                            render={({ field }) => {
+                                return (
+                                    <Input
+                                        {...field}
+                                        id='coAuthor'
+                                        placeholder='Nhập đồng tác giả'
+                                        invalid={errors.coAuthor && true}
+                                    />
+                                )
+                            }}
+                        />
+                        {errors.coAuthor && <FormFeedback>{errors.coAuthor.message}</FormFeedback>}
+                    </Col>
+                    <Col sm={6} xs={12}>
                         <Label className='form-label' for='course'>
                             Khóa học
                         </Label>
                         <Controller
                             name='course'
                             control={control}
-                            render={({ field }) => (
-                                <Select {...field} id='course' placeholder='Chọn khóa học' invalid={errors.course && true} options={listCourse} />
-                            )}
+                            render={({ field }) => {
+                                return (
+                                    <Select {...field} name='course' placeholder='Chọn khóa học' invalid={errors.course && true} options={listCourse} value={field.value} onChange={selectedOption => field.onChange(selectedOption)} />
+                                )
+                            }}
                         />
                         {errors.course && <FormFeedback>{errors.course.message}</FormFeedback>}
                     </Col>
-                    <Col xs={12}>
-                        <Label className='form-label' for='author'>
-                            Tác giả
+                    <Col sm={6} xs={12}>
+                        <Label className='form-label' for='documentType'>
+                            Loại tài liệu
                         </Label>
                         <Controller
-                            name='author'
+                            name='documentType'
                             control={control}
                             render={({ field }) => (
-                                <Input {...field} id='author' placeholder='Nhập tác giả' invalid={errors.author && true} />
+                                <Select {...field} id='documentType' placeholder='Chọn loại tài liệu' invalid={errors.documentType && true} options={listDocumentType} />
                             )}
                         />
-                        {errors.author && <FormFeedback>{errors.author.message}</FormFeedback>}
+                        {errors.documentType && <FormFeedback>{errors.documentType.message}</FormFeedback>}
                     </Col>
-                    <Col xs={12}>
+                    <Col sm={6} xs={12}>
+                        <Label className='form-label' for='major'>
+                            Chuyên ngành
+                        </Label>
+                        <Controller
+                            name='major'
+                            control={control}
+                            render={({ field }) => (
+                                <Select {...field} id='major' placeholder='Chọn chuyên ngành' invalid={errors.major && true} options={listMajor} />
+                            )}
+                        />
+                        {errors.major && <FormFeedback>{errors.major.message}</FormFeedback>}
+                    </Col>
+                    <Col sm={6} xs={12}>
                         <Label className='form-label' for='description'>
                             Mô tả
                         </Label>
@@ -226,7 +354,7 @@ const AddNewDocument = ({ open, handleAddModal, getData }) => {
                         />
                         {errors.description && <FormFeedback>{errors.description.message}</FormFeedback>}
                     </Col>
-                    <Col xs={12}>
+                    <Col sm={6} xs={12}>
                         <Label className='form-label' for='file'>
                             Tài liệu
                         </Label>
@@ -241,18 +369,18 @@ const AddNewDocument = ({ open, handleAddModal, getData }) => {
                             )}
                         />
                         {errors.file && <FormFeedback>{errors.file.message}</FormFeedback>}
-                    </Col>  
+                    </Col>
                     <Col xs={12} className='text-center mt-2 pt-50'>
                         <Button type='submit' name="add" className='me-1' color='primary'>
                             {
                                 loadingAdd === true ? <Loader color="#fff" size="16px" /> : 'Thêm'
                             }
                         </Button>
-                        <Button type='submit' name="extract" className='me-1' color='success'>
+                        {/* <Button type='submit' name="extract" className='me-1' color='success'>
                             {
                                 loadingExtract === true ? <Loader color="#fff" size="16px" /> : 'Tách câu'
                             }
-                        </Button>
+                        </Button> */}
                         <Button type='reset' color='secondary' outline onClick={handleCloseModal}>
                             Hủy
                         </Button>

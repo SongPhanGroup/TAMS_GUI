@@ -7,6 +7,9 @@ const Major = lazy(() => import('../../views/tams/major'))
 const DocumentType = lazy(() => import('../../views/tams/document_type'))
 const TypeChecking = lazy(() => import('../../views/tams/type_checking'))
 const Role = lazy(() => import('../../views/tams/role'))
+const Permission = lazy(() => import('../../views/tams/permission'))
+const Organization = lazy(() => import('../../views/tams/organization'))
+const User = lazy(() => import('../../views/tams/user'))
 const CheckingDocumentVersion = lazy(() => import('../../views/tams/checking_document_version'))
 
 const TamsRoutes = [
@@ -37,6 +40,18 @@ const TamsRoutes = [
   {
     path: '/tams/role',
     element: <Role />
+  },
+  {
+    path: '/tams/permission',
+    element: <Permission />
+  },
+  {
+    path: '/tams/organization',
+    element: <Organization />
+  },
+  {
+    path: '/tams/user',
+    element: <User />
   },
   {
     path: '/tams/checking-document-version',

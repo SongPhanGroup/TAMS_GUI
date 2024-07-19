@@ -96,13 +96,13 @@ const EditCourse = ({ open, handleEditModal, dataEdit, getData }) => {
             <ModalHeader className='bg-transparent' toggle={handleCloseModal}></ModalHeader>
             <ModalBody className='px-sm-5 mx-50 pb-5'>
                 <div className='text-center mb-2'>
-                    <h1 className='mb-1'>Cập nhật khóa học</h1>
-                    <p>Danh sách khóa học</p>
+                    <h1 className='mb-1'>Cập nhật đợt kiểm tra</h1>
+                    <p>Danh sách đợt kiểm tra</p>
                 </div>
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                     <Col xs={12}>
                         <Label className='form-label' for='name'>
-                            Tên khóa học
+                            Tên đợt kiểm tra
                         </Label>
                         <Controller
                             defaultValue={dataEdit?.name ?? ''}
@@ -113,7 +113,7 @@ const EditCourse = ({ open, handleEditModal, dataEdit, getData }) => {
                                     <Input
                                         {...field}
                                         id='name'
-                                        placeholder='Nhập tên khóa học'
+                                        placeholder='Nhập tên đợt kiểm tra'
                                         invalid={errors.name && true}
                                     />
                                 )

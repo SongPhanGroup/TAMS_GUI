@@ -43,7 +43,7 @@ const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
     const EditCheckingDocumentSchema = yup.object().shape({
         title: yup.string().required("Yêu cầu nhập tiêu đề"),
         author: yup.string().required("Yêu cầu nhập tác giả"),
-        course: yup.object().required("Yêu cầu nhập khóa học"),
+        course: yup.object().required("Yêu cầu nhập đợt kiểm tra"),
         description: yup.string().required("Yêu cầu nhập mô tả")
     })
 
@@ -163,13 +163,13 @@ const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='course'>
-                            Khóa học
+                            Đợt kiểm tra
                         </Label>
                         <Controller
                             name='course'
                             control={control}
                             render={({ field }) => (
-                                <Select {...field} id='course' placeholder='Chọn khóa học' invalid={errors.course && true} options={listCourse} />
+                                <Select {...field} id='course' placeholder='Chọn đợt kiểm tra' invalid={errors.course && true} options={listCourse} />
                             )}
                         />
                         {errors.course && <FormFeedback>{errors.course.message}</FormFeedback>}

@@ -13,64 +13,85 @@ import {
 } from "reactstrap"
 
 // ** Third Party Components
-import Select from 'react-select'
 import { useForm, Controller } from 'react-hook-form'
 import * as yup from "yup"
 import { yupResolver } from '@hookform/resolvers/yup'
-import Flatpickr from "react-flatpickr"
-
+import Select from 'react-select'
 // ** Utils
 
 // ** Styles
 import '@styles/react/libs/react-select/_react-select.scss'
-import { Vietnamese } from "flatpickr/dist/l10n/vn.js"
-import "@styles/react/libs/flatpickr/flatpickr.scss"
 import Swal from 'sweetalert2'
-import { postCourse } from "../../../../api/course"
-import { useState } from "react"
-import { toDateStringv2 } from "../../../../utility/Utils"
+import { editOrganization, getOrganization } from "../../../../api/organization"
+import { useEffect, useState } from "react"
 
-const AddNewCourse = ({ open, handleAddModal, getData }) => {
+const EditOrganization = ({ open, handleEditModal, dataEdit, getData }) => {
     // ** States
-    const AddNewCourseSchema = yup.object().shape({
-        name: yup.string().required("Yêu cầu nhập tên đợt kiểm tra"),
-        // date: yup.date().required("Yêu cầu nhập tên đợt kiểm tra"),
-        description: yup.string().required("Yêu cầu nhập mô tả")
+    const EditOrganizationSchema = yup.object().shape({
+        name: yup.string().required("Đây là trường bắt buộc"),
+        description: yup.string().required("Đây là trường bắt buộc")
     })
 
     // ** Hooks
     const {
-        reset,
         control,
         handleSubmit,
         formState: { errors }
     } = useForm({
         mode: 'onChange',
-        resolver: yupResolver(AddNewCourseSchema)
+        resolver: yupResolver(EditOrganizationSchema)
     })
 
-    // ** State
-    const [picker, setPicker] = useState(new Date())
-
     const handleCloseModal = () => {
-        handleAddModal()
-        reset()
+        handleEditModal()
     }
 
-    const handleChangeDate = (date) => {
-        setPicker(date[0])
+    const [listOrganization, setListOrganization] = useState([])
+
+    const getAllDataPromises = async () => {
+        const organizationPromise = getOrganization({ params: { page: 1, perPage: 10, search: '' } })
+
+        const promises = [organizationPromise]
+        const results = await Promise.allSettled(promises)
+        const responseData = promises.reduce((acc, promise, index) => {
+            if (results[index].status === 'fulfilled') {
+                acc[index] = results[index].value
+            } else {
+                acc[index] = { error: results[index].reason }
+            }
+            return acc
+        }, [])
+
+        const organizationRes = responseData[0]
+        results.map((res) => {
+            if (res.status !== 'fulfilled') {
+                setListOrganization(null)
+            }
+        })
+        const organizations = organizationRes?.data?.map((res) => {
+            return {
+                value: res.id,
+                label: `${res.name}`
+            }
+        })
+        setListOrganization(organizations)
     }
 
-    const onSubmit = (data) => {
-        // Lấy nút submit đã được nhấn
-        postCourse({
+    useEffect(() => {
+        if (open) {
+            getAllDataPromises()
+        }
+    }, [open])
+    
+    const onSubmit = data => {
+        editOrganization(dataEdit?.id, {
             name: data.name,
-            date: toDateStringv2(picker),
+            key: data.key,
             description: data.description
         }).then(result => {
             if (result.status === 'success') {
                 Swal.fire({
-                    title: "Thêm mới đợt kiểm tra thành công",
+                    title: "Cập nhật đơn vị thành công",
                     text: "Yêu cầu đã được phê duyệt!",
                     icon: "success",
                     customClass: {
@@ -79,8 +100,8 @@ const AddNewCourse = ({ open, handleAddModal, getData }) => {
                 })
             } else {
                 Swal.fire({
-                    title: "Thêm mới đợt kiểm tra thất bại",
-                    text: "Yêu cầu đã được phê duyệt!",
+                    title: "Cập nhật đơn vị thất bại",
+                    text: "Có lỗi xảy ra, vui lòng thử lại sau!",
                     icon: "error",
                     customClass: {
                         confirmButton: "btn btn-danger"
@@ -94,19 +115,20 @@ const AddNewCourse = ({ open, handleAddModal, getData }) => {
         })
     }
     return (
-        <Modal isOpen={open} toggle={handleAddModal} className='modal-dialog-centered modal-md'>
+        <Modal isOpen={open} toggle={handleEditModal} className='modal-dialog-centered modal-md'>
             <ModalHeader className='bg-transparent' toggle={handleCloseModal}></ModalHeader>
             <ModalBody className='px-sm-5 mx-50 pb-5'>
                 <div className='text-center mb-2'>
-                    <h1 className='mb-1'>Thêm mới đợt kiểm tra</h1>
-                    <p>Danh sách đợt kiểm tra</p>
+                    <h1 className='mb-1'>Cập nhật đơn vị</h1>
+                    <p>Danh sách đơn vị</p>
                 </div>
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                     <Col xs={12}>
                         <Label className='form-label' for='name'>
-                            Tên đợt kiểm tra
+                            Tên đơn vị
                         </Label>
                         <Controller
+                            defaultValue={dataEdit?.name ?? ''}
                             control={control}
                             name='name'
                             render={({ field }) => {
@@ -114,7 +136,7 @@ const AddNewCourse = ({ open, handleAddModal, getData }) => {
                                     <Input
                                         {...field}
                                         id='name'
-                                        placeholder='Nhập tên đợt kiểm tra'
+                                        placeholder='Nhập tên đơn vị'
                                         invalid={errors.name && true}
                                     />
                                 )
@@ -123,37 +145,26 @@ const AddNewCourse = ({ open, handleAddModal, getData }) => {
                         {errors.name && <FormFeedback>{errors.name.message}</FormFeedback>}
                     </Col>
                     <Col xs={12}>
-                        <Label className='form-label' for='date'>
-                            Thời gian
+                        <Label className='form-label' for='parentId'>
+                            Đơn vị cấp trên
                         </Label>
                         <Controller
                             control={control}
-                            name='date'
-                            render={() => {
+                            name='parentId'
+                            render={({ field }) => {
                                 return (
-                                    <Flatpickr
-                                        className="form-control invoice-edit-input date-picker"
-                                        options={{
-                                            dateFormat: "d-m-Y", // format ngày giờ
-                                            locale: {
-                                                ...Vietnamese
-                                            },
-                                            defaultDate: new Date()
-                                        }}
-                                        placeholder="dd/mm/yyyy"
-                                        onChange={handleChangeDate}
-                                    />
-
+                                    <Select {...field} name='parentId' placeholder='Chọn đơn vị cấp trên' invalid={errors.course && true} options={listOrganization} value={field.value} onChange={selectedOption => field.onChange(selectedOption)} />
                                 )
                             }}
                         />
-                        {/* {errors.date && <FormFeedback>{errors.date.message}</FormFeedback>} */}
+                        {errors.parentId && <FormFeedback>{errors.parentId.message}</FormFeedback>}
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='description'>
                             Mô tả
                         </Label>
                         <Controller
+                            defaultValue={dataEdit?.description ?? ''}
                             name='description'
                             control={control}
                             render={({ field }) => (
@@ -163,8 +174,8 @@ const AddNewCourse = ({ open, handleAddModal, getData }) => {
                         {errors.description && <FormFeedback>{errors.description.message}</FormFeedback>}
                     </Col>
                     <Col xs={12} className='text-center mt-2 pt-50'>
-                        <Button type='submit' name="add" className='me-1' color='primary'>
-                            Thêm
+                        <Button type='submit' className='me-1' color='primary'>
+                            Cập nhật
                         </Button>
                         <Button type='reset' color='secondary' outline onClick={handleCloseModal}>
                             Hủy
@@ -176,4 +187,4 @@ const AddNewCourse = ({ open, handleAddModal, getData }) => {
     )
 }
 
-export default AddNewCourse
+export default EditOrganization

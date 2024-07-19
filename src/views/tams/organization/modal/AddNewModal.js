@@ -1,5 +1,4 @@
 // ** React Imports
-import { useEffect, useState } from "react"
 // ** Reactstrap Imports
 import {
     Col,
@@ -10,29 +9,27 @@ import {
     ModalBody,
     ModalHeader,
     Row,
-    Button,
-    Form
+    Button
 } from "reactstrap"
 
 // ** Third Party Components
-import Select from 'react-select'
 import { useForm, Controller } from 'react-hook-form'
 import * as yup from "yup"
 import { yupResolver } from '@hookform/resolvers/yup'
+import Select from 'react-select'
 
 // ** Utils
 
 // ** Styles
 import '@styles/react/libs/react-select/_react-select.scss'
 import Swal from 'sweetalert2'
-import { postCheckingDocument } from "../../../../api/checking_document"
-import { getCourse } from "../../../../api/course"
+import { getOrganization, postOrganization } from "../../../../api/organization"
+import { useEffect, useState } from "react"
 
-const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
-    const AddNewCheckingDocumentSchema = yup.object().shape({
-        title: yup.string().required("Yêu cầu nhập tiêu đề"),
-        author: yup.string().required("Yêu cầu nhập tác giả"),
-        course: yup.object().required("Yêu cầu nhập đợt kiểm tra"),
+const AddNewOrganization = ({ open, handleAddModal, getData }) => {
+    // ** States
+    const AddNewOrganizationSchema = yup.object().shape({
+        name: yup.string().required("Yêu cầu nhập tên đơn vị"),
         description: yup.string().required("Yêu cầu nhập mô tả")
     })
 
@@ -44,17 +41,16 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
         formState: { errors }
     } = useForm({
         mode: 'onChange',
-        resolver: yupResolver(AddNewCheckingDocumentSchema)
+        resolver: yupResolver(AddNewOrganizationSchema)
     })
 
     // ** State
-    // const [file, setFile] = useState()
-    const [listCourse, setListCourse] = useState([])
+    const [listOrganization, setListOrganization] = useState([])
 
     const getAllDataPromises = async () => {
-        const coursePromise = getCourse({ params: { page: 1, perPage: 10, search: '' } })
+        const organizationPromise = getOrganization({ params: { page: 1, perPage: 10, search: '' } })
 
-        const promises = [coursePromise]
+        const promises = [organizationPromise]
         const results = await Promise.allSettled(promises)
         const responseData = promises.reduce((acc, promise, index) => {
             if (results[index].status === 'fulfilled') {
@@ -65,19 +61,19 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
             return acc
         }, [])
 
-        const courseRes = responseData[0]
+        const organizationRes = responseData[0]
         results.map((res) => {
             if (res.status !== 'fulfilled') {
-                setListCourse(null)
+                setListOrganization(null)
             }
         })
-        const courses = courseRes?.data?.map((res) => {
+        const organizations = organizationRes?.data?.map((res) => {
             return {
                 value: res.id,
                 label: `${res.name}`
             }
         })
-        setListCourse(courses)
+        setListOrganization(organizations)
     }
 
     useEffect(() => {
@@ -91,21 +87,12 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
         reset()
     }
 
-    // const handleChangeFile = (event) => {
-    //     const file = event.target.files[0]
-    //     setFile(file)
-    // }
-
     const onSubmit = (data) => {
-        postCheckingDocument({
-            title: data.title,
-            author: data.author,
-            courseId: data.course.value,
-            description: data.description
-        }).then(result => {
+        // Lấy nút submit đã được nhấn
+        postOrganization(data).then(result => {
             if (result.status === 'success') {
                 Swal.fire({
-                    title: "Thêm mới kiểm tra tài liệu thành công",
+                    title: "Thêm mới đơn vị thành công",
                     text: "Yêu cầu đã được phê duyệt!",
                     icon: "success",
                     customClass: {
@@ -114,8 +101,8 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
                 })
             } else {
                 Swal.fire({
-                    title: "Thêm mới kiểm tra tài liệu thất bại",
-                    text: "Vui lòng thử lại sau!",
+                    title: "Cập nhật đơn vị thất bại",
+                    text: "Có lỗi xảy ra, vui lòng thử lại sau!",
                     icon: "error",
                     customClass: {
                         confirmButton: "btn btn-danger"
@@ -128,60 +115,49 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
             console.log(error)
         })
     }
-
     return (
-        <Modal isOpen={open} toggle={handleAddModal} className='modal-dialog-centered modal-lg'>
+        <Modal isOpen={open} toggle={handleAddModal} className='modal-dialog-centered modal-md'>
             <ModalHeader className='bg-transparent' toggle={handleCloseModal}></ModalHeader>
             <ModalBody className='px-sm-5 mx-50 pb-5'>
                 <div className='text-center mb-2'>
-                    <h1 className='mb-1'>Thông tin tài liệu kiểm tra</h1>
+                    <h1 className='mb-1'>Thêm mới đơn vị</h1>
+                    <p>Danh sách đơn vị</p>
                 </div>
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                     <Col xs={12}>
-                        <Label className='form-label' for='title'>
-                            Tiêu đề
+                        <Label className='form-label' for='name'>
+                            Tên đơn vị
                         </Label>
                         <Controller
                             control={control}
-                            name='title'
+                            name='name'
                             render={({ field }) => {
                                 return (
                                     <Input
                                         {...field}
-                                        id='title'
-                                        placeholder='Nhập tiêu đề'
-                                        invalid={errors.title && true}
+                                        id='name'
+                                        placeholder='Nhập tên đơn vị'
+                                        invalid={errors.name && true}
                                     />
                                 )
                             }}
                         />
-                        {errors.title && <FormFeedback>{errors.title.message}</FormFeedback>}
+                        {errors.name && <FormFeedback>{errors.name.message}</FormFeedback>}
                     </Col>
                     <Col xs={12}>
-                        <Label className='form-label' for='course'>
-                            Đợt kiểm tra
+                        <Label className='form-label' for='parentId'>
+                            Đơn vị cấp trên
                         </Label>
                         <Controller
-                            name='course'
                             control={control}
-                            render={({ field }) => (
-                                <Select {...field} id='course' placeholder='Chọn đợt kiểm tra' invalid={errors.course && true} options={listCourse} />
-                            )}
+                            name='parentId'
+                            render={({ field }) => {
+                                return (
+                                    <Select {...field} name='parentId' placeholder='Chọn đơn vị cấp trên' invalid={errors.course && true} options={listOrganization} value={field.value} onChange={selectedOption => field.onChange(selectedOption)} />
+                                )
+                            }}
                         />
-                        {errors.course && <FormFeedback>{errors.course.message}</FormFeedback>}
-                    </Col>
-                    <Col xs={12}>
-                        <Label className='form-label' for='author'>
-                            Tác giả
-                        </Label>
-                        <Controller
-                            name='author'
-                            control={control}
-                            render={({ field }) => (
-                                <Input {...field} id='author' placeholder='Nhập tác giả' invalid={errors.author && true} />
-                            )}
-                        />
-                        {errors.author && <FormFeedback>{errors.author.message}</FormFeedback>}
+                        {errors.parentId && <FormFeedback>{errors.parentId.message}</FormFeedback>}
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='description'>
@@ -196,24 +172,8 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
                         />
                         {errors.description && <FormFeedback>{errors.description.message}</FormFeedback>}
                     </Col>
-                    {/* <Col xs={12}>
-                        <Label className='form-label' for='file'>
-                            Tài liệu
-                        </Label>
-                        <Controller
-                            name='file'
-                            control={control}
-                            render={({ field }) => (
-                                <Input {...field} id='file' type='file' placeholder='Chọn tài liệu' invalid={errors.file && true} onChange={(event) => {
-                                    handleChangeFile(event)
-                                    field.onChange(event)
-                                }} />
-                            )}
-                        />
-                        {errors.file && <FormFeedback>{errors.file.message}</FormFeedback>}
-                    </Col> */}
                     <Col xs={12} className='text-center mt-2 pt-50'>
-                        <Button type='submit' name='add' className='me-1' color='primary'>
+                        <Button type='submit' name="add" className='me-1' color='primary'>
                             Thêm
                         </Button>
                         <Button type='reset' color='secondary' outline onClick={handleCloseModal}>
@@ -226,4 +186,4 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
     )
 }
 
-export default AddNewCheckingDocument
+export default AddNewOrganization

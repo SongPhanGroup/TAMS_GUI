@@ -1,5 +1,5 @@
 // ** Icons Import
-import { Book, Calendar, ChevronsDown, ChevronsUp, Clipboard, FileMinus, FilePlus, FileText, Grid, UserCheck } from 'react-feather'
+import { Book, Calendar, ChevronsDown, ChevronsUp, Clipboard, FileMinus, FilePlus, FileText, Grid, Menu, UserCheck, UserPlus, Users } from 'react-feather'
 
 export default [
   {
@@ -54,6 +54,12 @@ export default [
     navLink: '/tams/major'
   },
   {
+    id: 'organization',
+    title: 'Đơn vị',
+    icon: <Menu size={20} />,
+    navLink: '/tams/organization'
+  },
+  {
     header: 'Quản lý người dùng'
   },
   {
@@ -61,5 +67,17 @@ export default [
     title: 'Vai trò',
     icon: <UserCheck size={20} />,
     navLink: '/tams/role'
+  },
+  {
+    id: 'permission',
+    title: 'Phân quyền',
+    icon: <UserPlus size={20} />,
+    navLink: '/tams/permission'
+  },
+  {
+    id: 'user',
+    title: 'Người dùng',
+    icon: <Users size={20} />,
+    navLink: '/tams/user'
   }
 ]

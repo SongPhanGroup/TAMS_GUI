@@ -39,13 +39,10 @@ import {
     Badge,
     UncontrolledTooltip
 } from 'reactstrap'
-import { deleteDocument, getDocument } from '../../../api/document'
-import AddNewDocument from './modal/AddNewModal'
-import EditDocument from './modal/EditModal'
 import { toDateString } from '../../../utility/Utils'
-import { getCourse } from '../../../api/course'
-import { getDocumentType } from '../../../api/document_type'
-import { getMajor } from '../../../api/major'
+import { deletePermission, getPermission } from '../../../api/permission'
+import AddNewPermission from './modal/AddNewModal'
+import EditPermission from './modal/EditModal'
 
 // ** Bootstrap Checkbox Component
 const BootstrapCheckbox = forwardRef((props, ref) => (
@@ -54,7 +51,7 @@ const BootstrapCheckbox = forwardRef((props, ref) => (
     </div>
 ))
 
-const Document = () => {
+const Permission = () => {
     const ability = useContext(AbilityContext)
     // ** States
     const [loading, setLoading] = useState(true)
@@ -62,9 +59,6 @@ const Document = () => {
     const [modalEdit, setModalEdit] = useState(false)
     const [currentPage, setCurrentPage] = useState(1)
     const [searchValue, setSearchValue] = useState('')
-    const [courseId, setCourseId] = useState()
-    const [typeId, setTypeId] = useState()
-    const [majorId, setMajorId] = useState()
     // const [filteredData, setFilteredData] = useState([])
     const [perPage, setPerPage] = useState(10)
     const [data, setData] = useState([])
@@ -75,69 +69,12 @@ const Document = () => {
         setDataEdit(data)
         setModalEdit(!modalEdit)
     }
-
-    const [listCourse, setListCourse] = useState([])
-    const [listDocumentType, setListDocumentType] = useState([])
-    const [listMajor, setListMajor] = useState([])
-
-    const getAllDataPromises = async () => {
-        const coursePromise = getCourse({ params: { page: 1, perPage: 10, search: '' } })
-        const documentTypePromise = getDocumentType({ params: { page: 1, perPage: 10, search: '' } })
-        const majorPromise = getMajor({ params: { page: 1, perPage: 10, search: '' } })
-
-        const promises = [coursePromise, documentTypePromise, majorPromise]
-        const results = await Promise.allSettled(promises)
-        const responseData = promises.reduce((acc, promise, index) => {
-            if (results[index].status === 'fulfilled') {
-                acc[index] = results[index].value
-            } else {
-                acc[index] = { error: results[index].reason }
-            }
-            return acc
-        }, [])
-
-        const courseRes = responseData[0]
-        const documentTypeRes = responseData[1]
-        const majorRes = responseData[2]
-        results.map((res) => {
-            if (res.status !== 'fulfilled') {
-                setListCourse(null)
-                setListDocumentType(null)
-                setListMajor(null)
-            }
-        })
-        const courses = courseRes?.data?.map((res) => {
-            return {
-                value: res.id,
-                label: `${res.name}`
-            }
-        })
-        const documentTypes = documentTypeRes?.data?.map((res) => {
-            return {
-                value: res.id,
-                label: `${res.name}`
-            }
-        })
-        const majors = majorRes?.data?.map((res) => {
-            return {
-                value: res.id,
-                label: `${res.name}`
-            }
-        })
-        setListCourse(courses)
-        setListDocumentType(documentTypes)
-        setListMajor(majors)
-    }
-
-    const fetchDocument = () => {
-        getDocument({
+    const fetchPermission = () => {
+        getPermission({
             params: {
                 page: currentPage,
                 pageSize: perPage,
-                search: searchValue || "",
-                courseId,
-                typeId,
-                majorId
+                search: searchValue || ""
             }
         }).then(res => {
             setData(res?.data)
@@ -149,18 +86,17 @@ const Document = () => {
     }
 
     useEffect(() => {
-        fetchDocument()
-        getAllDataPromises()
-    }, [currentPage, searchValue, perPage, courseId, typeId, majorId])
+        fetchPermission()
+    }, [currentPage, searchValue, perPage])
 
     const handleAddModal = () => {
         setModalAddNew(!modalAddNew)
     }
 
-    const handleDeleteDocument = (data) => {
+    const handleDeletePermission = (data) => {
         return Swal.fire({
             title: '',
-            text: 'Bạn có muốn xóa tài liệu này không?',
+            text: 'Bạn có muốn xóa quyền này không?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Xóa',
@@ -172,11 +108,11 @@ const Document = () => {
             buttonsStyling: false
         }).then((result) => {
             if (result.value) {
-                deleteDocument(data).then(result => {
+                deletePermission(data).then(result => {
                     if (result.status === 'success') {
                         Swal.fire({
                             icon: 'success',
-                            title: 'Xóa tài liệu thành công!',
+                            title: 'Xóa quyền thành công!',
                             text: 'Yêu cầu đã được phê duyệt',
                             customClass: {
                                 confirmButton: 'btn btn-success'
@@ -185,21 +121,21 @@ const Document = () => {
                     } else {
                         Swal.fire({
                             icon: 'error',
-                            title: 'Xóa tài liệu thất bại!',
+                            title: 'Xóa quyền thất bại!',
                             text: 'Yêu cầu chưa được phê duyệt',
                             customClass: {
                                 confirmButton: 'btn btn-danger'
                             }
                         })
                     }
-                    fetchDocument()
+                    fetchPermission()
                 }).catch(error => {
                     console.log(error)
                 })
             } else {
                 Swal.fire({
                     title: 'Hủy bỏ!',
-                    text: 'Không xóa tài liệu!',
+                    text: 'Không xóa quyền!',
                     icon: 'error',
                     customClass: {
                         confirmButton: 'btn btn-success'
@@ -217,24 +153,16 @@ const Document = () => {
             cell: (row, index) => <span>{((currentPage - 1) * perPage) + index + 1}</span>
         },
         {
-            name: "Tiêu đề",
+            name: "Tên quyền",
             center: true,
             minWidth: "50px",
-            selector: row => row.title
+            selector: row => row.name
         },
         {
-            name: "Tên tài liệu",
+            name: "Mã quyền",
             center: true,
-            minWidth: "300px",
-            cell: (row) => {
-                return <span style={{ whiteSpace: 'break-spaces' }}>{row.fileName}</span>
-            }
-        },
-        {
-            name: "Tác giả",
-            center: true,
-            minWidth: "200px",
-            selector: row => row.author
+            minWidth: "50px",
+            selector: row => row.key
         },
         {
             name: "Ngày tạo mới",
@@ -262,17 +190,17 @@ const Document = () => {
                                     style={{ cursor: "pointer", stroke: '#09A863' }}
                                 />
                                 <UncontrolledTooltip placement='top' target='tooltip_edit'>
-                                    Sửa tài liệu
+                                    Chi tiết quyền
                                 </UncontrolledTooltip>
                             </div>}
                         {ability.can('delete', 'nguoidung') &&
-                            <div id="tooltip_trash" style={{ marginRight: '1rem', marginLeft: '1rem' }} onClick={() => handleDeleteDocument(row.id)}>
+                            <div id="tooltip_trash" style={{ marginRight: '1rem', marginLeft: '1rem' }} onClick={() => handleDeletePermission(row.id)}>
                                 <Trash
                                     size={15}
                                     style={{ cursor: "pointer", stroke: "red" }}
                                 />
                                 <UncontrolledTooltip placement='top' target='tooltip_trash'>
-                                    Xóa tài liệu
+                                    Xóa quyền
                                 </UncontrolledTooltip>
                             </div>}
                     </div>
@@ -292,30 +220,6 @@ const Document = () => {
     const handlePerRowsChange = (perPage, page) => {
         setCurrentPage(page)
         setPerPage(perPage)
-    }
-
-    const handleChangeCourse = (value) => {
-        if (value) {
-            setCourseId(value?.value)
-        } else {
-            setCourseId()
-        }
-    }
-
-    const handleChangeDocumentType = (value) => {
-        if (value) {
-            setTypeId(value?.value)
-        } else {
-            setTypeId()
-        }
-    }
-
-    const handleChangeMajor = (value) => {
-        if (value) {
-            setMajorId(value?.value)
-        } else {
-            setMajorId()
-        }
     }
 
     // ** Custom Pagination
@@ -343,13 +247,11 @@ const Document = () => {
     //     />
     // )
 
-    console.log(data)
-
     return (
         <Fragment>
             <Card style={{ backgroundColor: 'white' }}>
                 <CardHeader className='flex-md-row flex-column align-md-items-center align-items-start border-bottom'>
-                    <CardTitle tag='h4'>Danh sách tài liệu</CardTitle>
+                    <CardTitle tag='h4'>Danh sách quyền</CardTitle>
                     <div className='d-flex mt-md-0 mt-1'>
                         {/* <UncontrolledButtonDropdown>
                             <DropdownToggle color='secondary' caret outline>
@@ -383,14 +285,9 @@ const Document = () => {
                     </div>
                 </CardHeader>
                 <Row className='justify-content-end mx-0'>
-                    <Col className='d-flex align-items-center justify-content-between mt-1' md='12' sm='12' style={{ padding: '0 20px' }}>
-                        <div className='d-flex align-items-center gap-2'>
-                            <Select placeholder="Chọn khóa học" className='mb-50 select-custom' options={listCourse} isClearable onChange={(value) => handleChangeCourse(value)} />
-                            <Select placeholder="Chọn loại tài liệu" className='mb-50 select-custom' options={listDocumentType} isClearable onChange={(value) => handleChangeDocumentType(value)} />
-                            <Select placeholder="Chọn chuyên ngành" className='mb-50 select-custom' options={listMajor} isClearable onChange={(value) => handleChangeMajor(value)} />
-                        </div>
+                    <Col className='d-flex align-items-center justify-content-end mt-1' md='12' sm='12' style={{ padding: '0 20px' }}>
                         <div className='d-flex align-items-center'>
-                            <Label className='' for='search-input' style={{ minWidth: '65px' }}>
+                            <Label className='me-1' for='search-input' style={{ minWidth: '80px' }}>
                                 Tìm kiếm
                             </Label>
                             <Input
@@ -434,10 +331,10 @@ const Document = () => {
                     />}
                 </div>
             </Card >
-            <AddNewDocument open={modalAddNew} handleAddModal={handleAddModal} getData={fetchDocument} />
-            {dataEdit && <EditDocument open={modalEdit} handleEditModal={handleEditModal} getData={fetchDocument} dataEdit={dataEdit} />}
+            <AddNewPermission open={modalAddNew} handleAddModal={handleAddModal} getData={fetchPermission} />
+            {dataEdit && <EditPermission open={modalEdit} handleEditModal={handleEditModal} getData={fetchPermission} dataEdit={dataEdit} />}
         </Fragment >
     )
 }
 
-export default Document
+export default Permission

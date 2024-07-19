@@ -12,3 +12,33 @@ WE WILL RELEASE FUTURE UPDATES SO IN ORDER TO NOT OVERWRITE YOUR STYLES IT'S BET
 .select-custom {
 	width: 250px;
 }
+
+.color-bg {
+	background-color: #09a863 !important;
+}
+
+.select-custom {
+	.css-13cymwt-control {
+		min-height: 24px !important;
+		.css-1fdsijx-ValueContainer {
+			padding: 1px 8px !important;
+		}
+		.css-1hb7zxy-IndicatorsContainer {
+			.css-1xc3v61-indicatorContainer {
+				padding: 4px !important;
+			}
+		}
+	}
+
+	.css-t3ipsp-control {
+		min-height: 24px !important;
+		.css-1fdsijx-ValueContainer {
+			padding: 1px 8px !important;
+		}
+		.css-1hb7zxy-IndicatorsContainer {
+			.css-15lsz6c-indicatorContainer {
+				padding: 4px !important;
+			}
+		}
+	}
+}

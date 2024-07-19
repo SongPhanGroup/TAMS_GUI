@@ -47,6 +47,7 @@ import { deleteCheckingDocument, detailCheckingDocument, getCheckingDocument } f
 import AddNewCheckingDocument from './modal/AddNewModal'
 import EditCheckingDocument from './modal/EditModal'
 import { getCourse } from '../../../api/course'
+import ResultCheckingDocument from './modal/ResultModal'
 
 // ** Bootstrap Checkbox Component
 const BootstrapCheckbox = forwardRef((props, ref) => (
@@ -62,6 +63,7 @@ const CheckingDocument = () => {
     const [loading, setLoading] = useState(true)
     const [modalAddNew, setModalAddNew] = useState(false)
     const [modalEdit, setModalEdit] = useState(false)
+    const [modalResult, setModalResult] = useState(false)
     const [currentPage, setCurrentPage] = useState(1)
     const [searchValue, setSearchValue] = useState('')
     const [courseId, setCourseId] = useState()
@@ -74,6 +76,11 @@ const CheckingDocument = () => {
     const handleEditModal = (data) => {
         setDataEdit(data)
         setModalEdit(!modalEdit)
+    }
+
+    const handleResultModal = (data) => {
+        setDataEdit(data)
+        setModalResult(!modalResult)
     }
 
     const [listCourse, setListCourse] = useState([])
@@ -195,7 +202,7 @@ const CheckingDocument = () => {
             cell: (row, index) => <span>{((currentPage - 1) * perPage) + index + 1}</span>
         },
         {
-            name: "Tên tài liệu",
+            name: "Tiêu đề",
             center: true,
             minWidth: "500px",
             selector: row => <span style={{
@@ -203,7 +210,7 @@ const CheckingDocument = () => {
             }}>{row.title}</span>
         },
         {
-            name: "Khóa học",
+            name: "Đợt kiểm tra",
             center: true,
             minWidth: "50px",
             selector: row => row.courseId
@@ -261,15 +268,15 @@ const CheckingDocument = () => {
                                     Xóa tài liệu
                                 </UncontrolledTooltip>
                             </div>}
-                            <div id="tooltip_result" onClick={() => handleDeleteCheckingDocument(row.id)}>
-                                <CheckSquare
-                                    size={15}
-                                    style={{ cursor: "pointer", stroke: "blue" }}
-                                />
-                                <UncontrolledTooltip placement='top' target='tooltip_result'>
-                                    Kết quả kiểm tra
-                                </UncontrolledTooltip>
-                            </div>
+                        <div id="tooltip_result" onClick={() => handleResultModal(row)}>
+                            <CheckSquare
+                                size={15}
+                                style={{ cursor: "pointer", stroke: "blue" }}
+                            />
+                            <UncontrolledTooltip placement='top' target='tooltip_result'>
+                                Kết quả kiểm tra
+                            </UncontrolledTooltip>
+                        </div>
                     </div>
                 )
             }
@@ -285,6 +292,14 @@ const CheckingDocument = () => {
         }
     }
 
+    // const customStylesSelect = {
+    //     option: (provided) => ({
+    //         ...provided,
+    //         height: 24, // Điều chỉnh chiều cao của mỗi tùy chọn
+    //         display: 'flex',
+    //         alignItems: 'center' // Căn giữa văn bản theo chiều dọc
+    //     })
+    // }
 
     // ** Function to handle modalThemNND toggle
     // const handleModalThemNND = () => setModalThemNND(!modalThemNND)
@@ -355,7 +370,7 @@ const CheckingDocument = () => {
             }}>{row.name}</span>
         },
         {
-            name: "Khóa học",
+            name: "Đợt kiểm tra",
             center: true,
             minWidth: "50px",
             selector: row => row.courseId
@@ -488,6 +503,7 @@ const CheckingDocument = () => {
                                 Ngày kiểm tra
                             </Label>
                             <Flatpickr
+                                style={{ padding: '0.35rem 1rem' }}
                                 className="form-control invoice-edit-input date-picker mb-50"
                                 options={{
                                     dateFormat: "d-m-Y", // format ngày giờ
@@ -528,6 +544,7 @@ const CheckingDocument = () => {
             </Card >
             <AddNewCheckingDocument open={modalAddNew} handleAddModal={handleAddModal} getData={fetchCheckingDocument} />
             {dataEdit && <EditCheckingDocument open={modalEdit} handleEditModal={handleEditModal} getData={fetchCheckingDocument} dataEdit={dataEdit} />}
+            {dataEdit && <ResultCheckingDocument open={modalResult} handleResultModal={handleResultModal} getData={fetchCheckingDocument} dataEdit={dataEdit} />}
         </Fragment >
     )
 }

@@ -17,24 +17,19 @@ import Select from 'react-select'
 import { useForm, Controller } from 'react-hook-form'
 import * as yup from "yup"
 import { yupResolver } from '@hookform/resolvers/yup'
-import Flatpickr from "react-flatpickr"
 
 // ** Utils
 
 // ** Styles
 import '@styles/react/libs/react-select/_react-select.scss'
-import { Vietnamese } from "flatpickr/dist/l10n/vn.js"
-import "@styles/react/libs/flatpickr/flatpickr.scss"
 import Swal from 'sweetalert2'
-import { postCourse } from "../../../../api/course"
-import { useState } from "react"
-import { toDateStringv2 } from "../../../../utility/Utils"
+import { postPermission } from "../../../../api/permission"
 
-const AddNewCourse = ({ open, handleAddModal, getData }) => {
+const AddNewPermisson = ({ open, handleAddModal, getData }) => {
     // ** States
-    const AddNewCourseSchema = yup.object().shape({
-        name: yup.string().required("Yêu cầu nhập tên đợt kiểm tra"),
-        // date: yup.date().required("Yêu cầu nhập tên đợt kiểm tra"),
+    const AddNewPermissonSchema = yup.object().shape({
+        name: yup.string().required("Yêu cầu nhập tên quyền"),
+        key: yup.string().required("Yêu cầu nhập mã quyền"),
         description: yup.string().required("Yêu cầu nhập mô tả")
     })
 
@@ -46,31 +41,22 @@ const AddNewCourse = ({ open, handleAddModal, getData }) => {
         formState: { errors }
     } = useForm({
         mode: 'onChange',
-        resolver: yupResolver(AddNewCourseSchema)
+        resolver: yupResolver(AddNewPermissonSchema)
     })
 
     // ** State
-    const [picker, setPicker] = useState(new Date())
 
     const handleCloseModal = () => {
         handleAddModal()
         reset()
     }
 
-    const handleChangeDate = (date) => {
-        setPicker(date[0])
-    }
-
     const onSubmit = (data) => {
         // Lấy nút submit đã được nhấn
-        postCourse({
-            name: data.name,
-            date: toDateStringv2(picker),
-            description: data.description
-        }).then(result => {
+        postPermission(data).then(result => {
             if (result.status === 'success') {
                 Swal.fire({
-                    title: "Thêm mới đợt kiểm tra thành công",
+                    title: "Thêm mới quyền thành công",
                     text: "Yêu cầu đã được phê duyệt!",
                     icon: "success",
                     customClass: {
@@ -79,8 +65,8 @@ const AddNewCourse = ({ open, handleAddModal, getData }) => {
                 })
             } else {
                 Swal.fire({
-                    title: "Thêm mới đợt kiểm tra thất bại",
-                    text: "Yêu cầu đã được phê duyệt!",
+                    title: "Cập nhật quyền thất bại",
+                    text: "Có lỗi xảy ra, vui lòng thử lại sau!",
                     icon: "error",
                     customClass: {
                         confirmButton: "btn btn-danger"
@@ -98,13 +84,13 @@ const AddNewCourse = ({ open, handleAddModal, getData }) => {
             <ModalHeader className='bg-transparent' toggle={handleCloseModal}></ModalHeader>
             <ModalBody className='px-sm-5 mx-50 pb-5'>
                 <div className='text-center mb-2'>
-                    <h1 className='mb-1'>Thêm mới đợt kiểm tra</h1>
-                    <p>Danh sách đợt kiểm tra</p>
+                    <h1 className='mb-1'>Thêm mới quyền</h1>
+                    <p>Danh sách quyền</p>
                 </div>
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                     <Col xs={12}>
                         <Label className='form-label' for='name'>
-                            Tên đợt kiểm tra
+                            Tên quyền
                         </Label>
                         <Controller
                             control={control}
@@ -114,7 +100,7 @@ const AddNewCourse = ({ open, handleAddModal, getData }) => {
                                     <Input
                                         {...field}
                                         id='name'
-                                        placeholder='Nhập tên đợt kiểm tra'
+                                        placeholder='Nhập tên quyền'
                                         invalid={errors.name && true}
                                     />
                                 )
@@ -123,31 +109,24 @@ const AddNewCourse = ({ open, handleAddModal, getData }) => {
                         {errors.name && <FormFeedback>{errors.name.message}</FormFeedback>}
                     </Col>
                     <Col xs={12}>
-                        <Label className='form-label' for='date'>
-                            Thời gian
+                        <Label className='form-label' for='key'>
+                            Mã quyền
                         </Label>
                         <Controller
                             control={control}
-                            name='date'
-                            render={() => {
+                            name='key'
+                            render={({ field }) => {
                                 return (
-                                    <Flatpickr
-                                        className="form-control invoice-edit-input date-picker"
-                                        options={{
-                                            dateFormat: "d-m-Y", // format ngày giờ
-                                            locale: {
-                                                ...Vietnamese
-                                            },
-                                            defaultDate: new Date()
-                                        }}
-                                        placeholder="dd/mm/yyyy"
-                                        onChange={handleChangeDate}
+                                    <Input
+                                        {...field}
+                                        id='key'
+                                        placeholder='Nhập mã quyền'
+                                        invalid={errors.key && true}
                                     />
-
                                 )
                             }}
                         />
-                        {/* {errors.date && <FormFeedback>{errors.date.message}</FormFeedback>} */}
+                        {errors.key && <FormFeedback>{errors.key.message}</FormFeedback>}
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='description'>
@@ -176,4 +155,4 @@ const AddNewCourse = ({ open, handleAddModal, getData }) => {
     )
 }
 
-export default AddNewCourse
+export default AddNewPermisson

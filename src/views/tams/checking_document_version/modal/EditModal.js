@@ -25,6 +25,7 @@ import '@styles/react/libs/react-select/_react-select.scss'
 import Swal from 'sweetalert2'
 import { useEffect, useState } from "react"
 import { editCheckingDocumentVersion } from "../../../../api/checking_document_version"
+import { detailCheckingDocument, getCheckingDocument } from "../../../../api/checking_document"
 
 const EditCheckingDocumentVersion = ({ open, handleEditModal, dataEdit, getData }) => {
     // ** States
@@ -178,7 +179,7 @@ const EditCheckingDocumentVersion = ({ open, handleEditModal, dataEdit, getData 
                             name='file'
                             control={control}
                             render={({ field }) => (
-                                <Input  {...field} id='file' placeholder='Chọn tài liệu' invalid={errors.file && true} onChange={handleChangeFile} />
+                                <Input {...field} id='file' placeholder='Chọn tài liệu' invalid={errors.file && true} onChange={handleChangeFile} />
                             )}
                         />
                         {errors.file && <FormFeedback>{errors.file.message}</FormFeedback>}

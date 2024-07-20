@@ -149,6 +149,7 @@ const EditOrganization = ({ open, handleEditModal, dataEdit, getData }) => {
                             Đơn vị cấp trên
                         </Label>
                         <Controller
+                            defaultValue={{value: dataEdit?.parent?.id, label: dataEdit?.parent?.name}}
                             control={control}
                             name='parentId'
                             render={({ field }) => {

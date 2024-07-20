@@ -89,31 +89,66 @@ const AddNewOrganization = ({ open, handleAddModal, getData }) => {
 
     const onSubmit = (data) => {
         // Lấy nút submit đã được nhấn
-        postOrganization(data).then(result => {
-            if (result.status === 'success') {
-                Swal.fire({
-                    title: "Thêm mới đơn vị thành công",
-                    text: "Yêu cầu đã được phê duyệt!",
-                    icon: "success",
-                    customClass: {
-                        confirmButton: "btn btn-success"
-                    }
-                })
-            } else {
-                Swal.fire({
-                    title: "Cập nhật đơn vị thất bại",
-                    text: "Có lỗi xảy ra, vui lòng thử lại sau!",
-                    icon: "error",
-                    customClass: {
-                        confirmButton: "btn btn-danger"
-                    }
-                })
-            }
-            getData()
-            handleCloseModal()
-        }).catch(error => {
-            console.log(error)
-        })
+        if (data?.parentId?.value) {
+            postOrganization({
+                name: data.name,
+                description: data.description,
+                parentId: data.parentId.value
+            }).then(result => {
+                if (result.status === 'success') {
+                    Swal.fire({
+                        title: "Thêm mới đơn vị thành công",
+                        text: "Yêu cầu đã được phê duyệt!",
+                        icon: "success",
+                        customClass: {
+                            confirmButton: "btn btn-success"
+                        }
+                    })
+                } else {
+                    Swal.fire({
+                        title: "Cập nhật đơn vị thất bại",
+                        text: "Có lỗi xảy ra, vui lòng thử lại sau!",
+                        icon: "error",
+                        customClass: {
+                            confirmButton: "btn btn-danger"
+                        }
+                    })
+                }
+                getData()
+                handleCloseModal()
+            }).catch(error => {
+                console.log(error)
+            })
+        } else {
+            postOrganization({
+                name: data.name,
+                description: data.description
+            }).then(result => {
+                if (result.status === 'success') {
+                    Swal.fire({
+                        title: "Thêm mới đơn vị thành công",
+                        text: "Yêu cầu đã được phê duyệt!",
+                        icon: "success",
+                        customClass: {
+                            confirmButton: "btn btn-success"
+                        }
+                    })
+                } else {
+                    Swal.fire({
+                        title: "Cập nhật đơn vị thất bại",
+                        text: "Có lỗi xảy ra, vui lòng thử lại sau!",
+                        icon: "error",
+                        customClass: {
+                            confirmButton: "btn btn-danger"
+                        }
+                    })
+                }
+                getData()
+                handleCloseModal()
+            }).catch(error => {
+                console.log(error)
+            })
+        }
     }
     return (
         <Modal isOpen={open} toggle={handleAddModal} className='modal-dialog-centered modal-md'>

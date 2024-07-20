@@ -301,6 +301,7 @@ const EditDocument = ({ open, handleEditModal, dataEdit, getData }) => {
                             Loại tài liệu
                         </Label>
                         <Controller
+                            defaultValue={{value: dataEdit?.documentType?.id, label: dataEdit?.documentType?.name}}
                             name='documentType'
                             control={control}
                             render={({ field }) => (

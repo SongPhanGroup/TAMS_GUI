@@ -148,6 +148,7 @@ const EditCheckingDocumentVersion = ({ open, handleEditModal, dataEdit, getData 
                             Kiểm tra tài liệu
                         </Label>
                         <Controller
+                            defaultValue={{value: dataEdit?.checkingDocument?.id, label: dataEdit?.checkingDocument?.title}}
                             name='checkingDocument'
                             control={control}
                             render={({ field }) => (
@@ -179,7 +180,7 @@ const EditCheckingDocumentVersion = ({ open, handleEditModal, dataEdit, getData 
                             name='file'
                             control={control}
                             render={({ field }) => (
-                                <Input {...field} id='file' placeholder='Chọn tài liệu' invalid={errors.file && true} onChange={handleChangeFile} />
+                                <Input {...field} id='file' type="file" placeholder='Chọn tài liệu' invalid={errors.file && true} onChange={handleChangeFile} />
                             )}
                         />
                         {errors.file && <FormFeedback>{errors.file.message}</FormFeedback>}

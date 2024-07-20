@@ -166,6 +166,7 @@ const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
                             Đợt kiểm tra
                         </Label>
                         <Controller
+                            defaultValue={{value: dataEdit?.course?.id, label: dataEdit?.course?.name}}
                             name='course'
                             control={control}
                             render={({ field }) => (

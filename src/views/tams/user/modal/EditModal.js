@@ -210,6 +210,7 @@ const EditUser = ({ open, handleEditModal, dataEdit, getData }) => {
                             Đơn vị
                         </Label>
                         <Controller
+                            defaultValue={{value: dataEdit?.organization?.id, label: dataEdit?.organization?.name}}
                             control={control}
                             name='organizationId'
                             render={({ field }) => {
@@ -225,6 +226,7 @@ const EditUser = ({ open, handleEditModal, dataEdit, getData }) => {
                             Vai trò
                         </Label>
                         <Controller
+                            defaultValue={{value: dataEdit?.role?.id, label: dataEdit?.role?.name}}
                             control={control}
                             name='roleId'
                             render={({ field }) => {

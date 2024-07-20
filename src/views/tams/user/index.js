@@ -161,13 +161,13 @@ const User = () => {
             name: "Đơn vị",
             center: true,
             minWidth: "50px",
-            selector: row => row.organizationId
+            selector: row => <span>{row.organization.name}</span>
         },
         {
             name: "Vai trò",
             center: true,
             minWidth: "50px",
-            selector: (row) => row.roleId
+            selector: (row) => <span>{row.role.name}</span>
         },
         {
             name: 'Mô tả',

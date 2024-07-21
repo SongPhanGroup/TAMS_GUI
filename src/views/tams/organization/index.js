@@ -162,7 +162,7 @@ const Organization = () => {
             name: "Đơn vị cấp trên",
             center: true,
             minWidth: "50px",
-            selector: row => <span>{row.parentId}</span>
+            selector: row => <span>{row?.parent?.name}</span>
         },
         {
             name: "Ngày tạo mới",

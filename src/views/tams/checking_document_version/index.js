@@ -40,7 +40,7 @@ import {
     UncontrolledTooltip
 } from 'reactstrap'
 import { toDateString } from '../../../utility/Utils'
-import { deleteCheckingDocumentVersion, detailCheckingDocumentVersion, getCheckingDocumentVersion } from '../../../api/checking_document_version'
+import { deleteCheckingDocumentVersion, getCheckingDocumentVersion } from '../../../api/checking_document_version'
 import AddNewCheckingDocumentVersion from './modal/AddNewModal'
 import EditCheckingDocumentVersion from './modal/EditModal'
 import { getCourse } from '../../../api/course'
@@ -214,13 +214,13 @@ const CheckingDocumentVersion = () => {
             name: "Đợt kiểm tra",
             center: true,
             minWidth: "50px",
-            selector: row => row.courseId
+            selector: row => <span>{row?.course?.name}</span>
         },
         {
             name: "Kiểm tra tài liệu",
             center: true,
             minWidth: "200px",
-            selector: row => row.checkingDocumentId
+            selector: row => <span>{row?.checkingDocument?.title}</span>
         },
         {
             name: "Ngày kiểm tra",
@@ -330,76 +330,6 @@ const CheckingDocumentVersion = () => {
     //     />
     // )
 
-    const subColumns = [
-        {
-            name: "STT",
-            center: true,
-            width: '100px',
-            cell: (row, index) => <span>{((currentPage - 1) * perPage) + index + 1}</span>
-        },
-        {
-            name: "Mã kết quả",
-            center: true,
-            width: '100px',
-            selector: row => row.id
-        },
-        {
-            name: "Loại kiểm tra",
-            center: true,
-            minWidth: "200px",
-            selector: row => row.type_checking_id
-        },
-        {
-            name: "Tổng số câu trùng",
-            center: true,
-            minWidth: "50px",
-            selector: row => row.similarity_total
-        }
-    ]
-
-    const ExpandedComponent = ({ data }) => {
-        const [dataDetailById, setDataDetailById] = useState([])
-
-        useEffect(() => {
-            detailCheckingDocumentVersion(data?.id).then((result) => {
-                const documentResult = result?.data?.documentResult
-                if (Array.isArray(documentResult)) {
-                    setDataDetailById(documentResult)
-                } else {
-                    console.error('Unexpected data format:', documentResult)
-                }
-            }).catch(error => {
-                console.log(error)
-            })
-        }, [data?.id])
-
-        return (
-            <>
-                {loading ? <WaitingModal /> : <DataTable
-                    noHeader
-                    // pagination
-                    columns={subColumns}
-                    // paginationPerPage={perPage}
-                    className='react-dataTable'
-                    sortIcon={<ChevronDown size={10} />}
-                    selectableRowsComponent={BootstrapCheckbox}
-                    // data={searchValue.length ? filteredData.data : data.data}
-                    data={dataDetailById}
-                    // paginationServer
-                    // paginationTotalRows={totalCount}
-                    // paginationComponentOptions={{
-                    //     rowsPerPageText: 'Số hàng trên 1 trang:'
-                    // }}
-                    // onChangeRowsPerPage={handlePerRowsChange}
-                    // onChangePage={handlePagination}
-                    customStyles={customStyles}
-                />}
-            </>
-        )
-    }
-
-    // const ExpandedComponent = ({ data }) => <pre>{JSON.stringify(data, null, 2)}</pre>
-
     return (
         <Fragment>
             <input type='file' id='file' ref={inputFile} style={{ display: 'none' }} onChange={e => handleImportFile(e)} />
@@ -488,9 +418,6 @@ const CheckingDocumentVersion = () => {
                         onChangeRowsPerPage={handlePerRowsChange}
                         onChangePage={handlePagination}
                         customStyles={customStyles}
-                        expandableRows
-                        expandableRowsComponent={ExpandedComponent}
-                        expandOnRowClicked
                     />}
                 </div>
             </Card >

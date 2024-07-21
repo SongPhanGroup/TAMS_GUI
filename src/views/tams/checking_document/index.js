@@ -204,7 +204,7 @@ const CheckingDocument = () => {
         {
             name: "Tiêu đề",
             center: true,
-            minWidth: "500px",
+            minWidth: "400px",
             selector: row => <span style={{
                 whiteSpace: 'break-spaces'
             }}>{row.title}</span>
@@ -213,12 +213,12 @@ const CheckingDocument = () => {
             name: "Đợt kiểm tra",
             center: true,
             minWidth: "50px",
-            selector: row => row.courseId
+            selector: row => <span>{row?.course?.name}</span>
         },
         {
             name: "Tác giả",
             center: true,
-            minWidth: "200px",
+            minWidth: "100px",
             selector: row => <span style={{
                 whiteSpace: 'break-spaces'
             }}>{row.author}</span>
@@ -226,7 +226,7 @@ const CheckingDocument = () => {
         {
             name: "Ngày kiểm tra",
             center: true,
-            minWidth: "100px",
+            minWidth: "200px",
             cell: (row) => <span style={{ textAlign: 'center' }}>{toDateTimeString(row.createdAt)}</span>
         },
         {
@@ -356,38 +356,24 @@ const CheckingDocument = () => {
             cell: (row, index) => <span>{((currentPage - 1) * perPage) + index + 1}</span>
         },
         {
-            name: "Mã tài liệu",
-            center: true,
-            width: '100px',
-            selector: row => row.id
-        },
-        {
             name: "Tên tài liệu",
             center: true,
-            minWidth: "200px",
+            width: '500px',
             selector: row => <span style={{
                 whiteSpace: 'break-spaces'
-            }}>{row.name}</span>
+            }}>{row.fileName}</span>
         },
         {
-            name: "Đợt kiểm tra",
+            name: "Phiên bản",
             center: true,
             minWidth: "50px",
-            selector: row => row.courseId
+            selector: row => row.version
         },
         {
-            name: "Tên tác giả",
+            name: 'Mô tả',
             center: true,
-            minWidth: "200px"
-            // selector: row => <span style={{
-            //     whiteSpace: 'break-spaces'
-            // }}>{row.name}</span>
-        },
-        {
-            name: "Phần trăm trùng",
-            center: true,
-            minWidth: "50px",
-            selector: row => row.percentage
+            minWidth: '200px',
+            selector: row => row.description
         }
     ]
 
@@ -396,11 +382,11 @@ const CheckingDocument = () => {
 
         useEffect(() => {
             detailCheckingDocument(data?.id).then((result) => {
-                const documentResult = result?.data?.documentResult
-                if (Array.isArray(documentResult)) {
-                    setDataDetailById(documentResult)
+                const checkingDocumentVersion = result?.data?.checkingDocumentVersion
+                if (Array.isArray(checkingDocumentVersion)) {
+                    setDataDetailById(checkingDocumentVersion)
                 } else {
-                    console.error('Unexpected data format:', documentResult)
+                    console.error('Unexpected data format:', checkingDocumentVersion)
                 }
             }).catch(error => {
                 console.log(error)

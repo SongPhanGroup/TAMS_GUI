@@ -25,14 +25,12 @@ import { yupResolver } from '@hookform/resolvers/yup'
 // ** Styles
 import '@styles/react/libs/react-select/_react-select.scss'
 import Swal from 'sweetalert2'
-import { postCheckingDocument } from "../../../../api/checking_document"
-import { getCourse } from "../../../../api/course"
+import { postCheckingDocumentVersion } from "../../../../api/checking_document_version"
+import { getCheckingDocument } from "../../../../api/checking_document"
 
-const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
-    const AddNewCheckingDocumentSchema = yup.object().shape({
-        title: yup.string().required("Yêu cầu nhập tiêu đề"),
-        author: yup.string().required("Yêu cầu nhập tác giả"),
-        course: yup.object().typeError("Yêu cầu nhập đợt kiểm tra"),
+const AddNewCheckingDocumentVersion = ({ open, handleAddModalVersion, getData }) => {
+    const AddNewCheckingDocumentVersionSchema = yup.object().shape({
+        file: yup.mixed().required("Yêu cầu nhập file"),
         description: yup.string().required("Yêu cầu nhập mô tả")
     })
 
@@ -44,17 +42,17 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
         formState: { errors }
     } = useForm({
         mode: 'onChange',
-        resolver: yupResolver(AddNewCheckingDocumentSchema)
+        resolver: yupResolver(AddNewCheckingDocumentVersionSchema)
     })
 
     // ** State
-    // const [file, setFile] = useState()
-    const [listCourse, setListCourse] = useState([])
+    const [file, setFile] = useState()
+    const [listCheckingDocument, setListCheckingDocument] = useState([])
 
     const getAllDataPromises = async () => {
-        const coursePromise = getCourse({ params: { page: 1, perPage: 10, search: '' } })
+        const checkingDocumentPromise = getCheckingDocument({ params: { page: 1, perPage: 10, search: '' } })
 
-        const promises = [coursePromise]
+        const promises = [checkingDocumentPromise]
         const results = await Promise.allSettled(promises)
         const responseData = promises.reduce((acc, promise, index) => {
             if (results[index].status === 'fulfilled') {
@@ -65,19 +63,19 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
             return acc
         }, [])
 
-        const courseRes = responseData[0]
+        const checkingDocumentRes = responseData[0]
         results.map((res) => {
             if (res.status !== 'fulfilled') {
-                setListCourse(null)
+                setListCheckingDocument(null)
             }
         })
-        const courses = courseRes?.data?.map((res) => {
+        const checkingDocuments = checkingDocumentRes?.data?.map((res) => {
             return {
                 value: res.id,
-                label: `${res.name}`
+                label: `${res.title}`
             }
         })
-        setListCourse(courses)
+        setListCheckingDocument(checkingDocuments)
     }
 
     useEffect(() => {
@@ -87,22 +85,21 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
     }, [open])
 
     const handleCloseModal = () => {
-        handleAddModal()
+        handleAddModalVersion()
         reset()
     }
 
-    // const handleChangeFile = (event) => {
-    //     const file = event.target.files[0]
-    //     setFile(file)
-    // }
+    const handleChangeFile = (event) => {
+        const file = event.target.files[0]
+        setFile(file)
+    }
 
     const onSubmit = (data) => {
-        postCheckingDocument({
-            title: data.title,
-            author: data.author,
-            courseId: data.course.value,
-            description: data.description
-        }).then(result => {
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('description', data.description)
+        formData.append('checkingDocumentId', data.checkingDocument.value)
+        postCheckingDocumentVersion(formData).then(result => {
             if (result.status === 'success') {
                 Swal.fire({
                     title: "Thêm mới kiểm tra tài liệu thành công",
@@ -130,58 +127,26 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
     }
 
     return (
-        <Modal isOpen={open} toggle={handleAddModal} className='modal-dialog-centered modal-lg'>
+        <Modal isOpen={open} toggle={handleAddModalVersion} className='modal-dialog-centered modal-lg'>
             <ModalHeader className='bg-transparent' toggle={handleCloseModal}></ModalHeader>
             <ModalBody className='px-sm-5 mx-50 pb-5'>
                 <div className='text-center mb-2'>
-                    <h1 className='mb-1'>Thông tin tài liệu kiểm tra</h1>
+                    <h1 className='mb-1'>Thêm mới tài liệu</h1>
+                    <p>Danh sách tài liệu</p>
                 </div>
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                     <Col xs={12}>
-                        <Label className='form-label' for='title'>
-                            Tiêu đề
+                        <Label className='form-label' for='checkingDocument'>
+                            Kiểm tra tài liệu
                         </Label>
                         <Controller
-                            control={control}
-                            name='title'
-                            render={({ field }) => {
-                                return (
-                                    <Input
-                                        {...field}
-                                        id='title'
-                                        placeholder='Nhập tiêu đề'
-                                        invalid={errors.title && true}
-                                    />
-                                )
-                            }}
-                        />
-                        {errors.title && <FormFeedback>{errors.title.message}</FormFeedback>}
-                    </Col>
-                    <Col xs={12}>
-                        <Label className='form-label' for='course'>
-                            Đợt kiểm tra
-                        </Label>
-                        <Controller
-                            name='course'
+                            name='checkingDocument'
                             control={control}
                             render={({ field }) => (
-                                <Select {...field} id='course' placeholder='Chọn đợt kiểm tra' invalid={errors.course && true} options={listCourse} />
+                                <Select {...field} id='checkingDocument' placeholder='Chọn kiểm tra tài liệu' invalid={errors.checkingDocument && true} options={listCheckingDocument} />
                             )}
                         />
-                        {errors.course && <FormFeedback>{errors.course.message}</FormFeedback>}
-                    </Col>
-                    <Col xs={12}>
-                        <Label className='form-label' for='author'>
-                            Tác giả
-                        </Label>
-                        <Controller
-                            name='author'
-                            control={control}
-                            render={({ field }) => (
-                                <Input {...field} id='author' placeholder='Nhập tác giả' invalid={errors.author && true} />
-                            )}
-                        />
-                        {errors.author && <FormFeedback>{errors.author.message}</FormFeedback>}
+                        {errors.checkingDocument && <FormFeedback>{errors.checkingDocument.message}</FormFeedback>}
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='description'>
@@ -196,7 +161,7 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
                         />
                         {errors.description && <FormFeedback>{errors.description.message}</FormFeedback>}
                     </Col>
-                    {/* <Col xs={12}>
+                    <Col xs={12}>
                         <Label className='form-label' for='file'>
                             Tài liệu
                         </Label>
@@ -211,7 +176,7 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
                             )}
                         />
                         {errors.file && <FormFeedback>{errors.file.message}</FormFeedback>}
-                    </Col> */}
+                    </Col>
                     <Col xs={12} className='text-center mt-2 pt-50'>
                         <Button type='submit' name='add' className='me-1' color='primary'>
                             Thêm
@@ -226,4 +191,4 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
     )
 }
 
-export default AddNewCheckingDocument
+export default AddNewCheckingDocumentVersion

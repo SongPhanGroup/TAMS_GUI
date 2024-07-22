@@ -1,5 +1,5 @@
 // ** React Imports
-import React, { Fragment, useState, forwardRef, useEffect, useContext } from 'react'
+import React, { Fragment, useState, forwardRef, useEffect, useContext, useCallback } from 'react'
 // imprt thư viện của bảng
 import ReactPaginate from 'react-paginate'
 import DataTable from 'react-data-table-component'
@@ -135,11 +135,8 @@ const CheckingDocument = () => {
     }
 
     useEffect(() => {
-        getAllDataPromises()
-    }, [])
-
-    useEffect(() => {
         fetchCheckingDocument()
+        getAllDataPromises()
     }, [currentPage, searchValue, perPage, courseId])
 
     const handleAddModal = () => {
@@ -412,7 +409,8 @@ const CheckingDocument = () => {
             setModalVersionEdit(!modalVersionEdit)
         }
 
-        const fetchCheckingDocumentVersion = () => {
+        const fetchCheckingDocumentVersion = useCallback(() => {
+            if (!data?.id) return
             detailCheckingDocument(data?.id).then((result) => {
                 const checkingDocumentVersion = result?.data?.checkingDocumentVersion
                 if (Array.isArray(checkingDocumentVersion)) {
@@ -421,13 +419,13 @@ const CheckingDocument = () => {
                     console.error('Unexpected data format:', checkingDocumentVersion)
                 }
             }).catch(error => {
-                console.log(error)
+                console.error(error)
             })
-        }
+        }, [data?.id])
 
         useEffect(() => {
             fetchCheckingDocumentVersion()
-        }, [data?.id])
+        }, [fetchCheckingDocumentVersion])
 
         const subColumns = [
             {
@@ -659,7 +657,7 @@ const CheckingDocument = () => {
                         onChangePage={handlePagination}
                         customStyles={customStyles}
                         expandableRows
-                        expandableRowsComponent={ExpandedComponent}
+                        expandableRowsComponent={(prev) => ExpandedComponent(prev)}
                         expandOnRowClicked
                     />}
                 </div>

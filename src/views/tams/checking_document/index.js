@@ -1,5 +1,5 @@
 // ** React Imports
-import React, { Fragment, useState, forwardRef, useEffect, useContext, useCallback } from 'react'
+import React, { Fragment, useState, forwardRef, useEffect, useContext } from 'react'
 // imprt thư viện của bảng
 import ReactPaginate from 'react-paginate'
 import DataTable from 'react-data-table-component'
@@ -212,7 +212,7 @@ const CheckingDocument = () => {
         {
             name: "Đợt kiểm tra",
             center: true,
-            minWidth: "50px",
+            minWidth: "150px",
             selector: row => <span>{row?.course?.name}</span>
         },
         {
@@ -229,17 +229,23 @@ const CheckingDocument = () => {
             minWidth: "200px",
             cell: (row) => <span style={{ textAlign: 'center' }}>{toDateTimeString(row.createdAt)}</span>
         },
+        // {
+        //     name: 'Mô tả',
+        //     center: true,
+        //     minWidth: '100px',
+        //     selector: row => row.description
+        // },
         {
-            name: 'Mô tả',
+            name: 'Trùng lặp theo đợt (%)',
             center: true,
-            minWidth: '100px',
-            selector: row => row.description
+            minWidth: '200px',
+            selector: row => <span>{row?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal}</span>
         },
         {
-            name: 'Trùng lặp (%)',
+            name: 'Trùng lặp theo tài liệu mẫu (%)',
             center: true,
-            minWidth: '100px',
-            selector: row => row.percentage
+            minWidth: '200px',
+            selector: row => <span>{row?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}</span>
         },
         {
             name: 'Tác vụ',
@@ -409,8 +415,7 @@ const CheckingDocument = () => {
             setModalVersionEdit(!modalVersionEdit)
         }
 
-        const fetchCheckingDocumentVersion = useCallback(() => {
-            if (!data?.id) return
+        const fetchCheckingDocumentVersion = () => {
             detailCheckingDocument(data?.id).then((result) => {
                 const checkingDocumentVersion = result?.data?.checkingDocumentVersion
                 if (Array.isArray(checkingDocumentVersion)) {
@@ -421,11 +426,11 @@ const CheckingDocument = () => {
             }).catch(error => {
                 console.error(error)
             })
-        }, [data?.id])
+        }
 
         useEffect(() => {
             fetchCheckingDocumentVersion()
-        }, [fetchCheckingDocumentVersion])
+        }, [data?.id])
 
         const subColumns = [
             {
@@ -472,7 +477,7 @@ const CheckingDocument = () => {
                                     </UncontrolledTooltip>
                                 </div>}
                             {ability.can('delete', 'nguoidung') &&
-                                <div id="tooltip_trash" style={{ marginRight: '1rem' }} onClick={() => handleDeleteCheckingDocumentVersion(row)}>
+                                <div id="tooltip_trash" style={{ marginRight: '1rem' }} onClick={() => handleDeleteCheckingDocumentVersion(row.id)}>
                                     <Trash
                                         size={15}
                                         style={{ cursor: "pointer", stroke: "red" }}

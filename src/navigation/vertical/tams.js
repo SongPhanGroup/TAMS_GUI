@@ -22,7 +22,7 @@ export default [
   },
   {
     id: 'checking-document',
-    title: 'KT tài liệu theo đợt',
+    title: 'Kiểm tra tài liệu',
     icon: <Clipboard size={20} />,
     navLink: '/tams/checking-document'
   },
@@ -35,12 +35,12 @@ export default [
     icon: <Book size={20} />,
     navLink: '/tams/document-type'
   },
-  {
-    id: 'type-checking',
-    title: 'Loại kiểm tra',
-    icon: <FileMinus size={20} />,
-    navLink: '/tams/type-checking'
-  },
+  // {
+  //   id: 'type-checking',
+  //   title: 'Loại kiểm tra',
+  //   icon: <FileMinus size={20} />,
+  //   navLink: '/tams/type-checking'
+  // },
   {
     id: 'checking-document-version',
     title: 'Phiên bản KT tài liệu',

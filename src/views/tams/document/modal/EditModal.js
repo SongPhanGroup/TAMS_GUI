@@ -134,7 +134,6 @@ const EditDocument = ({ open, handleEditModal, dataEdit, getData }) => {
     const onSubmit = data => {
         setLoadingEdit(true)
         const formData = new FormData()
-        formData.append("file", file)
         formData.append("description", data.description)
         formData.append("title", data.title)
         formData.append("source", data.source)

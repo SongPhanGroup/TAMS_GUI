@@ -13,6 +13,7 @@ import {
 } from "reactstrap"
 
 // ** Third Party Components
+import Select from 'react-select'
 import { useForm, Controller } from 'react-hook-form'
 import * as yup from "yup"
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -22,37 +23,39 @@ import { yupResolver } from '@hookform/resolvers/yup'
 // ** Styles
 import '@styles/react/libs/react-select/_react-select.scss'
 import Swal from 'sweetalert2'
-import { editRole } from "../../../../api/role"
+import { postRole } from "../../../../api/role"
 
-const EditRole = ({ open, handleEditModal, dataEdit, getData }) => {
+const AddNewRole = ({ open, handleAddModal, getData }) => {
     // ** States
-    const EditRoleSchema = yup.object().shape({
-        name: yup.string().required("Đây là trường bắt buộc"),
-        description: yup.string().required("Đây là trường bắt buộc")
+    const AddNewRoleSchema = yup.object().shape({
+        name: yup.string().required("Yêu cầu nhập tên vai trò"),
+        description: yup.string().required("Yêu cầu nhập mô tả")
     })
 
     // ** Hooks
     const {
+        reset,
         control,
         handleSubmit,
         formState: { errors }
     } = useForm({
         mode: 'onChange',
-        resolver: yupResolver(EditRoleSchema)
+        resolver: yupResolver(AddNewRoleSchema)
     })
 
+    // ** State
+
     const handleCloseModal = () => {
-        handleEditModal()
+        handleAddModal()
+        reset()
     }
-    
-    const onSubmit = data => {
-        editRole(dataEdit?.id, {
-            name: data.name,
-            description: data.description
-        }).then(result => {
+
+    const onSubmit = (data) => {
+        // Lấy nút submit đã được nhấn
+        postRole(data).then(result => {
             if (result.status === 'success') {
                 Swal.fire({
-                    title: "Cập nhật vai trò thành công",
+                    title: "Thêm mới vai trò thành công",
                     text: "Yêu cầu đã được phê duyệt!",
                     icon: "success",
                     customClass: {
@@ -76,11 +79,11 @@ const EditRole = ({ open, handleEditModal, dataEdit, getData }) => {
         })
     }
     return (
-        <Modal isOpen={open} toggle={handleEditModal} className='modal-dialog-centered modal-md'>
+        <Modal isOpen={open} toggle={handleAddModal} className='modal-dialog-centered modal-md'>
             <ModalHeader className='bg-transparent' toggle={handleCloseModal}></ModalHeader>
             <ModalBody className='px-sm-5 mx-50 pb-5'>
                 <div className='text-center mb-2'>
-                    <h1 className='mb-1'>Cập nhật vai trò</h1>
+                    <h1 className='mb-1'>Thêm mới vai trò</h1>
                     <p>Danh sách vai trò</p>
                 </div>
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
@@ -89,7 +92,6 @@ const EditRole = ({ open, handleEditModal, dataEdit, getData }) => {
                             Tên vai trò
                         </Label>
                         <Controller
-                            defaultValue={dataEdit?.name ?? ''}
                             control={control}
                             name='name'
                             render={({ field }) => {
@@ -110,7 +112,6 @@ const EditRole = ({ open, handleEditModal, dataEdit, getData }) => {
                             Mô tả
                         </Label>
                         <Controller
-                            defaultValue={dataEdit?.description ?? ''}
                             name='description'
                             control={control}
                             render={({ field }) => (
@@ -120,8 +121,8 @@ const EditRole = ({ open, handleEditModal, dataEdit, getData }) => {
                         {errors.description && <FormFeedback>{errors.description.message}</FormFeedback>}
                     </Col>
                     <Col xs={12} className='text-center mt-2 pt-50'>
-                        <Button type='submit' className='me-1' color='primary'>
-                            Cập nhật
+                        <Button type='submit' name="add" className='me-1' color='primary'>
+                            Thêm
                         </Button>
                         <Button type='reset' color='secondary' outline onClick={handleCloseModal}>
                             Hủy
@@ -133,4 +134,4 @@ const EditRole = ({ open, handleEditModal, dataEdit, getData }) => {
     )
 }
 
-export default EditRole
+export default AddNewRole

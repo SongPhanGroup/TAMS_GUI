@@ -72,7 +72,7 @@ export default [
     id: 'permission',
     title: 'Phân quyền',
     icon: <UserPlus size={20} />,
-    navLink: '/tams/permission'
+    navLink: '/tams/role_permissions'
   },
   {
     id: 'user',

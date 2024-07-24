@@ -96,7 +96,7 @@ const Major = () => {
     const handleDeleteMajor = (data) => {
         return Swal.fire({
             title: '',
-            text: 'Bạn có muốn xóa chuyên ngành này không?',
+            text: 'Bạn có muốn xóa lĩnh vực này không?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Xóa',
@@ -112,7 +112,7 @@ const Major = () => {
                     if (result.status === 'success') {
                         Swal.fire({
                             icon: 'success',
-                            title: 'Xóa chuyên ngành thành công!',
+                            title: 'Xóa lĩnh vực thành công!',
                             text: 'Yêu cầu đã được phê duyệt',
                             customClass: {
                                 confirmButton: 'btn btn-success'
@@ -121,7 +121,7 @@ const Major = () => {
                     } else {
                         Swal.fire({
                             icon: 'error',
-                            title: 'Xóa chuyên ngành thất bại!',
+                            title: 'Xóa lĩnh vực thất bại!',
                             text: 'Yêu cầu chưa được phê duyệt',
                             customClass: {
                                 confirmButton: 'btn btn-danger'
@@ -135,7 +135,7 @@ const Major = () => {
             } else {
                 Swal.fire({
                     title: 'Hủy bỏ!',
-                    text: 'Không xóa chuyên ngành!',
+                    text: 'Không xóa lĩnh vực!',
                     icon: 'error',
                     customClass: {
                         confirmButton: 'btn btn-success'
@@ -153,7 +153,7 @@ const Major = () => {
             cell: (row, index) => <span>{((currentPage - 1) * perPage) + index + 1}</span>
         },
         {
-            name: "Tên chuyên ngành",
+            name: "Tên lĩnh vực",
             center: true,
             minWidth: "50px",
             selector: row => row.name
@@ -184,7 +184,7 @@ const Major = () => {
                                     style={{ cursor: "pointer", stroke: '#09A863' }}
                                 />
                                 <UncontrolledTooltip placement='top' target='tooltip_edit'>
-                                    Chi tiết chuyên ngành
+                                    Chi tiết lĩnh vực
                                 </UncontrolledTooltip>
                             </div>}
                         {ability.can('delete', 'nguoidung') &&
@@ -194,7 +194,7 @@ const Major = () => {
                                     style={{ cursor: "pointer", stroke: "red" }}
                                 />
                                 <UncontrolledTooltip placement='top' target='tooltip_trash'>
-                                    Xóa chuyên ngành
+                                    Xóa lĩnh vực
                                 </UncontrolledTooltip>
                             </div>}
                     </div>
@@ -245,7 +245,7 @@ const Major = () => {
         <Fragment>
             <Card style={{ backgroundColor: 'white' }}>
                 <CardHeader className='flex-md-row flex-column align-md-items-center align-items-start border-bottom'>
-                    <CardTitle tag='h4'>Danh sách chuyên ngành</CardTitle>
+                    <CardTitle tag='h4'>Danh sách lĩnh vực</CardTitle>
                     <div className='d-flex mt-md-0 mt-1'>
                         {/* <UncontrolledButtonDropdown>
                             <DropdownToggle color='secondary' caret outline>

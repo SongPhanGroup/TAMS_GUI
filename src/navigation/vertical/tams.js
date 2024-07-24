@@ -41,15 +41,15 @@ export default [
   //   icon: <FileMinus size={20} />,
   //   navLink: '/tams/type-checking'
   // },
-  {
-    id: 'checking-document-version',
-    title: 'Phiên bản KT tài liệu',
-    icon: <FilePlus size={20} />,
-    navLink: '/tams/checking-document-version'
-  },
+  // {
+  //   id: 'checking-document-version',
+  //   title: 'Phiên bản KT tài liệu',
+  //   icon: <FilePlus size={20} />,
+  //   navLink: '/tams/checking-document-version'
+  // },
   {
     id: 'major',
-    title: 'Chuyên ngành',
+    title: 'Lĩnh vực',
     icon: <Grid size={20} />,
     navLink: '/tams/major'
   },

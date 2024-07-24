@@ -26,10 +26,10 @@ import '@styles/react/libs/react-select/_react-select.scss'
 import Swal from 'sweetalert2'
 import { postDocument } from "../../../../api/document"
 import { extractingFromFileUpload } from "../../../../api/sentence_doc"
-import { getCourse } from "../../../../api/course"
 import { Loader } from "react-feather"
 import { getMajor } from "../../../../api/major"
 import { getDocumentType } from "../../../../api/document_type"
+import classNames from "classnames"
 
 const AddNewDocument = ({ open, handleAddModal, getData }) => {
     // ** States
@@ -37,16 +37,11 @@ const AddNewDocument = ({ open, handleAddModal, getData }) => {
         file: yup.mixed().required("Yêu cầu chọn file"),
         title: yup.string().required("Yêu cầu nhập tiêu đề"),
         source: yup.string().required("Yêu cầu nhập nguồn tài liệu"),
-        course: yup.object({
-            value: yup.string().required(),
-            label: yup.string().required()
-        }).required("Yêu cầu chọn khóa học").nullable(),
-        documentType: yup.object().required("Yêu cầu chọn loại tài liệu"),
-        major: yup.object().required("Yêu cầu chọn chuyên ngành"),
+        documentType: yup.object().required("Yêu cầu chọn loại tài liệu").nullable(),
+        major: yup.object().required("Yêu cầu chọn chuyên ngành").nullable(),
         author: yup.string().required("Yêu cầu nhập tác giả"),
         coAuthor: yup.string().required("Yêu cầu nhập đồng tác giả"),
-        supervisor: yup.string().required("Yêu cầu nhập người giám sát"),
-        description: yup.string().required("Yêu cầu nhập mô tả")
+        supervisor: yup.string().required("Yêu cầu nhập người giám sát")
     })
 
     // ** Hooks
@@ -60,20 +55,20 @@ const AddNewDocument = ({ open, handleAddModal, getData }) => {
         resolver: yupResolver(AddNewDocumentSchema)
     })
 
+    console.log(errors)
+
     // ** State
     const [file, setFile] = useState()
-    const [listCourse, setListCourse] = useState([])
     const [listDocumentType, setListDocumentType] = useState([])
     const [listMajor, setListMajor] = useState([])
     const [loadingAdd, setLoadingAdd] = useState(false)
     // const [loadingExtract, setLoadingExtract] = useState(false)
 
     const getAllDataPromises = async () => {
-        const coursePromise = getCourse({ params: { page: 1, perPage: 10, search: '' } })
         const majorPromise = getMajor({ params: { page: 1, perPage: 10, search: '' } })
         const documentTypePromise = getDocumentType({ params: { page: 1, perPage: 10, search: '' } })
 
-        const promises = [coursePromise, documentTypePromise, majorPromise]
+        const promises = [documentTypePromise, majorPromise]
         const results = await Promise.allSettled(promises)
         const responseData = promises.reduce((acc, promise, index) => {
             if (results[index].status === 'fulfilled') {
@@ -84,20 +79,12 @@ const AddNewDocument = ({ open, handleAddModal, getData }) => {
             return acc
         }, [])
 
-        const courseRes = responseData[0]
-        const documentTypeRes = responseData[1]
-        const majorRes = responseData[2]
+        const documentTypeRes = responseData[0]
+        const majorRes = responseData[1]
         results.map((res) => {
             if (res.status !== 'fulfilled') {
-                setListCourse(null)
                 setListDocumentType(null)
                 setListMajor(null)
-            }
-        })
-        const courses = courseRes?.data?.map((res) => {
-            return {
-                value: res.id,
-                label: `${res.name}`
             }
         })
         const documentTypes = documentTypeRes?.data?.map((res) => {
@@ -112,7 +99,6 @@ const AddNewDocument = ({ open, handleAddModal, getData }) => {
                 label: `${res.name}`
             }
         })
-        setListCourse(courses)
         setListDocumentType(documentTypes)
         setListMajor(majors)
     }
@@ -141,7 +127,7 @@ const AddNewDocument = ({ open, handleAddModal, getData }) => {
         formData.append("description", data.description)
         formData.append("title", data.title)
         formData.append("source", data.source)
-        formData.append("courseId", data.course.value)
+        formData.append("courseId", 0)
         formData.append("majorId", data.major.value)
         formData.append("typeId", data.documentType.value)
         formData.append("author", data.author)
@@ -197,12 +183,11 @@ const AddNewDocument = ({ open, handleAddModal, getData }) => {
             <ModalBody className='px-sm-5 mx-50 pb-5'>
                 <div className='text-center mb-2'>
                     <h1 className='mb-1'>Thêm mới tài liệu</h1>
-                    <p>Danh sách tài liệu</p>
                 </div>
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
-                    <Col sm={6} xs={12}>
+                    <Col sm={12} xs={12}>
                         <Label className='form-label' for='title'>
-                            Tiêu đề
+                            Tiêu đề <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
                             control={control}
@@ -221,48 +206,8 @@ const AddNewDocument = ({ open, handleAddModal, getData }) => {
                         {errors.title && <FormFeedback>{errors.title.message}</FormFeedback>}
                     </Col>
                     <Col sm={6} xs={12}>
-                        <Label className='form-label' for='supervisor'>
-                            Người giám sát
-                        </Label>
-                        <Controller
-                            control={control}
-                            name='supervisor'
-                            render={({ field }) => {
-                                return (
-                                    <Input
-                                        {...field}
-                                        id='supervisor'
-                                        placeholder='Nhập người giám sát'
-                                        invalid={errors.supervisor && true}
-                                    />
-                                )
-                            }}
-                        />
-                        {errors.supervisor && <FormFeedback>{errors.supervisor.message}</FormFeedback>}
-                    </Col>
-                    <Col sm={6} xs={12}>
-                        <Label className='form-label' for='source'>
-                            Nguồn tài liệu
-                        </Label>
-                        <Controller
-                            control={control}
-                            name='source'
-                            render={({ field }) => {
-                                return (
-                                    <Input
-                                        {...field}
-                                        id='source'
-                                        placeholder='Nhập tiêu đề'
-                                        invalid={errors.source && true}
-                                    />
-                                )
-                            }}
-                        />
-                        {errors.source && <FormFeedback>{errors.source.message}</FormFeedback>}
-                    </Col>
-                    <Col sm={6} xs={12}>
                         <Label className='form-label' for='author'>
-                            Tác giả
+                            Tác giả <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
                             control={control}
@@ -282,7 +227,7 @@ const AddNewDocument = ({ open, handleAddModal, getData }) => {
                     </Col>
                     <Col sm={6} xs={12}>
                         <Label className='form-label' for='coAuthor'>
-                            Đồng tác giả
+                            Đồng tác giả <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
                             control={control}
@@ -301,49 +246,91 @@ const AddNewDocument = ({ open, handleAddModal, getData }) => {
                         {errors.coAuthor && <FormFeedback>{errors.coAuthor.message}</FormFeedback>}
                     </Col>
                     <Col sm={6} xs={12}>
-                        <Label className='form-label' for='course'>
-                            Khóa học
+                        <Label className='form-label' for='supervisor'>
+                            Người hướng dẫn <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
-                            name='course'
                             control={control}
+                            name='supervisor'
                             render={({ field }) => {
                                 return (
-                                    <Select {...field} name='course' placeholder='Chọn khóa học' invalid={errors.course && true} options={listCourse} value={field.value} onChange={selectedOption => field.onChange(selectedOption)} />
+                                    <Input
+                                        {...field}
+                                        id='supervisor'
+                                        placeholder='Nhập người hướng dẫn'
+                                        invalid={errors.supervisor && true}
+                                    />
                                 )
                             }}
                         />
-                        {errors.course && <FormFeedback>{errors.course.message}</FormFeedback>}
+                        {errors.supervisor && <FormFeedback>{errors.supervisor.message}</FormFeedback>}
+                    </Col>
+                    <Col sm={6} xs={12}>
+                        <Label className='form-label' for='source'>
+                            Nguồn tài liệu <span style={{color: 'red'}}>(*)</span>
+                        </Label>
+                        <Controller
+                            control={control}
+                            name='source'
+                            render={({ field }) => {
+                                return (
+                                    <Input
+                                        {...field}
+                                        id='source'
+                                        placeholder='Nhập tiêu đề'
+                                        invalid={errors.source && true}
+                                    />
+                                )
+                            }}
+                        />
+                        {errors.source && <FormFeedback>{errors.source.message}</FormFeedback>}
                     </Col>
                     <Col sm={6} xs={12}>
                         <Label className='form-label' for='documentType'>
-                            Loại tài liệu
+                            Loại tài liệu <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
+                            id="react-select"
                             name='documentType'
                             control={control}
                             render={({ field }) => (
-                                <Select {...field} id='documentType' placeholder='Chọn loại tài liệu' invalid={errors.documentType && true} options={listDocumentType} />
+                                <Select
+                                    placeholder="Chọn loại tài liệu"
+                                    classNamePrefix='select'
+                                    name='clear'
+                                    options={listDocumentType}
+                                    isClearable
+                                    className={classNames('react-select', { 'is-invalid': errors.documentType && true })}
+                                    {...field}
+                                />
                             )}
                         />
                         {errors.documentType && <FormFeedback>{errors.documentType.message}</FormFeedback>}
                     </Col>
                     <Col sm={6} xs={12}>
                         <Label className='form-label' for='major'>
-                            Chuyên ngành
+                            Lĩnh vực <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
+                            id='react-select'
                             name='major'
                             control={control}
                             render={({ field }) => (
-                                <Select {...field} id='major' placeholder='Chọn chuyên ngành' invalid={errors.major && true} options={listMajor} />
-                            )}
+                                <Select
+                                    placeholder="Chọn lĩnh vực"
+                                    classNamePrefix='select'
+                                    name='clear'
+                                    options={listMajor}
+                                    isClearable
+                                    className={classNames('react-select', { 'is-invalid': errors.major && true })}
+                                    {...field}
+                                />)}
                         />
                         {errors.major && <FormFeedback>{errors.major.message}</FormFeedback>}
                     </Col>
-                    <Col sm={6} xs={12}>
+                    <Col sm={12} xs={12}>
                         <Label className='form-label' for='description'>
-                            Mô tả
+                            Mô tả 
                         </Label>
                         <Controller
                             name='description'
@@ -352,11 +339,10 @@ const AddNewDocument = ({ open, handleAddModal, getData }) => {
                                 <Input {...field} id='description' placeholder='Nhập mô tả' invalid={errors.description && true} />
                             )}
                         />
-                        {errors.description && <FormFeedback>{errors.description.message}</FormFeedback>}
                     </Col>
-                    <Col sm={6} xs={12}>
+                    <Col sm={12} xs={12}>
                         <Label className='form-label' for='file'>
-                            Tài liệu
+                            Tài liệu <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
                             name='file'

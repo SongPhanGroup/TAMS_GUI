@@ -26,6 +26,7 @@ import Swal from 'sweetalert2'
 import { useEffect, useState } from "react"
 import { detailCheckingDocument, editCheckingDocument } from "../../../../api/checking_document"
 import { getCourse } from "../../../../api/course"
+import classNames from "classnames"
 
 const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
     // ** States
@@ -43,8 +44,7 @@ const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
     const EditCheckingDocumentSchema = yup.object().shape({
         title: yup.string().required("Yêu cầu nhập tiêu đề"),
         author: yup.string().required("Yêu cầu nhập tác giả"),
-        course: yup.object().required("Yêu cầu nhập đợt kiểm tra"),
-        description: yup.string().required("Yêu cầu nhập mô tả")
+        course: yup.object().required("Yêu cầu nhập đợt kiểm tra").nullable()
     })
 
     // ** Hooks
@@ -97,7 +97,7 @@ const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
             getAllDataPromises()
         }
     }, [open])
-    
+
     const onSubmit = (data) => {
         editCheckingDocument(dataEdit?.id, {
             title: data.title,
@@ -136,12 +136,11 @@ const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
             <ModalBody className='px-sm-5 mx-50 pb-5'>
                 <div className='text-center mb-2'>
                     <h1 className='mb-1'>Cập nhật tài liệu</h1>
-                    <p>Danh sách tài liệu</p>
                 </div>
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                     <Col xs={12}>
                         <Label className='form-label' for='title'>
-                            Tiêu đề
+                            Tiêu đề <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
                             defaultValue={dataEdit?.title}
@@ -150,7 +149,7 @@ const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
                             render={({ field }) => {
                                 return (
                                     <Input
-                                        
+
                                         {...field}
                                         id='title'
                                         placeholder='Nhập tiêu đề'
@@ -163,21 +162,29 @@ const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='course'>
-                            Đợt kiểm tra
+                            Đợt kiểm tra <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
-                            defaultValue={{value: dataEdit?.course?.id, label: dataEdit?.course?.name}}
+                            id='react-select'
+                            defaultValue={{ value: dataEdit?.course?.id, label: dataEdit?.course?.name }}
                             name='course'
                             control={control}
                             render={({ field }) => (
-                                <Select {...field} id='course' placeholder='Chọn đợt kiểm tra' invalid={errors.course && true} options={listCourse} />
-                            )}
+                                <Select
+                                    placeholder="Chọn đợt kiểm tra"
+                                    classNamePrefix='select'
+                                    name='clear'
+                                    options={listCourse}
+                                    isClearable
+                                    className={classNames('react-select', { 'is-invalid': errors.course && true })}
+                                    {...field}
+                                />)}
                         />
                         {errors.course && <FormFeedback>{errors.course.message}</FormFeedback>}
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='author'>
-                            Tác giả
+                            Tác giả <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
                             defaultValue={dataEdit?.author}

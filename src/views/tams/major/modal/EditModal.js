@@ -27,8 +27,7 @@ import { editMajor } from "../../../../api/major"
 const EditMajor = ({ open, handleEditModal, dataEdit, getData }) => {
     // ** States
     const EditMajorSchema = yup.object().shape({
-        name: yup.string().required("Đây là trường bắt buộc"),
-        description: yup.string().required("Đây là trường bắt buộc")
+        name: yup.string().required("Đây là trường bắt buộc")
     })
 
     // ** Hooks
@@ -52,7 +51,7 @@ const EditMajor = ({ open, handleEditModal, dataEdit, getData }) => {
         }).then(result => {
             if (!result.error) {
                 Swal.fire({
-                    title: "Cập nhật chuyên ngành thành công",
+                    title: "Cập nhật lĩnh vực thành công",
                     text: "Yêu cầu đã được phê duyệt!",
                     icon: "success",
                     customClass: {
@@ -72,13 +71,12 @@ const EditMajor = ({ open, handleEditModal, dataEdit, getData }) => {
             <ModalHeader className='bg-transparent' toggle={handleCloseModal}></ModalHeader>
             <ModalBody className='px-sm-5 mx-50 pb-5'>
                 <div className='text-center mb-2'>
-                    <h1 className='mb-1'>Cập nhật chuyên ngành</h1>
-                    <p>Danh sách chuyên ngành</p>
+                    <h1 className='mb-1'>Cập nhật lĩnh vực</h1>
                 </div>
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                     <Col xs={12}>
                         <Label className='form-label' for='name'>
-                            Tên chuyên ngành
+                            Tên lĩnh vực <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
                             defaultValue={dataEdit?.name ?? ''}
@@ -89,7 +87,7 @@ const EditMajor = ({ open, handleEditModal, dataEdit, getData }) => {
                                     <Input
                                         {...field}
                                         id='name'
-                                        placeholder='Nhập tên chuyên ngành'
+                                        placeholder='Nhập tên lĩnh vực'
                                         invalid={errors.name && true}
                                     />
                                 )
@@ -109,7 +107,6 @@ const EditMajor = ({ open, handleEditModal, dataEdit, getData }) => {
                                 <Input {...field} id='description' placeholder='Nhập mô tả' invalid={errors.description && true} />
                             )}
                         />
-                        {errors.description && <FormFeedback>{errors.description.message}</FormFeedback>}
                     </Col>
                     <Col xs={12} className='text-center mt-2 pt-50'>
                         <Button type='submit' className='me-1' color='primary'>

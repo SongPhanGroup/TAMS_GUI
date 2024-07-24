@@ -28,8 +28,7 @@ import { useEffect, useState } from "react"
 const EditOrganization = ({ open, handleEditModal, dataEdit, getData }) => {
     // ** States
     const EditOrganizationSchema = yup.object().shape({
-        name: yup.string().required("Đây là trường bắt buộc"),
-        description: yup.string().required("Đây là trường bắt buộc")
+        name: yup.string().required("Đây là trường bắt buộc")
     })
 
     // ** Hooks
@@ -120,12 +119,11 @@ const EditOrganization = ({ open, handleEditModal, dataEdit, getData }) => {
             <ModalBody className='px-sm-5 mx-50 pb-5'>
                 <div className='text-center mb-2'>
                     <h1 className='mb-1'>Cập nhật đơn vị</h1>
-                    <p>Danh sách đơn vị</p>
                 </div>
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                     <Col xs={12}>
                         <Label className='form-label' for='name'>
-                            Tên đơn vị
+                            Tên đơn vị <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
                             defaultValue={dataEdit?.name ?? ''}
@@ -172,7 +170,6 @@ const EditOrganization = ({ open, handleEditModal, dataEdit, getData }) => {
                                 <Input {...field} id='description' placeholder='Nhập mô tả' invalid={errors.description && true} />
                             )}
                         />
-                        {errors.description && <FormFeedback>{errors.description.message}</FormFeedback>}
                     </Col>
                     <Col xs={12} className='text-center mt-2 pt-50'>
                         <Button type='submit' className='me-1' color='primary'>

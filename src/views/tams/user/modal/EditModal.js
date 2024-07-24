@@ -33,8 +33,7 @@ const EditUser = ({ open, handleEditModal, dataEdit, getData }) => {
     const EditUserSchema = yup.object().shape({
         fullName: yup.string().required("Đây là trường bắt buộc"),
         username: yup.string().required("Đây là trường bắt buộc"),
-        password: yup.string().required("Đây là trường bắt buộc"),
-        description: yup.string().required("Đây là trường bắt buộc")
+        password: yup.string().required("Đây là trường bắt buộc")    
     })
 
     // ** Hooks
@@ -139,12 +138,11 @@ const EditUser = ({ open, handleEditModal, dataEdit, getData }) => {
             <ModalBody className='px-sm-5 mx-50 pb-5'>
                 <div className='text-center mb-2'>
                     <h1 className='mb-1'>Cập nhật người dùng</h1>
-                    <p>Danh sách người dùng</p>
                 </div>
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                 <Col sm={6} xs={12}>
                         <Label className='form-label' for='fullName'>
-                            Tên người dùng
+                            Tên người dùng <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
                             defaultValue={dataEdit?.fullName ?? ''}
@@ -165,7 +163,7 @@ const EditUser = ({ open, handleEditModal, dataEdit, getData }) => {
                     </Col>
                     <Col sm={6} xs={12}>
                         <Label className='form-label' for='username'>
-                            Tên đăng nhập
+                            Tên đăng nhập <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
                             defaultValue={dataEdit?.userName ?? ''}
@@ -186,7 +184,7 @@ const EditUser = ({ open, handleEditModal, dataEdit, getData }) => {
                     </Col>
                     <Col sm={6} xs={12}>
                         <Label className='form-label' for='password'>
-                            Mật khẩu
+                            Mật khẩu <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
                             defaultValue={dataEdit?.password ?? ''}
@@ -207,7 +205,7 @@ const EditUser = ({ open, handleEditModal, dataEdit, getData }) => {
                     </Col>
                     <Col sm={6} xs={12}>
                         <Label className='form-label' for='organizationId'>
-                            Đơn vị
+                            Đơn vị <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
                             defaultValue={{value: dataEdit?.organization?.id, label: dataEdit?.organization?.name}}
@@ -223,7 +221,7 @@ const EditUser = ({ open, handleEditModal, dataEdit, getData }) => {
                     </Col>
                     <Col sm={6} xs={12}>
                         <Label className='form-label' for='roleId'>
-                            Vai trò
+                            Vai trò <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
                             defaultValue={{value: dataEdit?.role?.id, label: dataEdit?.role?.name}}
@@ -249,7 +247,6 @@ const EditUser = ({ open, handleEditModal, dataEdit, getData }) => {
                                 <Input {...field} id='description' placeholder='Nhập mô tả' invalid={errors.description && true} />
                             )}
                         />
-                        {errors.description && <FormFeedback>{errors.description.message}</FormFeedback>}
                     </Col>
                     <Col xs={12} className='text-center mt-2 pt-50'>
                         <Button type='submit' className='me-1' color='primary'>

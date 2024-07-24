@@ -47,10 +47,10 @@ import { deleteCheckingDocument, detailCheckingDocument, getCheckingDocument } f
 import AddNewCheckingDocument from './modal/AddNewModal'
 import EditCheckingDocument from './modal/EditModal'
 import { getCourse } from '../../../api/course'
-import ResultCheckingDocument from './modal/ResultModal'
 import { deleteCheckingDocumentVersion } from '../../../api/checking_document_version'
 import AddNewCheckingDocumentVersion from './modalVersion/AddNewModal'
 import EditCheckingDocumentVersion from './modalVersion/EditModal'
+import ResultCheckingDocument from './modalVersion/ResultModal'
 
 // ** Bootstrap Checkbox Component
 const BootstrapCheckbox = forwardRef((props, ref) => (
@@ -65,7 +65,6 @@ const CheckingDocument = () => {
     const [loading, setLoading] = useState(true)
     const [modalAddNew, setModalAddNew] = useState(false)
     const [modalEdit, setModalEdit] = useState(false)
-    const [modalResult, setModalResult] = useState(false)
     const [currentPage, setCurrentPage] = useState(1)
     const [searchValue, setSearchValue] = useState('')
     const [courseId, setCourseId] = useState()
@@ -79,11 +78,6 @@ const CheckingDocument = () => {
     const handleEditModal = (data) => {
         setDataEdit(data)
         setModalEdit(!modalEdit)
-    }
-
-    const handleResultModal = (data) => {
-        setDataEdit(data)
-        setModalResult(!modalResult)
     }
 
     const [listCourse, setListCourse] = useState([])
@@ -274,15 +268,6 @@ const CheckingDocument = () => {
                                     Xóa tài liệu
                                 </UncontrolledTooltip>
                             </div>}
-                        <div id="tooltip_result" onClick={() => handleResultModal(row)}>
-                            <CheckSquare
-                                size={15}
-                                style={{ cursor: "pointer", stroke: "blue" }}
-                            />
-                            <UncontrolledTooltip placement='top' target='tooltip_result'>
-                                Kết quả kiểm tra
-                            </UncontrolledTooltip>
-                        </div>
                     </div>
                 )
             }
@@ -402,17 +387,23 @@ const CheckingDocument = () => {
     }
 
     const ExpandedComponent = ({ data }) => {
-        
         const [modalVersionAddNew, setModalVersionAddNew] = useState(false)
         const [modalVersionEdit, setModalVersionEdit] = useState(false)
         const [dataDetailById, setDataDetailById] = useState([])
+        const [modalResult, setModalResult] = useState(false)
+        const [dataEditVersion, setDataEditVersion] = useState()
 
         const handleAddModalVersion = () => {
             setModalVersionAddNew(!modalVersionAddNew)
         }
 
-        const handleEditModalVersion = () => {
+        const handleEditModalVersion = (data) => {
+            setDataEditVersion(data)
             setModalVersionEdit(!modalVersionEdit)
+        }
+
+        const handleResultModal = () => {
+            setModalResult(!modalResult)
         }
 
         const fetchCheckingDocumentVersion = () => {
@@ -486,12 +477,21 @@ const CheckingDocument = () => {
                                         Xóa phiên bản
                                     </UncontrolledTooltip>
                                 </div>}
+                            <div id="tooltip_result" onClick={() => handleResultModal(row)}>
+                                <CheckSquare
+                                    size={15}
+                                    style={{ cursor: "pointer", stroke: "blue" }}
+                                />
+                                <UncontrolledTooltip placement='top' target='tooltip_result'>
+                                    Kết quả kiểm tra
+                                </UncontrolledTooltip>
+                            </div>
                         </div>
                     )
                 }
             }
         ]
-        
+
         return (
             <Fragment>
                 <Card style={{ backgroundColor: 'white' }}>
@@ -499,8 +499,8 @@ const CheckingDocument = () => {
                         <CardTitle tag='h4'>Danh sách phiên bản kiểm tra</CardTitle>
                         <div className='d-flex mt-md-0 mt-1'>
                             {ability.can('add', 'nguoidung') &&
-                                <Button className='ms-2' color='primary' onClick={handleAddModalVersion}>
-                                    <Plus size={15} />
+                                <Button className='ms-2 btn-sub_add' color='primary' onClick={handleAddModalVersion}>
+                                    <Plus size={11} />
                                     <span className='align-middle ms-50'>Thêm mới</span>
                                 </Button>}
                         </div>
@@ -554,8 +554,9 @@ const CheckingDocument = () => {
                         />}
                     </div>
                 </Card>
-                <AddNewCheckingDocumentVersion open={modalVersionAddNew} handleAddModalVersion={handleAddModalVersion} getData={fetchCheckingDocumentVersion} />
-                {dataDetailById && <EditCheckingDocumentVersion open={modalVersionEdit} handleEditModalVersion={handleEditModalVersion} getData={fetchCheckingDocumentVersion} dataDetailById={dataDetailById} />}
+                <AddNewCheckingDocumentVersion open={modalVersionAddNew} handleAddModalVersion={handleAddModalVersion} getData={fetchCheckingDocumentVersion} dataTitle={data?.title} />
+                {dataDetailById && <EditCheckingDocumentVersion open={modalVersionEdit} handleEditModalVersion={handleEditModalVersion} getData={fetchCheckingDocumentVersion} dataEdit={dataEditVersion} dataTitle={data?.title} />}
+                {dataDetailById && <ResultCheckingDocument open={modalResult} handleResultModal={handleResultModal} getData={fetchCheckingDocumentVersion} dataDetailById={dataDetailById} />}
             </Fragment>
         )
     }
@@ -669,7 +670,6 @@ const CheckingDocument = () => {
             </Card >
             <AddNewCheckingDocument open={modalAddNew} handleAddModal={handleAddModal} getData={fetchCheckingDocument} />
             {dataEdit && <EditCheckingDocument open={modalEdit} handleEditModal={handleEditModal} getData={fetchCheckingDocument} dataEdit={dataEdit} />}
-            {dataEdit && <ResultCheckingDocument open={modalResult} handleResultModal={handleResultModal} getData={fetchCheckingDocument} dataEdit={dataEdit} />}
         </Fragment >
     )
 }

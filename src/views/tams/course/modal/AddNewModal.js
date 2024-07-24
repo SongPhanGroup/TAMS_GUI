@@ -33,9 +33,7 @@ import { toDateStringv2 } from "../../../../utility/Utils"
 const AddNewCourse = ({ open, handleAddModal, getData }) => {
     // ** States
     const AddNewCourseSchema = yup.object().shape({
-        name: yup.string().required("Yêu cầu nhập tên đợt kiểm tra"),
-        // date: yup.date().required("Yêu cầu nhập tên đợt kiểm tra"),
-        description: yup.string().required("Yêu cầu nhập mô tả")
+        name: yup.string().required("Yêu cầu nhập tên đợt kiểm tra")
     })
 
     // ** Hooks
@@ -99,12 +97,11 @@ const AddNewCourse = ({ open, handleAddModal, getData }) => {
             <ModalBody className='px-sm-5 mx-50 pb-5'>
                 <div className='text-center mb-2'>
                     <h1 className='mb-1'>Thêm mới đợt kiểm tra</h1>
-                    <p>Danh sách đợt kiểm tra</p>
                 </div>
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                     <Col xs={12}>
                         <Label className='form-label' for='name'>
-                            Tên đợt kiểm tra
+                            Tên đợt kiểm tra <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
                             control={control}
@@ -124,7 +121,7 @@ const AddNewCourse = ({ open, handleAddModal, getData }) => {
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='date'>
-                            Thời gian
+                            Thời gian <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
                             control={control}
@@ -160,7 +157,6 @@ const AddNewCourse = ({ open, handleAddModal, getData }) => {
                                 <Input {...field} id='description' placeholder='Nhập mô tả' invalid={errors.description && true} />
                             )}
                         />
-                        {errors.description && <FormFeedback>{errors.description.message}</FormFeedback>}
                     </Col>
                     <Col xs={12} className='text-center mt-2 pt-50'>
                         <Button type='submit' name="add" className='me-1' color='primary'>

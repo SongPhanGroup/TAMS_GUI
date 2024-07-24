@@ -76,7 +76,6 @@ const AddNewTypeChecking = ({ open, handleAddModal, getData }) => {
             <ModalBody className='px-sm-5 mx-50 pb-5'>
                 <div className='text-center mb-2'>
                     <h1 className='mb-1'>Thêm mới loại kiểm tra</h1>
-                    <p>Danh sách loại kiểm tra</p>
                 </div>
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                     <Col xs={12}>

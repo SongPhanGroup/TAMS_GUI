@@ -3,7 +3,7 @@
 //Template config options
 const themeConfig = {
   app: {
-    appName: 'Phần mềm chống đạo văn',
+    appName: 'Phần mềm phát hiện đạo văn',
     appLogoImage: require('@src/assets/images/logo/logo_MTA.png').default
   },
   layout: {

@@ -27,13 +27,14 @@ import '@styles/react/libs/react-select/_react-select.scss'
 import Swal from 'sweetalert2'
 import { postCheckingDocument } from "../../../../api/checking_document"
 import { getCourse } from "../../../../api/course"
+import classNames from "classnames"
 
 const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
     const AddNewCheckingDocumentSchema = yup.object().shape({
+        file: yup.mixed().required("Yêu cầu chọn file"),
         title: yup.string().required("Yêu cầu nhập tiêu đề"),
         author: yup.string().required("Yêu cầu nhập tác giả"),
-        course: yup.object().typeError("Yêu cầu nhập đợt kiểm tra"),
-        description: yup.string().required("Yêu cầu nhập mô tả")
+        course: yup.object().required("Yêu cầu nhập đợt kiểm tra").nullable()
     })
 
     // ** Hooks
@@ -48,7 +49,7 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
     })
 
     // ** State
-    // const [file, setFile] = useState()
+    const [file, setFile] = useState()
     const [listCourse, setListCourse] = useState([])
 
     const getAllDataPromises = async () => {
@@ -91,11 +92,12 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
         reset()
     }
 
-    // const handleChangeFile = (event) => {
-    //     const file = event.target.files[0]
-    //     setFile(file)
-    // }
+    const handleChangeFile = (event) => {
+        const file = event.target.files[0]
+        setFile(file)
+    }
 
+    console.log(file)
     const onSubmit = (data) => {
         postCheckingDocument({
             title: data.title,
@@ -139,7 +141,7 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                     <Col xs={12}>
                         <Label className='form-label' for='title'>
-                            Tiêu đề
+                            Tiêu đề <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
                             control={control}
@@ -159,20 +161,28 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='course'>
-                            Đợt kiểm tra
+                            Đợt kiểm tra <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
+                            id='react-select'
                             name='course'
                             control={control}
                             render={({ field }) => (
-                                <Select {...field} id='course' placeholder='Chọn đợt kiểm tra' invalid={errors.course && true} options={listCourse} />
-                            )}
+                                <Select
+                                    placeholder="Chọn đợt kiểm tra"
+                                    classNamePrefix='select'
+                                    name='clear'
+                                    options={listCourse}
+                                    isClearable
+                                    className={classNames('react-select', { 'is-invalid': errors.course && true })}
+                                    {...field}
+                                />)}
                         />
                         {errors.course && <FormFeedback>{errors.course.message}</FormFeedback>}
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='author'>
-                            Tác giả
+                            Tác giả <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
                             name='author'
@@ -194,11 +204,10 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
                                 <Input {...field} id='description' placeholder='Nhập mô tả' invalid={errors.description && true} />
                             )}
                         />
-                        {errors.description && <FormFeedback>{errors.description.message}</FormFeedback>}
                     </Col>
-                    {/* <Col xs={12}>
+                    <Col xs={12}>
                         <Label className='form-label' for='file'>
-                            Tài liệu
+                            Tài liệu <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
                             name='file'
@@ -211,7 +220,7 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
                             )}
                         />
                         {errors.file && <FormFeedback>{errors.file.message}</FormFeedback>}
-                    </Col> */}
+                    </Col>
                     <Col xs={12} className='text-center mt-2 pt-50'>
                         <Button type='submit' name='add' className='me-1' color='primary'>
                             Thêm

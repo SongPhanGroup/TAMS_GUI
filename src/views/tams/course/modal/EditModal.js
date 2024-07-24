@@ -33,8 +33,7 @@ import { useState } from "react"
 const EditCourse = ({ open, handleEditModal, dataEdit, getData }) => {
     // ** States
     const EditCourseSchema = yup.object().shape({
-        name: yup.string().required("Đây là trường bắt buộc"),
-        description: yup.string().required("Đây là trường bắt buộc")
+        name: yup.string().required("Đây là trường bắt buộc")
     })
 
     // ** Hooks
@@ -90,19 +89,17 @@ const EditCourse = ({ open, handleEditModal, dataEdit, getData }) => {
         })
     }
 
-    console.log(convertDateString(dataEdit.date))
     return (
         <Modal isOpen={open} toggle={handleEditModal} className='modal-dialog-centered modal-md'>
             <ModalHeader className='bg-transparent' toggle={handleCloseModal}></ModalHeader>
             <ModalBody className='px-sm-5 mx-50 pb-5'>
                 <div className='text-center mb-2'>
                     <h1 className='mb-1'>Cập nhật đợt kiểm tra</h1>
-                    <p>Danh sách đợt kiểm tra</p>
                 </div>
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                     <Col xs={12}>
                         <Label className='form-label' for='name'>
-                            Tên đợt kiểm tra
+                            Tên đợt kiểm tra <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
                             defaultValue={dataEdit?.name ?? ''}
@@ -123,7 +120,7 @@ const EditCourse = ({ open, handleEditModal, dataEdit, getData }) => {
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='date'>
-                            Thời gian
+                            Thời gian <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
                             control={control}
@@ -137,7 +134,6 @@ const EditCourse = ({ open, handleEditModal, dataEdit, getData }) => {
                                             locale: {
                                                 ...Vietnamese
                                             }
-                                            // defaultDate: new Date()
                                         }}
                                         placeholder="dd/mm/yyyy"
                                         onChange={handleChangeDate}
@@ -161,7 +157,6 @@ const EditCourse = ({ open, handleEditModal, dataEdit, getData }) => {
                                 <Input {...field} id='description' placeholder='Nhập mô tả' invalid={errors.description && true} />
                             )}
                         />
-                        {errors.description && <FormFeedback>{errors.description.message}</FormFeedback>}
                     </Col>
                     <Col xs={12} className='text-center mt-2 pt-50'>
                         <Button type='submit' className='me-1' color='primary'>

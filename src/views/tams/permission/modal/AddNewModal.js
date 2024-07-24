@@ -85,12 +85,11 @@ const AddNewPermisson = ({ open, handleAddModal, getData }) => {
             <ModalBody className='px-sm-5 mx-50 pb-5'>
                 <div className='text-center mb-2'>
                     <h1 className='mb-1'>Thêm mới quyền</h1>
-                    <p>Danh sách quyền</p>
                 </div>
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                     <Col xs={12}>
                         <Label className='form-label' for='name'>
-                            Tên quyền
+                            Tên quyền <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
                             control={control}
@@ -110,7 +109,7 @@ const AddNewPermisson = ({ open, handleAddModal, getData }) => {
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='key'>
-                            Mã quyền
+                            Mã quyền <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
                             control={control}

@@ -27,6 +27,7 @@ import { useEffect, useState } from "react"
 import { getOrganization } from "../../../../api/organization"
 import { getRole } from "../../../../api/role"
 import { postUser } from "../../../../api/user"
+import classNames from "classnames"
 
 const AddNewUser = ({ open, handleAddModal, getData }) => {
     // ** States
@@ -34,7 +35,8 @@ const AddNewUser = ({ open, handleAddModal, getData }) => {
         fullName: yup.string().required("Yêu cầu nhập tên người dùng"),
         username: yup.string().required("Yêu cầu nhập tên đăng nhập"),
         password: yup.string().required("Yêu cầu nhập mật khẩu"),
-        description: yup.string().required("Yêu cầu nhập mô tả")
+        organizationId: yup.object().required("Vui lòng chọn đơn vị").nullable(),
+        roleId: yup.object().required("Vui lòng chọn vai trò").nullable()
     })
 
     // ** Hooks
@@ -143,12 +145,11 @@ const AddNewUser = ({ open, handleAddModal, getData }) => {
             <ModalBody className='px-sm-5 mx-50 pb-5'>
                 <div className='text-center mb-2'>
                     <h1 className='mb-1'>Thêm mới người dùng</h1>
-                    <p>Danh sách người dùng</p>
                 </div>
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                     <Col sm={6} xs={12}>
                         <Label className='form-label' for='fullName'>
-                            Tên người dùng
+                            Tên người dùng <span style={{ color: 'red' }}>(*)</span>
                         </Label>
                         <Controller
                             control={control}
@@ -168,7 +169,7 @@ const AddNewUser = ({ open, handleAddModal, getData }) => {
                     </Col>
                     <Col sm={6} xs={12}>
                         <Label className='form-label' for='username'>
-                            Tên đăng nhập
+                            Tên đăng nhập <span style={{ color: 'red' }}>(*)</span>
                         </Label>
                         <Controller
                             control={control}
@@ -188,7 +189,7 @@ const AddNewUser = ({ open, handleAddModal, getData }) => {
                     </Col>
                     <Col sm={6} xs={12}>
                         <Label className='form-label' for='password'>
-                            Mật khẩu
+                            Mật khẩu <span style={{ color: 'red' }}>(*)</span>
                         </Label>
                         <Controller
                             control={control}
@@ -208,30 +209,46 @@ const AddNewUser = ({ open, handleAddModal, getData }) => {
                     </Col>
                     <Col sm={6} xs={12}>
                         <Label className='form-label' for='organizationId'>
-                            Đơn vị
+                            Đơn vị <span style={{ color: 'red' }}>(*)</span>
                         </Label>
                         <Controller
+                            id='react-select'
                             control={control}
                             name='organizationId'
                             render={({ field }) => {
                                 return (
-                                    <Select {...field} name='organizationId' placeholder='Chọn đơn vị' invalid={errors.course && true} options={listOrganization} value={field.value} onChange={selectedOption => field.onChange(selectedOption)} />
-                                )
+                                    <Select
+                                        placeholder="Chọn đơn vị"
+                                        classNamePrefix='select'
+                                        name='clear'
+                                        options={listOrganization}
+                                        isClearable
+                                        className={classNames('react-select', { 'is-invalid': errors.organizationId && true })}
+                                        {...field}
+                                    />)
                             }}
                         />
                         {errors.organizationId && <FormFeedback>{errors.organizationId.message}</FormFeedback>}
                     </Col>
                     <Col sm={6} xs={12}>
                         <Label className='form-label' for='roleId'>
-                            Vai trò
+                            Vai trò <span style={{ color: 'red' }}>(*)</span>
                         </Label>
                         <Controller
+                            id='react-select'
                             control={control}
                             name='roleId'
                             render={({ field }) => {
                                 return (
-                                    <Select {...field} name='roleId' placeholder='Chọn vai trò' invalid={errors.course && true} options={listRole} value={field.value} onChange={selectedOption => field.onChange(selectedOption)} />
-                                )
+                                    <Select
+                                        placeholder="Chọn vai trò"
+                                        classNamePrefix='select'
+                                        name='clear'
+                                        options={listRole}
+                                        isClearable
+                                        className={classNames('react-select', { 'is-invalid': errors.roleId && true })}
+                                        {...field}
+                                    />)
                             }}
                         />
                         {errors.roleId && <FormFeedback>{errors.roleId.message}</FormFeedback>}
@@ -247,7 +264,6 @@ const AddNewUser = ({ open, handleAddModal, getData }) => {
                                 <Input {...field} id='description' placeholder='Nhập mô tả' invalid={errors.description && true} />
                             )}
                         />
-                        {errors.description && <FormFeedback>{errors.description.message}</FormFeedback>}
                     </Col>
                     <Col xs={12} className='text-center mt-2 pt-50'>
                         <Button type='submit' name="add" className='me-1' color='primary'>

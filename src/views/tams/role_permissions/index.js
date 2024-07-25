@@ -4,7 +4,7 @@ import { Fragment, useState, useEffect } from "react"
 import { Row, Col } from "reactstrap"
 
 import RoleCards from "./RoleCards"
-import UserTable from "./UserTable"
+import RoleTable from "./RoleTable"
 import { getRole } from '../../../api/role'
 
 const ListPermission = () => {
@@ -45,7 +45,7 @@ const ListPermission = () => {
           <RoleCards reload={reload} />
         </Col>
         <Col md="12">
-          <UserTable setReload={setReload} reload={reload} />
+          <RoleTable setReload={setReload} reload={reload} />
         </Col>
       </Row>
     </Fragment>

@@ -29,3 +29,15 @@ export const deletePermission = async (id) => {
   const res = await API.delete(uri)
   return res
 }
+
+export const getPermissionByRole = async (id) => {
+  const uri = `/permission/${id}`
+  const res = await API.get(uri)
+  return res
+}
+
+export const listPerNotInRole = async (id) => {
+  const uri = `/permission/${id}`
+  const res = await API.get(uri)
+  return res
+}

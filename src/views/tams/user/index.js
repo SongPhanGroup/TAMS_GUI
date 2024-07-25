@@ -167,7 +167,7 @@ const User = () => {
             name: "Vai trò",
             center: true,
             minWidth: "50px",
-            selector: (row) => <span>{row.role.name}</span>
+            selector: (row) => <span>{row.role?.name}</span>
         },
         {
             name: 'Mô tả',

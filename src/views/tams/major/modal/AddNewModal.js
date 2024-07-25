@@ -28,8 +28,7 @@ import { postMajor } from "../../../../api/major"
 const AddNewMajor = ({ open, handleAddModal, getData }) => {
     // ** States
     const AddNewMajorSchema = yup.object().shape({
-        name: yup.string().required("Yêu cầu nhập tên chuyên ngành"),
-        description: yup.string().required("Yêu cầu nhập mô tả")
+        name: yup.string().required("Yêu cầu nhập tên lĩnh vực")
     })
 
     // ** Hooks
@@ -55,7 +54,7 @@ const AddNewMajor = ({ open, handleAddModal, getData }) => {
         postMajor(data).then(result => {
             if (!result.errors) {
                 Swal.fire({
-                    title: "Thêm mới chuyên ngành thành công",
+                    title: "Thêm mới lĩnh vực thành công",
                     text: "Yêu cầu đã được phê duyệt!",
                     icon: "success",
                     customClass: {
@@ -75,13 +74,12 @@ const AddNewMajor = ({ open, handleAddModal, getData }) => {
             <ModalHeader className='bg-transparent' toggle={handleCloseModal}></ModalHeader>
             <ModalBody className='px-sm-5 mx-50 pb-5'>
                 <div className='text-center mb-2'>
-                    <h1 className='mb-1'>Thêm mới chuyên ngành</h1>
-                    <p>Danh sách chuyên ngành</p>
+                    <h1 className='mb-1'>Thêm mới lĩnh vực</h1>
                 </div>
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                     <Col xs={12}>
                         <Label className='form-label' for='name'>
-                            Tên chuyên ngành
+                            Tên lĩnh vực <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
                             control={control}
@@ -91,7 +89,7 @@ const AddNewMajor = ({ open, handleAddModal, getData }) => {
                                     <Input
                                         {...field}
                                         id='name'
-                                        placeholder='Nhập tên chuyên ngành'
+                                        placeholder='Nhập tên lĩnh vực'
                                         invalid={errors.name && true}
                                     />
                                 )
@@ -110,7 +108,6 @@ const AddNewMajor = ({ open, handleAddModal, getData }) => {
                                 <Input {...field} id='description' placeholder='Nhập mô tả' invalid={errors.description && true} />
                             )}
                         />
-                        {errors.description && <FormFeedback>{errors.description.message}</FormFeedback>}
                     </Col>
                     <Col xs={12} className='text-center mt-2 pt-50'>
                         <Button type='submit' name="add" className='me-1' color='primary'>

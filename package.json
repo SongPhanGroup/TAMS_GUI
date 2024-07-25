@@ -26,6 +26,7 @@
     "chart.js": "^3.7.1",
     "classnames": "^2.3.2",
     "cleave.js": "1.6.0",
+    "dayjs": "^1.11.12",
     "draft-js": "0.11.7",
     "draftjs-to-html": "0.9.1",
     "easy-template-x": "^4.1.0",

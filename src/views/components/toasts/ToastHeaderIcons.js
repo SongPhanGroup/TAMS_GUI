@@ -60,7 +60,7 @@ const ToastHeaderIcons = () => {
       <Col md='6' sm='12'>
         <Toast>
           <ToastHeader close={close} icon='primary'>
-            Vuexy
+            HVCT
           </ToastHeader>
           <ToastBody>This is a toast with a primary icon — check it out!</ToastBody>
         </Toast>
@@ -68,7 +68,7 @@ const ToastHeaderIcons = () => {
       <Col md='6' sm='12'>
         <Toast>
           <ToastHeader close={close} icon='success'>
-            Vuexy
+            HVCT
           </ToastHeader>
           <ToastBody>This is a toast with a success icon — check it out!</ToastBody>
         </Toast>
@@ -76,7 +76,7 @@ const ToastHeaderIcons = () => {
       <Col md='6' sm='12'>
         <Toast>
           <ToastHeader close={close} icon='info'>
-            Vuexy
+            HVCT
           </ToastHeader>
           <ToastBody>This is a toast with a info icon — check it out!</ToastBody>
         </Toast>
@@ -84,7 +84,7 @@ const ToastHeaderIcons = () => {
       <Col md='6' sm='12'>
         <Toast>
           <ToastHeader close={close} icon='danger'>
-            Vuexy
+            HVCT
           </ToastHeader>
           <ToastBody>This is a toast with a danger icon — check it out!</ToastBody>
         </Toast>
@@ -92,7 +92,7 @@ const ToastHeaderIcons = () => {
       <Col md='6' sm='12'>
         <Toast>
           <ToastHeader close={close} icon='warning'>
-            Vuexy
+            HVCT
           </ToastHeader>
           <ToastBody>This is a toast with a warning icon — check it out!</ToastBody>
         </Toast>
@@ -100,7 +100,7 @@ const ToastHeaderIcons = () => {
       <Col md='6' sm='12'>
         <Toast>
           <ToastHeader close={close} icon='dark'>
-            Vuexy
+            HVCT
           </ToastHeader>
           <ToastBody>This is a toast with a dark icon — check it out!</ToastBody>
         </Toast>
@@ -109,7 +109,7 @@ const ToastHeaderIcons = () => {
       <Col md='6' sm='12'>
         <Toast>
           <ToastHeader close={close} icon={<Spinner size='sm' color='primary' />}>
-            Vuexy
+            HVCT
           </ToastHeader>
           <ToastBody>This is a toast with a spinner — check it out!</ToastBody>
         </Toast>
@@ -118,7 +118,7 @@ const ToastHeaderIcons = () => {
       <Col md='6' sm='12'>
         <Toast>
           <ToastHeader close={close} icon={logo}>
-            Vuexy
+            HVCT
           </ToastHeader>
           <ToastBody>This is a toast with a logo — check it out!</ToastBody>
         </Toast>

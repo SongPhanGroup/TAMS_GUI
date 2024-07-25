@@ -42,7 +42,7 @@ import {
 import { deleteDocument, getDocument } from '../../../api/document'
 import AddNewDocument from './modal/AddNewModal'
 import EditDocument from './modal/EditModal'
-import { toDateString } from '../../../utility/Utils'
+import { toDateTimeString } from '../../../utility/Utils'
 import { getCourse } from '../../../api/course'
 import { getDocumentType } from '../../../api/document_type'
 import { getMajor } from '../../../api/major'
@@ -219,16 +219,8 @@ const Document = () => {
         {
             name: "Tiêu đề",
             center: true,
-            minWidth: "50px",
-            selector: row => row.title
-        },
-        {
-            name: "Tên tài liệu",
-            center: true,
-            minWidth: "300px",
-            cell: (row) => {
-                return <span style={{ whiteSpace: 'break-spaces' }}>{row.fileName}</span>
-            }
+            minWidth: "200px",
+            selector: row => <span style={{whiteSpace: 'break-spaces'}}>{row.title}</span>
         },
         {
             name: "Tác giả",
@@ -240,7 +232,7 @@ const Document = () => {
             name: "Ngày tạo mới",
             center: true,
             minWidth: "50px",
-            cell: (row) => <span>{toDateString(row.createdAt)}</span>
+            cell: (row) => <span>{toDateTimeString(row.createdAt)}</span>
         },
         {
             name: 'Mô tả',
@@ -342,8 +334,6 @@ const Document = () => {
     //         containerClassName='pagination react-paginate separated-pagination pagination-sm justify-content-end pe-1 mt-1'
     //     />
     // )
-
-    console.log(data)
 
     return (
         <Fragment>

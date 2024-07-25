@@ -139,7 +139,6 @@ const EditCheckingDocumentVersion = ({ open, handleEditModal, dataEdit, getData 
             <ModalBody className='px-sm-5 mx-50 pb-5'>
                 <div className='text-center mb-2'>
                     <h1 className='mb-1'>Cập nhật tài liệu</h1>
-                    <p>Danh sách tài liệu</p>
                 </div>
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                     

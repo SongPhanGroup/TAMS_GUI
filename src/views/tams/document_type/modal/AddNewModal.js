@@ -28,8 +28,7 @@ import { postDocumentType } from "../../../../api/document_type"
 const AddNewDocumentType = ({ open, handleAddModal, getData }) => {
     // ** States
     const AddNewDocumentTypeSchema = yup.object().shape({
-        name: yup.string().required("Yêu cầu nhập tên loại tài liệu"),
-        description: yup.string().required("Yêu cầu nhập mô tả")
+        name: yup.string().required("Yêu cầu nhập tên loại tài liệu")
     })
 
     // ** Hooks
@@ -76,12 +75,11 @@ const AddNewDocumentType = ({ open, handleAddModal, getData }) => {
             <ModalBody className='px-sm-5 mx-50 pb-5'>
                 <div className='text-center mb-2'>
                     <h1 className='mb-1'>Thêm mới loại tài liệu</h1>
-                    <p>Danh sách loại tài liệu</p>
                 </div>
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                     <Col xs={12}>
                         <Label className='form-label' for='name'>
-                            Tên loại tài liệu
+                            Tên loại tài liệu <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
                             control={control}
@@ -110,7 +108,6 @@ const AddNewDocumentType = ({ open, handleAddModal, getData }) => {
                                 <Input {...field} id='description' placeholder='Nhập mô tả' invalid={errors.description && true} />
                             )}
                         />
-                        {errors.description && <FormFeedback>{errors.description.message}</FormFeedback>}
                     </Col>
                     <Col xs={12} className='text-center mt-2 pt-50'>
                         <Button type='submit' name="add" className='me-1' color='primary'>

@@ -157,7 +157,7 @@ const RoleCards = ({ reload }) => {
                     // }).catch(err => {
                     //     console.log(err)
                     // })
-                    const res = await updateRole(dataSubmit)
+                    const res = await editRole(dataSubmit)
                     if (res) {
                         MySwal.fire({
                             icon: 'success',

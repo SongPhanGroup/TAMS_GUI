@@ -554,7 +554,7 @@ const CheckingDocument = () => {
                         />}
                     </div>
                 </Card>
-                <AddNewCheckingDocumentVersion open={modalVersionAddNew} handleAddModalVersion={handleAddModalVersion} getData={fetchCheckingDocumentVersion} dataTitle={data?.title} />
+                <AddNewCheckingDocumentVersion open={modalVersionAddNew} handleAddModalVersion={handleAddModalVersion} getData={fetchCheckingDocumentVersion} dataTitle={data?.title} dataId={data?.id} />
                 {dataDetailById && <EditCheckingDocumentVersion open={modalVersionEdit} handleEditModalVersion={handleEditModalVersion} getData={fetchCheckingDocumentVersion} dataEdit={dataEditVersion} dataTitle={data?.title} />}
                 {dataDetailById && <ResultCheckingDocument open={modalResult} handleResultModal={handleResultModal} getData={fetchCheckingDocumentVersion} dataDetailById={dataDetailById} />}
             </Fragment>

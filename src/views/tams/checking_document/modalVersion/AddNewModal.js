@@ -26,7 +26,7 @@ import '@styles/react/libs/react-select/_react-select.scss'
 import Swal from 'sweetalert2'
 import { postCheckingDocumentVersion } from "../../../../api/checking_document_version"
 
-const AddNewCheckingDocumentVersion = ({ open, handleAddModalVersion, getData, dataTitle }) => {
+const AddNewCheckingDocumentVersion = ({ open, handleAddModalVersion, getData, dataTitle, dataId }) => {
     const AddNewCheckingDocumentVersionSchema = yup.object().shape({
         file: yup.mixed().required("Yêu cầu nhập file")
     })
@@ -59,11 +59,11 @@ const AddNewCheckingDocumentVersion = ({ open, handleAddModalVersion, getData, d
         const formData = new FormData()
         formData.append('file', file)
         formData.append('description', data.description)
-        formData.append('checkingDocumentId', data.checkingDocument.value)
+        formData.append('checkingDocumentId', dataId)
         postCheckingDocumentVersion(formData).then(result => {
             if (result.status === 'success') {
                 Swal.fire({
-                    title: "Thêm mới kiểm tra tài liệu thành công",
+                    title: "Thêm mới phiên bản kiểm tra thành công",
                     text: "Yêu cầu đã được phê duyệt!",
                     icon: "success",
                     customClass: {
@@ -72,7 +72,7 @@ const AddNewCheckingDocumentVersion = ({ open, handleAddModalVersion, getData, d
                 })
             } else {
                 Swal.fire({
-                    title: "Thêm mới kiểm tra tài liệu thất bại",
+                    title: "Thêm mới phiên bản kiểm tra thất bại",
                     text: "Vui lòng thử lại sau!",
                     icon: "error",
                     customClass: {
@@ -97,7 +97,7 @@ const AddNewCheckingDocumentVersion = ({ open, handleAddModalVersion, getData, d
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                     <Col xs={12}>
                         <Label className='form-label' for='checkingDocument'>
-                            Kiểm tra tài liệu <span style={{color: 'red'}}>(*)</span>
+                            phiên bản kiểm tra <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
                             disabled
@@ -105,7 +105,7 @@ const AddNewCheckingDocumentVersion = ({ open, handleAddModalVersion, getData, d
                             name='checkingDocument'
                             control={control}
                             render={({ field }) => (
-                                <Input {...field} id='checkingDocument' placeholder='Nhập kiểm tra tài liệu' invalid={errors.checkingDocument && true} />
+                                <Input {...field} id='checkingDocument' placeholder='Nhập phiên bản kiểm tra' invalid={errors.checkingDocument && true} />
                             )}
                         />
                     </Col>

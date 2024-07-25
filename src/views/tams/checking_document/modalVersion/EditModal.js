@@ -61,7 +61,7 @@ const EditCheckingDocumentVersion = ({ open, handleEditModalVersion, dataEdit, g
         editCheckingDocumentVersion(dataEdit?.id, formData).then(result => {
             if (result.status === 'success') {
                 Swal.fire({
-                    title: "Cập nhật kiểm tra tài liệu thành công",
+                    title: "Cập nhật phiên bản kiểm tra thành công",
                     text: "Yêu cầu đã được phê duyệt!",
                     icon: "success",
                     customClass: {
@@ -70,7 +70,7 @@ const EditCheckingDocumentVersion = ({ open, handleEditModalVersion, dataEdit, g
                 })
             } else {
                 Swal.fire({
-                    title: "Cập nhật kiểm tra tài liệu thất bại",
+                    title: "Cập nhật phiên bản kiểm tra thất bại",
                     text: "Vui lòng thử lại sau!",
                     icon: "error",
                     customClass: {
@@ -94,7 +94,7 @@ const EditCheckingDocumentVersion = ({ open, handleEditModalVersion, dataEdit, g
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                     <Col xs={12}>
                         <Label className='form-label' for='checkingDocument'>
-                            Kiểm tra tài liệu <span style={{color: 'red'}}>(*)</span>
+                            phiên bản kiểm tra <span style={{color: 'red'}}>(*)</span>
                         </Label>
                         <Controller
                             disabled
@@ -102,7 +102,7 @@ const EditCheckingDocumentVersion = ({ open, handleEditModalVersion, dataEdit, g
                             name='checkingDocument'
                             control={control}
                             render={({ field }) => (
-                                <Input {...field} id='checkingDocument' placeholder='Nhập kiểm tra tài liệu' invalid={errors.checkingDocument && true} />
+                                <Input {...field} id='checkingDocument' placeholder='Nhập phiên bản kiểm tra' invalid={errors.checkingDocument && true} />
                             )}
                         />
                         {errors.checkingDocument && <FormFeedback>{errors.checkingDocument.message}</FormFeedback>}

@@ -28,6 +28,7 @@ import Swal from 'sweetalert2'
 import { postCheckingDocument } from "../../../../api/checking_document"
 import { getCourse } from "../../../../api/course"
 import classNames from "classnames"
+import { postCheckingDocumentVersion } from "../../../../api/checking_document_version"
 
 const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
     const AddNewCheckingDocumentSchema = yup.object().shape({
@@ -97,7 +98,6 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
         setFile(file)
     }
 
-    console.log(file)
     const onSubmit = (data) => {
         postCheckingDocument({
             title: data.title,
@@ -106,12 +106,20 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
             description: data.description
         }).then(result => {
             if (result.status === 'success') {
-                Swal.fire({
-                    title: "Thêm mới kiểm tra tài liệu thành công",
-                    text: "Yêu cầu đã được phê duyệt!",
-                    icon: "success",
-                    customClass: {
-                        confirmButton: "btn btn-success"
+                const formData = new FormData()
+                formData.append('file', file)
+                formData.append('description', data.description)
+                formData.append('checkingDocumentId', result?.data?.id)
+                postCheckingDocumentVersion(formData).then(result => {
+                    if (result.status === 'success') {
+                        Swal.fire({
+                            title: "Thêm mới kiểm tra tài liệu thành công",
+                            text: "Yêu cầu đã được phê duyệt!",
+                            icon: "success",
+                            customClass: {
+                                confirmButton: "btn btn-success"
+                            }
+                        })
                     }
                 })
             } else {
@@ -141,7 +149,7 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                     <Col xs={12}>
                         <Label className='form-label' for='title'>
-                            Tiêu đề <span style={{color: 'red'}}>(*)</span>
+                            Tiêu đề <span style={{ color: 'red' }}>(*)</span>
                         </Label>
                         <Controller
                             control={control}
@@ -161,7 +169,7 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='course'>
-                            Đợt kiểm tra <span style={{color: 'red'}}>(*)</span>
+                            Đợt kiểm tra <span style={{ color: 'red' }}>(*)</span>
                         </Label>
                         <Controller
                             id='react-select'
@@ -182,7 +190,7 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='author'>
-                            Tác giả <span style={{color: 'red'}}>(*)</span>
+                            Tác giả <span style={{ color: 'red' }}>(*)</span>
                         </Label>
                         <Controller
                             name='author'
@@ -207,7 +215,7 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='file'>
-                            Tài liệu <span style={{color: 'red'}}>(*)</span>
+                            Tài liệu <span style={{ color: 'red' }}>(*)</span>
                         </Label>
                         <Controller
                             name='file'

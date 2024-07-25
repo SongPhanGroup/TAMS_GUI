@@ -49,3 +49,27 @@ WE WILL RELEASE FUTURE UPDATES SO IN ORDER TO NOT OVERWRITE YOUR STYLES IT'S BET
 		}
 	}
 }
+
+.red-color {
+	color: red !important;
+	padding-left: 0.2rem;
+}
+.rdt_TableHeadRow {
+    background-color: #09A863!important;
+    border-top: 1px solid!important;
+    border-color: #ebe9f1!important;
+	color: #fff!important;
+}
+
+.rdt_TableHeadRow .rdt_TableCol {
+	color: #fff!important;
+	text-transform: uppercase!important;
+}
+
+.react-dataTable .rdt_TableHead .rdt_TableHeadRow .rdt_TableCol .rdt_TableCol_Sortable .sc-cwHptR.brFloq {
+    white-space: break-spaces!important;
+    color: #fff!important;
+	font-weight: bold;
+    // font-style: 0.857rem;
+    letter-spacing: 0.5px;
+}

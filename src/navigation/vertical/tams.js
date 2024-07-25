@@ -63,21 +63,27 @@ export default [
     header: 'Quản lý người dùng'
   },
   {
+    id: 'user',
+    title: 'QL Tài khoản',
+    icon: <Users size={20} />,
+    navLink: '/tams/user'
+  },
+  {
     id: 'role',
-    title: 'Vai trò',
+    title: 'Vai trò, phân quyền',
     icon: <UserCheck size={20} />,
     navLink: '/tams/role'
   },
+  // {
+  //   id: 'permission',
+  //   title: 'Phân quyền',
+  //   icon: <UserPlus size={20} />,
+  //   navLink: '/tams/role_permissions'
+  // },
   {
-    id: 'permission',
-    title: 'Phân quyền',
+    id: 'permissions',
+    title: 'QL các quyền cơ bản',
     icon: <UserPlus size={20} />,
     navLink: '/tams/permission'
-  },
-  {
-    id: 'user',
-    title: 'Người dùng',
-    icon: <Users size={20} />,
-    navLink: '/tams/user'
   }
 ]

@@ -29,3 +29,9 @@ export const deleteUser = async (id) => {
   const res = await API.delete(uri)
   return res
 }
+
+export const getListUserByRole = async (id) => {
+  const uri = `/user/${id}`
+  const res = await API.get(uri)
+  return res
+}

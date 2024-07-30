@@ -1,5 +1,5 @@
 // ** Icons Import
-import { Mail, MessageSquare, CheckSquare, Calendar, FileText, Circle, ShoppingCart, User, Shield } from 'react-feather'
+import { Mail, MessageSquare, CheckSquare, Calendar, FileText, Circle, ShoppingCart, User, Shield, Users } from 'react-feather'
 
 export default [
   {
@@ -9,31 +9,31 @@ export default [
     id: 'email',
     title: 'Email',
     icon: <Mail size={20} />,
-    navLink: '/apps/email'
+    navLink: '/apps/email',
   },
   {
     id: 'chat',
     title: 'Chat',
     icon: <MessageSquare size={20} />,
-    navLink: '/apps/chat'
+    navLink: '/apps/chat',
   },
   {
     id: 'todo',
     title: 'Todo',
     icon: <CheckSquare size={20} />,
-    navLink: '/apps/todo'
+    navLink: '/apps/todo',
   },
   {
     id: 'calendar',
     title: 'Calendar',
     icon: <Calendar size={20} />,
-    navLink: '/apps/calendar'
+    navLink: '/apps/calendar',
   },
   {
     id: 'kanban',
     title: 'Kanban',
     icon: <CheckSquare size={20} />,
-    navLink: '/apps/kanban'
+    navLink: '/apps/kanban',
   },
   {
     id: 'invoiceApp',
@@ -64,27 +64,26 @@ export default [
         icon: <Circle size={12} />,
         navLink: '/apps/invoice/add'
       }
-    ]
+    ],
   },
-
   {
     id: 'roles-permissions',
     title: 'Roles & Permissions',
-    icon: <Shield size={20} />,
+    icon: <Users size={20} />,
     children: [
+      {
+        id: 'permissions',
+        title: 'Permissions',
+        icon: <Circle size={12} />,
+        navLink: '/apps/permissions'
+      },
       {
         id: 'roles',
         title: 'Roles',
         icon: <Circle size={12} />,
         navLink: '/apps/roles'
       },
-      {
-        id: 'permissions',
-        title: 'Permissions',
-        icon: <Circle size={12} />,
-        navLink: '/apps/permissions'
-      }
-    ]
+    ],
   },
   {
     id: 'eCommerce',
@@ -115,7 +114,7 @@ export default [
         icon: <Circle size={12} />,
         navLink: '/apps/ecommerce/checkout'
       }
-    ]
+    ],
   },
   {
     id: 'users',
@@ -134,6 +133,6 @@ export default [
         icon: <Circle size={12} />,
         navLink: '/apps/user/view'
       }
-    ]
-  }
+    ],
+  },
 ]

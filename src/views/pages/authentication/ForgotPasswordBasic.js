@@ -64,7 +64,7 @@ const ForgotPasswordBasic = () => {
                   </g>
                 </g>
               </svg>
-              <h2 className='brand-text text-primary ms-1'>HVCT</h2>
+              <h2 className='brand-text text-primary ms-1'>Vuexy</h2>
             </Link>
             <CardTitle tag='h4' className='mb-1'>
               Forgot Password? 🔒
@@ -84,7 +84,7 @@ const ForgotPasswordBasic = () => {
               </Button>
             </Form>
             <p className='text-center mt-2'>
-              <Link to='/pages/login-basic'>
+              <Link to='/pages-basic'>
                 <ChevronLeft className='rotate-rtl me-25' size={14} />
                 <span className='align-middle'>Back to login</span>
               </Link>

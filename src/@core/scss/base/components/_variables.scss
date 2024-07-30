@@ -101,3 +101,6 @@ $timeline-event-time-color: $text-muted !default;
 // custom options
 // ------------------------------------------------
 $custom-options-bg-color: rgba($secondary, 0.06);
+$lg-layout: 'only screen and (min-width: 992px) and (max-width: 1199px)';
+$md-layout: 'only screen and (min-width: 768px) and (max-width: 991px)';
+$xs-layout: 'only screen and (max-width: 767px)';

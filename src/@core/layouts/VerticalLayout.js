@@ -39,7 +39,6 @@ import '@styles/base/core/menu/menu-types/vertical-overlay-menu.scss'
 const VerticalLayout = props => {
   // ** Props
   const { menu, navbar, footer, children, menuData } = props
-
   // ** Hooks
   const [isRtl, setIsRtl] = useRTL()
   const { skin, setSkin } = useSkin()
@@ -165,7 +164,7 @@ const VerticalLayout = props => {
           `header-navbar navbar align-items-center ${navbarClasses[navbarType] || 'floating-nav'} navbar-shadow`
         )}
       >
-        <div className='navbar-container d-flex content'>
+        <div className='navbar-container d-flex content' style={{width: '100%'}}>
           {navbar ? (
             navbar({ skin, setSkin, setMenuVisibility })
           ) : (

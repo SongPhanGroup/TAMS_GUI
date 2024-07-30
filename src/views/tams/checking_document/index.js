@@ -1,89 +1,105 @@
-// ** React Imports
-import React, { Fragment, useState, forwardRef, useEffect, useContext } from 'react'
-// imprt thư viện của bảng
-import ReactPaginate from 'react-paginate'
-import DataTable from 'react-data-table-component'
-
-//import icon
-import { ChevronDown, Share, Printer, FileText, File, Grid, Copy, Plus, MoreVertical, Trash, Edit, Search, BarChart, CheckSquare } from 'react-feather'
-
-//import css
-import '@styles/react/libs/tables/react-dataTable-component.scss'
-
-// import API
-
-//import thư viện
-// import { TemplateHandler } from "easy-template-x"
-// import { saveFile } from '../../utils/util'
-// import readXlsxFile from 'read-excel-file/web-worker'
-import Swal from 'sweetalert2'
-// import withReactContent from 'sweetalert2-react-content'
+import {
+    Table,
+    Input,
+    Card,
+    CardTitle,
+    Tag,
+    Popconfirm,
+    Switch,
+    Collapse,
+    Select,
+    Spin
+} from "antd"
+import React, { useState, Fragment, useEffect, useRef, useContext } from "react"
+import {
+    Label,
+    Modal,
+    ModalHeader,
+    ModalBody,
+    Form,
+    Button,
+    Row,
+    Col,
+    FormFeedback,
+    UncontrolledTooltip,
+    CardBody,
+} from "reactstrap"
+import { Link } from "react-router-dom"
+import { Plus, X } from "react-feather"
+import {
+    AppstoreAddOutlined,
+    DeleteOutlined,
+    EditOutlined,
+    LockOutlined,
+} from "@ant-design/icons"
 import { AbilityContext } from '@src/utility/context/Can'
-import WaitingModal from '../../../views/ui-elements/waiting-modals'
-import Select from 'react-select'
+// import style from "../../../../assets/scss/index.module.scss"
+import Swal from "sweetalert2"
+import withReactContent from "sweetalert2-react-content"
+import AvatarGroup from "@components/avatar-group"
+// import Select from 'react-select'
 import Flatpickr from "react-flatpickr"
 import { Vietnamese } from "flatpickr/dist/l10n/vn.js"
 import "@styles/react/libs/flatpickr/flatpickr.scss"
-// ** Reactstrap Import
-import {
-    Row,
-    Col,
-    Card,
-    Input,
-    Label,
-    Button,
-    CardTitle,
-    CardHeader,
-    DropdownMenu,
-    DropdownItem,
-    DropdownToggle,
-    UncontrolledButtonDropdown,
-    UncontrolledDropdown,
-    Badge,
-    UncontrolledTooltip
-} from 'reactstrap'
-import { toDateTimeString } from '../../../utility/Utils'
-import { deleteCheckingDocument, detailCheckingDocument, getCheckingDocument } from '../../../api/checking_document'
-import AddNewCheckingDocument from './modal/AddNewModal'
-import EditCheckingDocument from './modal/EditModal'
-import { getCourse } from '../../../api/course'
-import { deleteCheckingDocumentVersion } from '../../../api/checking_document_version'
-import AddNewCheckingDocumentVersion from './modalVersion/AddNewModal'
-import EditCheckingDocumentVersion from './modalVersion/EditModal'
-import ResultCheckingDocument from './modalVersion/ResultModal'
+import * as yup from "yup"
+import { useForm, Controller } from "react-hook-form"
+import { yupResolver } from "@hookform/resolvers/yup"
+import classnames from "classnames"
+import { toDateString, toDateTimeString } from "../../../utility/Utils"
+// import {
+//     getRole,
+//     createRole,
+//     updateRole,
+//     deleteRole,
+//     listAllRoleUserCount,
+// } from "../../../../api/roles"
+// import {
+//     listAllUser,
+//     getListUserByRole
+// } from "../../../../api/users"
+// import { getGroupPermission } from "../../../../api/permissionGroups"
+// import {
+//     getPerByRoleId,
+//     getAllRolePer,
+//     updateRoleManyPer,
+// } from "../../../../api/rolePermissions"
+// import { getPermission } from "../../../../api/permissions"
+// import ListPermission from './detail'
+import { deleteCheckingDocument, getCheckingDocument } from "../../../api/checking_document"
+import VersionModal from "./modal/VersionModal"
+import { PAGE_DEFAULT, PER_PAGE_DEFAULT } from "../../../utility/constant"
+import { getCourse } from "../../../api/course"
 
-// ** Bootstrap Checkbox Component
-const BootstrapCheckbox = forwardRef((props, ref) => (
-    <div className='form-check'>
-        <Input type='checkbox' ref={ref} {...props} />
-    </div>
-))
+const oneWeekAgo = new Date()
+oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
 
 const CheckingDocument = () => {
+    const [loadingData, setLoadingData] = useState(false)
     const ability = useContext(AbilityContext)
-    // ** States
-    const [loading, setLoading] = useState(true)
-    const [modalAddNew, setModalAddNew] = useState(false)
-    const [modalEdit, setModalEdit] = useState(false)
+    const selected = useRef()
+    const MySwal = withReactContent(Swal)
+    const [data, setData] = useState([])
+    const [count, setCount] = useState(0)
+    const [totalUser, setTotalUser] = useState(0)
     const [currentPage, setCurrentPage] = useState(1)
-    const [searchValue, setSearchValue] = useState('')
+    const [rowsPerPage, setRowsPerpage] = useState(100)
+    const [search, setSearch] = useState("")
     const [courseId, setCourseId] = useState()
-    // const [filteredData, setFilteredData] = useState([])
-    const [perPage, setPerPage] = useState(10)
-    const [dataCheckingDocument, setDataCheckingDocument] = useState([])
-    const [totalCount, setTotalCount] = useState()
-    const [dataEdit, setDataEdit] = useState()
-
-    // const [infoDelete, setInfoDelete] = useState()
-    const handleEditModal = (data) => {
-        setDataEdit(data)
-        setModalEdit(!modalEdit)
-    }
+    const [isAdd, setIsAdd] = useState(false)
+    const [isEdit, setIsEdit] = useState(false)
+    const [isPer, setIsPer] = useState(false)
+    const [isView, setIsView] = useState(false)
+    const [listPerGroup, setListPerGroup] = useState([])
+    const [permissionView, setPermissionView] = useState([])
+    const [listAllPer, setListAllPer] = useState([])
+    const [listPermissionSelected, setListPermissionSelected] = useState([])
+    const [checkingDocumentSelected, setCheckingDocumentSelected] = useState()
+    const [listAllRole, setListAllRole] = useState([])
 
     const [listCourse, setListCourse] = useState([])
 
     const getAllDataPromises = async () => {
-        const coursePromise = getCourse({ params: { page: 1, perPage: 10, search: '' } })
+        const coursePromise = getCourse({ params: { page: PAGE_DEFAULT, perPage: PER_PAGE_DEFAULT, search: '' } })
 
         const promises = [coursePromise]
         const results = await Promise.allSettled(promises)
@@ -111,567 +127,570 @@ const CheckingDocument = () => {
         setListCourse(courses)
     }
 
-    const fetchCheckingDocument = () => {
+    const getData = (page, limit, search, courseId) => {
+        setLoadingData(true)
         getCheckingDocument({
             params: {
-                page: currentPage.toString(),
-                pageSize: perPage.toString(),
-                search: searchValue || "",
+                page,
+                limit,
+                ...(search && search !== "" && { search }),
                 courseId
-            }
-        }).then(res => {
-            setDataCheckingDocument(res.data)
-            setTotalCount(res?.pagination?.totalRecords)
-            setLoading(false)
-        }).catch(error => {
-            console.log(error)
-        })
-    }
-
-    useEffect(() => {
-        fetchCheckingDocument()
-        getAllDataPromises()
-    }, [currentPage, searchValue, perPage, courseId])
-
-    const handleAddModal = () => {
-        setModalAddNew(!modalAddNew)
-    }
-
-    const handleDeleteCheckingDocument = (data) => {
-        return Swal.fire({
-            title: '',
-            text: 'Bạn có muốn xóa tài liệu kiểm tra này không?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Xóa',
-            cancelButtonText: 'Hủy',
-            customClass: {
-                confirmButton: 'btn btn-primary',
-                cancelButton: 'btn btn-outline-danger ms-1'
             },
-            buttonsStyling: false
-        }).then((result) => {
-            if (result.value) {
-                deleteCheckingDocument(data).then(result => {
-                    if (result.status === 'success') {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Xóa tài liệu kiểm tra thành công!',
-                            text: 'Yêu cầu đã được phê duyệt',
-                            customClass: {
-                                confirmButton: 'btn btn-success'
-                            }
-                        })
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Xóa tài liệu kiểm tra thất bại!',
-                            text: 'Yêu cầu chưa được phê duyệt',
-                            customClass: {
-                                confirmButton: 'btn btn-danger'
-                            }
-                        })
-                    }
-                    fetchCheckingDocument()
-                }).catch(error => {
-                    console.log(error)
-                })
-            } else {
-                Swal.fire({
-                    title: 'Hủy bỏ!',
-                    text: 'Không xóa tài liệu kiểm tra!',
-                    icon: 'error',
-                    customClass: {
-                        confirmButton: 'btn btn-success'
-                    }
-                })
-            }
         })
-    }
-    const columns = [
-        {
-            name: "STT",
-            center: true,
-            width: '70px',
-            cell: (row, index) => <span>{((currentPage - 1) * perPage) + index + 1}</span>
-        },
-        {
-            name: "Tiêu đề",
-            center: true,
-            minWidth: "400px",
-            selector: row => <span style={{
-                whiteSpace: 'break-spaces'
-            }}>{row.title}</span>
-        },
-        {
-            name: "Đợt kiểm tra",
-            center: true,
-            minWidth: "150px",
-            selector: row => <span>{row?.course?.name}</span>
-        },
-        {
-            name: "Tác giả",
-            center: true,
-            minWidth: "100px",
-            selector: row => <span style={{
-                whiteSpace: 'break-spaces'
-            }}>{row.author}</span>
-        },
-        {
-            name: "Ngày kiểm tra",
-            center: true,
-            minWidth: "200px",
-            cell: (row) => <span style={{ textAlign: 'center' }}>{toDateTimeString(row.createdAt)}</span>
-        },
-        // {
-        //     name: 'Mô tả',
-        //     center: true,
-        //     minWidth: '100px',
-        //     selector: row => row.description
-        // },
-        {
-            name: 'Trùng lặp theo đợt (%)',
-            center: true,
-            minWidth: '200px',
-            selector: row => <span>{row?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal}</span>
-        },
-        {
-            name: 'Trùng lặp theo tài liệu mẫu (%)',
-            center: true,
-            minWidth: '200px',
-            selector: row => <span>{row?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}</span>
-        },
-        {
-            name: 'Tác vụ',
-            minWidth: "100px",
-            center: true,
-            cell: (row) => {
-                return (
-                    <div className="column-action d-flex align-items-center">
-                        {ability.can('update', 'nguoidung') &&
-                            <div id="tooltip_edit" style={{ marginRight: '1rem' }} onClick={() => handleEditModal(row)}>
-                                <Edit
-                                    size={15}
-                                    style={{ cursor: "pointer", stroke: '#09A863' }}
-                                />
-                                <UncontrolledTooltip placement='top' target='tooltip_edit'>
-                                    Sửa tài liệu kiểm tra
-                                </UncontrolledTooltip>
-                            </div>}
-                        {ability.can('delete', 'nguoidung') &&
-                            <div id="tooltip_trash" style={{ marginRight: '1rem' }} onClick={() => handleDeleteCheckingDocument(row.id)}>
-                                <Trash
-                                    size={15}
-                                    style={{ cursor: "pointer", stroke: "red" }}
-                                />
-                                <UncontrolledTooltip placement='top' target='tooltip_trash'>
-                                    Xóa tài liệu
-                                </UncontrolledTooltip>
-                            </div>}
-                    </div>
-                )
-            }
-        }
-    ]
-
-    const customStyles = {
-        rows: {
-            style: {
-                minHeight: '50px',
-                alignItems: 'center' // chiều cao tối thiểu của hàng
-            }
-        }
+            .then((res) => {
+                const result = res?.data?.map(((item, index) => {
+                    return { ...item, _id: item.id, key: index }
+                }))
+                setData(result)
+                setCount(res?.pagination?.totalRecords)
+            })
+            .catch((err) => {
+                console.log(err)
+            }).finally(() => {
+                setLoadingData(false)
+            })
     }
 
-    // const customStylesSelect = {
-    //     option: (provided) => ({
-    //         ...provided,
-    //         height: 24, // Điều chỉnh chiều cao của mỗi tùy chọn
-    //         display: 'flex',
-    //         alignItems: 'center' // Căn giữa văn bản theo chiều dọc
+    // const getInfo = () => {
+    //     getAllRolePer({
+    //         params: {
+    //             page: 1,
+    //             limit: 5000,
+    //         },
     //     })
+    //         .then((res) => {
+    //             const { count, data } = res[0]
+    //             setListPermissionSelected(data)
+    //         })
+    //         .catch((err) => {
+    //             console.log(err)
+    //         })
+    //     getGroupPermission({
+    //         params: {
+    //             page: 1,
+    //             limit: 500,
+    //         },
+    //     })
+    //         .then((res) => {
+    //             const { count, data } = res[0]
+    //             setListPerGroup(data ?? [])
+    //         })
+    //         .catch((err) => {
+    //             console.log(err)
+    //         })
+    //     getPermission({
+    //         params: {
+    //             page: 1,
+    //             limit: 5000,
+    //         },
+    //     })
+    //         .then((res) => {
+    //             const { count, data } = res[0]
+    //             setListAllPer(data ?? [])
+    //         })
+    //         .catch((err) => {
+    //             console.log(err)
+    //         })
     // }
+    useEffect(() => {
+        getData(currentPage, rowsPerPage, search, courseId)
+        getAllDataPromises()
+    }, [currentPage, rowsPerPage, search, courseId])
 
-    // ** Function to handle Pagination
-    const handlePagination = page => {
-        setCurrentPage(page)
+    const handleModal = () => {
+        setIsAdd(false)
+        setIsEdit(false)
+        setIsPer(false)
+        setIsView(false)
+        setCheckingDocumentSelected(null)
     }
-    const handlePerRowsChange = (perPage, page) => {
-        setCurrentPage(page)
-        setPerPage(perPage)
+    const CloseBtn = (
+        <X className="cursor-pointer" size={15} onClick={handleModal} />
+    )
+    const handleEdit = (record) => {
+        setCheckingDocumentSelected(record)
+        setIsEdit(true)
     }
-
     const handleChangeCourse = (value) => {
         if (value) {
-            setCourseId(value?.value)
+            setCourseId(value)
+            setCurrentPage(1)
         } else {
             setCourseId()
         }
     }
-
-    // ** Custom Pagination
-    // const CustomPagination = () => (
-    //     <ReactPaginate
-    //         previousLabel=''
-    //         nextLabel=''
-    //         forcePage={currentPage}
-    //         onPageChange={page => handlePagination(page)}
-    //         // pageCount={searchValue.length ? Math.ceil(filteredData.totalCount / 7) : Math.ceil(data.totalCount / 7) || 1}
-    //         pageCount={Math.ceil(data.totalCount / perPage) || 1}
-    //         breakLabel='...'
-    //         pageRangeDisplayed={2}
-    //         marginPagesDisplayed={2}
-    //         activeClassName='active'
-    //         pageClassName='page-item'
-    //         breakClassName='page-item'
-    //         nextLinkClassName='page-link'
-    //         pageLinkClassName='page-link'
-    //         breakLinkClassName='page-link'
-    //         previousLinkClassName='page-link'
-    //         nextClassName='page-item next-item'
-    //         previousClassName='page-item prev-item'
-    //         containerClassName='pagination react-paginate separated-pagination pagination-sm justify-content-end pe-1 mt-1'
-    //     />
-    // )
-
-    const handleDeleteCheckingDocumentVersion = (data) => {
-        return Swal.fire({
-            title: '',
-            text: 'Bạn có muốn xóa phiên bản kiểm tra này không?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Xóa',
-            cancelButtonText: 'Hủy',
-            customClass: {
-                confirmButton: 'btn btn-primary',
-                cancelButton: 'btn btn-outline-danger ms-1'
-            },
-            buttonsStyling: false
-        }).then((result) => {
-            if (result.value) {
-                deleteCheckingDocumentVersion(data).then(result => {
-                    if (result.status === 'success') {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Xóa phiên bản kiểm tra thành công!',
-                            text: 'Yêu cầu đã được phê duyệt',
-                            customClass: {
-                                confirmButton: 'btn btn-success'
-                            }
-                        })
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Xóa phiên bản kiểm tra thất bại!',
-                            text: 'Yêu cầu chưa được phê duyệt',
-                            customClass: {
-                                confirmButton: 'btn btn-danger'
-                            }
-                        })
-                    }
-                    fetchCheckingDocumentVersion()
-                }).catch(error => {
-                    console.log(error)
-                })
-            } else {
-                Swal.fire({
-                    title: 'Hủy bỏ!',
-                    text: 'Không xóa phiên bản kiểm tra!',
-                    icon: 'error',
+    const handleViewUser = (role) => {
+        setRoleSelected(role)
+        setIsView(true)
+    }
+    const handleDelete = (key) => {
+        deleteCheckingDocument(key)
+            .then((res) => {
+                MySwal.fire({
+                    title: "Xóa kiểm tra tài liệu thành công",
+                    icon: "success",
                     customClass: {
-                        confirmButton: 'btn btn-success'
+                        confirmButton: "btn btn-success",
+                    },
+                }).then((result) => {
+                    if (currentPage === 1) {
+                        getData(1, rowsPerPage)
+                    } else {
+                        setCurrentPage(1)
                     }
+                    handleModal()
                 })
-            }
-        })
-    }
-
-    const ExpandedComponent = ({ data }) => {
-        const [modalVersionAddNew, setModalVersionAddNew] = useState(false)
-        const [modalVersionEdit, setModalVersionEdit] = useState(false)
-        const [dataDetailById, setDataDetailById] = useState([])
-        const [modalResult, setModalResult] = useState(false)
-        const [dataEditVersion, setDataEditVersion] = useState()
-
-        const handleAddModalVersion = () => {
-            setModalVersionAddNew(!modalVersionAddNew)
-        }
-
-        const handleEditModalVersion = (data) => {
-            setDataEditVersion(data)
-            setModalVersionEdit(!modalVersionEdit)
-        }
-
-        const handleResultModal = () => {
-            setModalResult(!modalResult)
-        }
-
-        const fetchCheckingDocumentVersion = () => {
-            detailCheckingDocument(data?.id).then((result) => {
-                const checkingDocumentVersion = result?.data?.checkingDocumentVersion
-                if (Array.isArray(checkingDocumentVersion)) {
-                    setDataDetailById(checkingDocumentVersion)
-                } else {
-                    console.error('Unexpected data format:', checkingDocumentVersion)
-                }
-            }).catch(error => {
-                console.error(error)
             })
-        }
-
-        useEffect(() => {
-            fetchCheckingDocumentVersion()
-        }, [data?.id])
-
-        const subColumns = [
-            {
-                name: "STT",
-                center: true,
-                width: '100px',
-                cell: (row, index) => <span>{((currentPage - 1) * perPage) + index + 1}</span>
-            },
-            {
-                name: "Tên tài liệu",
-                center: true,
-                width: '500px',
-                selector: row => <span style={{
-                    whiteSpace: 'break-spaces'
-                }}>{row.fileName}</span>
-            },
-            {
-                name: "Phiên bản",
-                center: true,
-                minWidth: "50px",
-                selector: row => row.version
-            },
-            {
-                name: 'Mô tả',
-                center: true,
-                minWidth: '200px',
-                selector: row => row.description
-            },
-            {
-                name: 'Tác vụ',
-                minWidth: "100px",
-                center: true,
-                cell: (row) => {
-                    return (
-                        <div className="column-action d-flex align-items-center">
-                            {ability.can('update', 'nguoidung') &&
-                                <div id="tooltip_edit" style={{ marginRight: '1rem' }} onClick={() => handleEditModalVersion(row)}>
-                                    <Edit
-                                        size={15}
-                                        style={{ cursor: "pointer", stroke: '#09A863' }}
-                                    />
-                                    <UncontrolledTooltip placement='top' target='tooltip_edit'>
-                                        Sửa phiên bản kiểm tra
-                                    </UncontrolledTooltip>
-                                </div>}
-                            {ability.can('delete', 'nguoidung') &&
-                                <div id="tooltip_trash" style={{ marginRight: '1rem' }} onClick={() => handleDeleteCheckingDocumentVersion(row.id)}>
-                                    <Trash
-                                        size={15}
-                                        style={{ cursor: "pointer", stroke: "red" }}
-                                    />
-                                    <UncontrolledTooltip placement='top' target='tooltip_trash'>
-                                        Xóa phiên bản
-                                    </UncontrolledTooltip>
-                                </div>}
-                            <div id="tooltip_result" onClick={() => handleResultModal(row)}>
-                                <CheckSquare
-                                    size={15}
-                                    style={{ cursor: "pointer", stroke: "blue" }}
-                                />
-                                <UncontrolledTooltip placement='top' target='tooltip_result'>
-                                    Kết quả kiểm tra
-                                </UncontrolledTooltip>
-                            </div>
-                        </div>
-                    )
-                }
-            }
-        ]
-
-        return (
-            <Fragment>
-                <Card style={{ backgroundColor: 'white' }}>
-                    <CardHeader className='flex-md-row flex-column align-md-items-center align-items-start border-bottom'>
-                        <CardTitle tag='h4'>Danh sách phiên bản kiểm tra</CardTitle>
-                        <div className='d-flex mt-md-0 mt-1'>
-                            {ability.can('add', 'nguoidung') &&
-                                <Button className='ms-2 btn-sub_add' color='primary' onClick={handleAddModalVersion}>
-                                    <Plus size={11} />
-                                    <span className='align-middle ms-50'>Thêm mới</span>
-                                </Button>}
-                        </div>
-                    </CardHeader>
-                    <Row className='justify-content-end mx-0'>
-                        <Col className='d-flex align-items-center justify-content-start mt-1 gap-2' md='12' sm='12' style={{ paddingRight: '20px' }}>
-                            <div className='d-flex align-items-center'>
-                                <Label className='' for='search-input' style={{ minWidth: '65px' }}>
-                                    Tìm kiếm
-                                </Label>
-                                <Input
-                                    style={{ width: '500px' }}
-                                    className='dataTable-filter mb-50'
-                                    type='text'
-                                    bsSize='sm'
-                                    id='search-input'
-                                    onChange={(e) => {
-                                        if (e.target.value === "") {
-                                            setSearchValue('')
-                                        }
-                                    }}
-                                    onKeyPress={(e) => {
-                                        if (e.key === "Enter") {
-                                            setSearchValue(e.target.value)
-                                            setCurrentPage(1)
-                                        }
-                                    }}
-                                />
-                            </div>
-                        </Col>
-                    </Row>
-                    <div className='react-dataTable react-dataTable-selectable-rows' style={{ marginRight: '20px', marginLeft: '20px' }}>
-                        {loading ? <WaitingModal /> : <DataTable
-                            noHeader
-                            // pagination
-                            columns={subColumns}
-                            // paginationPerPage={perPage}
-                            className='react-dataTable'
-                            sortIcon={<ChevronDown size={10} />}
-                            selectableRowsComponent={BootstrapCheckbox}
-                            // data={searchValue.length ? filteredData.data : data.data}
-                            data={dataDetailById}
-                            // paginationServer
-                            // paginationTotalRows={totalCount}
-                            // paginationComponentOptions={{
-                            //     rowsPerPageText: 'Số hàng trên 1 trang:'
-                            // }}
-                            // onChangeRowsPerPage={handlePerRowsChange}
-                            // onChangePage={handlePagination}
-                            customStyles={customStyles}
-                        />}
-                    </div>
-                </Card>
-                <AddNewCheckingDocumentVersion open={modalVersionAddNew} handleAddModalVersion={handleAddModalVersion} getData={fetchCheckingDocumentVersion} dataTitle={data?.title} />
-                {dataDetailById && <EditCheckingDocumentVersion open={modalVersionEdit} handleEditModalVersion={handleEditModalVersion} getData={fetchCheckingDocumentVersion} dataEdit={dataEditVersion} dataTitle={data?.title} />}
-                {dataDetailById && <ResultCheckingDocument open={modalResult} handleResultModal={handleResultModal} getData={fetchCheckingDocumentVersion} dataDetailById={dataDetailById} />}
-            </Fragment>
-        )
+            .catch((error) => {
+                MySwal.fire({
+                    title: "Xóa thất bại",
+                    icon: "error",
+                    customClass: {
+                        confirmButton: "btn btn-danger",
+                    },
+                })
+                console.log(error)
+            })
     }
+
+    // const _handleSelectAll = (e) => {
+    //     let listPermitFormat = []
+    //     if (e.target.checked) {
+    //         rolesArr.map((item) => {
+    //             listPermitFormat = listPermitFormat.concat(item.actions)
+    //         })
+    //     }
+    //     setListPermissionSelected(listPermitFormat)
+    // }
+
+    // const _handleCheckRoleAction = (e, act, permission, role) => {
+    //     setListPermissionSelected((pre) => {
+    //         const isChecked = listPermissionSelected.find(
+    //             (per) => per.permissionID === permission._id &&
+    //                 per.roleID === role?._id &&
+    //                 per.actionContent === act.value
+    //         )
+    //         if (isChecked) {
+    //             if (act.value === 'read') {
+    //                 return listPermissionSelected.filter(
+    //                     (per) => !(per.permissionID === permission._id &&
+    //                         per.roleID === role?._id)
+    //                 )
+    //             }
+    //             return listPermissionSelected.filter(
+    //                 (per) => !(per.permissionID === permission._id &&
+    //                     per.roleID === role?._id &&
+    //                     per.actionContent === act.value)
+    //             )
+    //         } else {
+    //             if (act.value !== 'read') {
+    //                 const isChecked_ = listPermissionSelected.find(
+    //                     (per) => per.permissionID === permission._id &&
+    //                         per.roleID === role?._id &&
+    //                         per.actionContent === 'read'
+    //                 )
+    //                 if (isChecked_) {
+    //                     return [
+    //                         ...pre,
+    //                         {
+    //                             permissionID: permission._id,
+    //                             roleID: role._id,
+    //                             actionContent: act.value,
+    //                             isActive: 1,
+    //                         }
+    //                     ]
+    //                 } else {
+    //                     return [
+    //                         ...pre,
+    //                         {
+    //                             permissionID: permission._id,
+    //                             roleID: role._id,
+    //                             actionContent: 'read',
+    //                             isActive: 1,
+    //                         },
+    //                         {
+    //                             permissionID: permission._id,
+    //                             roleID: role._id,
+    //                             actionContent: act.value,
+    //                             isActive: 1,
+    //                         },
+    //                     ]
+    //                 }
+    //             }
+    //             return [
+    //                 ...pre,
+    //                 {
+    //                     permissionID: permission._id,
+    //                     roleID: role._id,
+    //                     actionContent: act.value,
+    //                     isActive: 1,
+    //                 },
+    //             ]
+    //         }
+    //     })
+    // }
+
+    // const _renderRoleItem = (act, ind, permission, role) => {
+    //     const permissionData = listPermissionSelected?.find(
+    //         (lstPer) => lstPer.permissionID === permission._id &&
+    //             lstPer.actionContent === act.value &&
+    //             lstPer.roleID === role?._id
+    //     )
+    //     return (
+    //         <div className="form-check me-2" key={ind} style={{ minWidth: "6rem" }}>
+    //             <Input
+    //                 type="checkbox"
+    //                 style={{ cursor: "pointer", marginRight: "1rem" }}
+    //                 className="action-cb"
+    //                 id={`${permission._id}_${act.id}`}
+    //                 checked={permissionData || false}
+    //                 onChange={(e) => _handleCheckRoleAction(e, act, permission, role)}
+    //             />
+    //             <Label
+    //                 className="form-check-label"
+    //                 style={{ cursor: "pointer", fontSize: "0.875rem" }}
+    //                 for={`${permission._id}_${act.id}`}
+    //             >
+    //                 {act.label}
+    //             </Label>
+    //         </div>
+    //     )
+    // }
+    // const handlePer = (role) => {
+    //     setRoleSelected(role)
+    //     setIsPer(true)
+    // }
+    const columns = [
+        {
+            title: "STT",
+            dataIndex: "stt",
+            width: 30,
+            align: "center",
+            render: (text, record, index) => (
+                <span>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
+            ),
+        },
+        {
+            title: "Tiêu đề",
+            dataIndex: "title",
+            width: 500,
+            align: "left",
+            render: (text, record, index) => (
+                <span style={{ whiteSpace: 'break-spaces' }}>{record.title}</span>
+            ),
+        },
+        {
+            title: "Tác giả",
+            dataIndex: "author",
+            width: 220,
+            align: "left",
+            render: (text, record, index) => (
+                <span style={{ whiteSpace: 'break-spaces' }}>{record.author}</span>
+            ),
+        },
+        {
+            title: "Đợt kiểm tra",
+            dataIndex: "course",
+            width: 150,
+            align: "left",
+            render: (text, record, index) => (
+                <span style={{ whiteSpace: 'break-spaces' }}>{record?.course?.name}</span>
+            ),
+        },
+        {
+            title: "Ngày tạo",
+            dataIndex: "createdAt",
+            width: 120,
+            align: "center",
+            render: (text, record, index) => (
+                <span style={{ whiteSpace: 'break-spaces' }}>{toDateTimeString(record.createdAt)}</span>
+            ),
+        },
+        {
+            title: "Trùng với TL cùng đợt (%)",
+            width: 120,
+            align: "center",
+            render: (text, record, index) => (
+                <span style={{ whiteSpace: 'break-spaces' }}>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal}</span>
+            ),
+        },
+        {
+            title: "Trùng với DL mẫu (%)",
+            width: 120,
+            align: "center",
+            render: (text, record, index) => (
+                <span style={{ whiteSpace: 'break-spaces' }}>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}</span>
+            ),
+        },
+        {
+            title: "Mô tả",
+            dataIndex: "description",
+            align: 'left',
+            width: 200,
+        },
+        {
+            title: "Thao tác",
+            width: 100,
+            align: "center",
+            render: (record) => (
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                    {ability.can('update', 'PHAN_QUYEN_VAI_TRO') &&
+                        <>
+                            <EditOutlined
+                                id={`tooltip_edit_${record._id}`}
+                                style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
+                                onClick={(e) => handleEdit(record)}
+                            />
+                            <UncontrolledTooltip placement="top" target={`tooltip_edit_${record._id}`}
+                            >
+                                Chỉnh sửa
+                            </UncontrolledTooltip>
+                        </>}
+                    {/* { ability.can('update', 'PHAN_QUYEN_VAI_TRO') && 
+                              <>
+              <AppstoreAddOutlined
+                id={`tooltip_per_${record._id}`}
+                style={{ color: "#09A863", cursor: "pointer" }}
+                onClick={(e) => handlePer(record)}
+              />
+              <UncontrolledTooltip placement="top" target={`tooltip_per_${record._id}`}>
+                Phân quyền
+              </UncontrolledTooltip></>} */}
+                    {ability.can('delete', 'PHAN_QUYEN_VAI_TRO') &&
+                        <Popconfirm
+                            title="Bạn chắc chắn xóa?"
+                            onConfirm={() => handleDelete(record._id)}
+                            cancelText="Hủy"
+                            okText="Đồng ý"
+                        >
+                            <DeleteOutlined
+                                style={{ color: "red", cursor: "pointer" }}
+                                id={`tooltip_delete_${record._id}`}
+                            />
+                            <UncontrolledTooltip placement="top" target={`tooltip_delete_${record._id}`}>
+                                Xóa
+                            </UncontrolledTooltip>
+                        </Popconfirm>}
+                </div>
+            ),
+        },
+    ]
+
+    // const handleUpDateManyPer = () => {
+    //     const listSelected = listPermissionSelected.filter(x => x.roleID === roleSelected._id)
+    //     const arr = listSelected.map((per, index) => {
+    //         if (per.roleID === roleSelected._id) {
+    //             return {
+    //                 permissionID: per.permissionID,
+    //                 actionContent: per.actionContent,
+    //             }
+    //         }
+    //     })
+    //     const dataSubmit = {
+    //         roleID: roleSelected?._id,
+    //         isActive: 1,
+    //         arrContent: arr,
+    //         actionTime: "2023-09-13T04:08:14.369Z",
+    //     }
+    //     updateRoleManyPer(dataSubmit)
+    //         .then((res) => {
+    //             MySwal.fire({
+    //                 title: "Chỉnh sửa thành công",
+
+    //                 icon: "success",
+    //                 customClass: {
+    //                     confirmButton: "btn btn-success",
+    //                 },
+    //             }).then((result) => {
+    //                 if (currentPage === 1) {
+    //                     getData(1, rowsPerPage)
+    //                 } else {
+    //                     setCurrentPage(1)
+    //                 }
+    //                 handleModal()
+    //             })
+    //         })
+    //         .catch((err) => {
+    //             MySwal.fire({
+    //                 title: "Chỉnh sửa thất bại",
+    //                 icon: "error",
+    //                 customClass: {
+    //                     confirmButton: "btn btn-danger",
+    //                 },
+    //             })
+    //         })
+    // }
+    // const showTotal = (count) => `Tổng số: ${count}`
 
     return (
         <Fragment>
-            <Card style={{ backgroundColor: 'white' }}>
-                <CardHeader className='flex-md-row flex-column align-md-items-center align-items-start border-bottom'>
-                    <CardTitle tag='h4'>Danh sách tài liệu kiểm tra</CardTitle>
-                    <div className='d-flex mt-md-0 mt-1'>
-                        {/* <UncontrolledButtonDropdown>
-                            <DropdownToggle color='secondary' caret outline>
-                                <Share size={15} />
-                                <span className='align-middle ms-50'>Tùy chọn</span>
-                            </DropdownToggle>
-                            <DropdownMenu>
-                                <DropdownItem className='w-100'>
-                                    <Printer size={15} />
-                                    <span className='align-middle ms-50 ' onClick={onImportFileClick}>Nhập từ file excel</span>
-                                </DropdownItem>
-                                <DropdownItem className='w-100' onClick={() => handleExportFileDocx(data)}>
-                                    <FileText size={15} />
-                                    <span className='align-middle ms-50'>Xuất file docx</span>
-                                </DropdownItem>
-                                <DropdownItem className='w-100' onClick={() => handleExportFileExcel(data)}>
-                                    <Grid size={15} />
-                                    <span className='align-middle ms-50'> Xuất file Excel</span>
-                                </DropdownItem>
-                                <DropdownItem className='w-100' onClick={() => handleExportFileTemplate()}>
-                                    <File size={15} />
-                                    <span className='align-middle ms-50'>Tải file nhập mẫu</span>
-                                </DropdownItem>
-                            </DropdownMenu>
-                        </UncontrolledButtonDropdown> */}
-                        {ability.can('add', 'nguoidung') &&
-                            <Button className='ms-2' color='primary' onClick={handleAddModal}>
-                                <Plus size={15} />
-                                <span className='align-middle ms-50'>Thêm mới</span>
-                            </Button>}
-                    </div>
-                </CardHeader>
-                <Row className='justify-content-end mx-0'>
-                    <Col className='d-flex align-items-center justify-content-start mt-1 gap-2' md='12' sm='12' style={{ paddingRight: '20px' }}>
-                        <div className='d-flex align-items-center'>
-                            <Label className='' for='search-input' style={{ minWidth: '65px' }}>
-                                Tìm kiếm
-                            </Label>
-                            <Input
-                                style={{ width: '500px' }}
-                                className='dataTable-filter mb-50'
-                                type='text'
-                                bsSize='sm'
-                                id='search-input'
-                                onChange={(e) => {
-                                    if (e.target.value === "") {
-                                        setSearchValue('')
-                                    }
-                                }}
-                                onKeyPress={(e) => {
-                                    if (e.key === "Enter") {
-                                        setSearchValue(e.target.value)
-                                        setCurrentPage(1)
-                                    }
-                                }}
+            <Card
+                title="Danh sách kiểm tra tài liệu"
+                style={{ backgroundColor: "white", width: "100%", height: "100%" }}
+            >
+                <Row>
+                    <Col md="12">
+                        <Row>
+                            <Col md="10" style={{ display: "flex", justifyContent: "flex-start" }}>
+                                <Col
+                                    sm="4"
+                                    style={{ display: "flex", justifyContent: "flex-end", marginRight: "0.5rem" }}
+                                >
+                                    <Label
+                                        className=""
+                                        style={{
+                                            width: "100px",
+                                            fontSize: "14px",
+                                            height: "34px",
+                                            display: "flex",
+                                            alignItems: "center",
+                                        }}
+                                    >
+                                        Tìm kiếm
+                                    </Label>
+                                    <Input
+                                        type="text"
+                                        placeholder="Tìm kiếm"
+                                        style={{ height: "34px" }}
+                                        onChange={(e) => {
+                                            if (e.target.value === "") {
+                                                setSearch("")
+                                            }
+                                        }}
+                                        onKeyPress={(e) => {
+                                            if (e.key === "Enter") {
+                                                setSearch(e.target.value)
+                                                setCurrentPage(1)
+                                            }
+                                        }}
+                                    />
+                                </Col>
+                                <Col
+                                    sm="4"
+                                    style={{
+                                        display: "flex",
+                                        justifyContent: "flex-start",
+                                        marginRight: "0.5rem"
+                                    }}
+                                >
+                                    <Label
+                                        className=""
+                                        style={{
+                                            width: "120px",
+                                            fontSize: "14px",
+                                            height: "34px",
+                                            display: "flex",
+                                            alignItems: "center",
+                                        }}
+                                    >
+                                        Chọn đợt kiểm tra
+                                    </Label>
+                                    <Select
+                                        placeholder="Chọn đợt kiểm tra"
+                                        className='mb-50 select-custom flex-1'
+                                        options={listCourse}
+                                        allowClear
+                                        onChange={(value) => handleChangeCourse(value)}
+                                    />
+
+                                </Col>
+                                <Col
+                                    sm="4"
+                                    style={{ display: "flex", justifyContent: "flex-start" }}
+                                >
+                                    <Label
+                                        className=""
+                                        style={{
+                                            width: "150px",
+                                            fontSize: "14px",
+                                            height: "34px",
+                                            display: "flex",
+                                            alignItems: "center",
+                                        }}
+                                    >
+                                        Ngày kiểm tra
+                                    </Label>
+                                    <Flatpickr
+                                        style={{ padding: '0.35rem 1rem' }}
+                                        className="form-control invoice-edit-input date-picker mb-50"
+                                        options={{
+                                            mode: "range",
+                                            dateFormat: "d-m-Y", // format ngày giờ
+                                            locale: {
+                                                ...Vietnamese
+                                            },
+                                            defaultDate: [oneWeekAgo, new Date()]
+                                        }}
+                                        placeholder="dd/mm/yyyy"
+                                    />
+                                </Col>
+                            </Col>
+                            <Col md="2" style={{ display: "flex", justifyContent: "flex-end" }}>
+                                {ability.can('create', 'PHAN_QUYEN_VAI_TRO') &&
+                                    <Button
+                                        onClick={(e) => setIsAdd(true)}
+                                        color="primary"
+                                        className="addBtn"
+                                        style={{
+                                            width: '100px',
+                                        }}
+                                    >
+                                        Thêm mới
+                                    </Button>
+                                }
+                            </Col>
+                        </Row>
+                        {loadingData === true ? <Spin style={{ position: 'relative', left: '50%' }} /> : <Table
+                            columns={columns}
+                            dataSource={data}
+                            bordered
+                            expandable={{
+                                expandedRowRender: (record) => <VersionModal
+                                    checkingDocumentSelected={record} />,
+                                rowExpandable: (record) => record.name !== 'Not Expandable',
+                                // expandRowByClick: true
+                            }}
+                            pagination={{
+                                defaultPageSize: 10,
+                                showSizeChanger: true,
+                                pageSizeOptions: ["10", "20", "30"],
+                                total: { count },
+                                locale: { items_per_page: "/ trang" },
+                                showSizeChanger: true,
+                                showTotal: (total, range) => <span>Tổng số: {total}</span>,
+                            }}
+                        />}
+                        <AddNewModal
+                            open={isAdd}
+                            handleModal={handleModal}
+                            getData={getData}
+                            currentPage={currentPage}
+                            rowsPerPage={rowsPerPage}
+                        />
+                        {
+                            <EditModal
+                                open={isEdit}
+                                handleModal={handleModal}
+                                getData={getData}
+                                infoEdit={checkingDocumentSelected}
+                                currentPage={currentPage}
+                                rowsPerPage={rowsPerPage}
                             />
-                        </div>
-                        <Select placeholder="Chọn đợt kiểm tra" className='mb-50 select-custom' options={listCourse} isClearable onChange={(value) => handleChangeCourse(value)} />
-                        <div className='d-flex align-items-center'>
-                            <Label className='' for='search-input' style={{ minWidth: '100px' }}>
-                                Ngày kiểm tra
-                            </Label>
-                            <Flatpickr
-                                style={{ padding: '0.35rem 1rem' }}
-                                className="form-control invoice-edit-input date-picker mb-50"
-                                options={{
-                                    dateFormat: "d-m-Y", // format ngày giờ
-                                    locale: {
-                                        ...Vietnamese
-                                    },
-                                    defaultDate: new Date()
-                                }}
-                                placeholder="dd/mm/yyyy"
+                        }
+                        {/* {
+                            <ListUsersModal
+                                open={isView}
+                                setIsView={setIsView}
+                                roleSelected={roleSelected}
                             />
-                        </div>
+                        } */}
                     </Col>
                 </Row>
-                <div className='react-dataTable react-dataTable-selectable-rows' style={{ marginRight: '20px', marginLeft: '20px' }}>
-                    {loading ? <WaitingModal /> : <DataTable
-                        noHeader
-                        pagination
-                        columns={columns}
-                        paginationPerPage={perPage}
-                        className='react-dataTable'
-                        sortIcon={<ChevronDown size={10} />}
-                        selectableRowsComponent={BootstrapCheckbox}
-                        // data={searchValue.length ? filteredData.data : data.data}
-                        data={dataCheckingDocument}
-                        paginationServer
-                        paginationTotalRows={totalCount}
-                        paginationComponentOptions={{
-                            rowsPerPageText: 'Số hàng trên 1 trang:'
-                        }}
-                        onChangeRowsPerPage={handlePerRowsChange}
-                        onChangePage={handlePagination}
-                        customStyles={customStyles}
-                        expandableRows
-                        expandableRowsComponent={(prev) => ExpandedComponent(prev)}
-                        expandOnRowClicked
-                    />}
-                </div>
-            </Card >
-            <AddNewCheckingDocument open={modalAddNew} handleAddModal={handleAddModal} getData={fetchCheckingDocument} />
-            {dataEdit && <EditCheckingDocument open={modalEdit} handleEditModal={handleEditModal} getData={fetchCheckingDocument} dataEdit={dataEdit} />}
-        </Fragment >
+            </Card>
+        </Fragment>
     )
 }
-
+const AddNewModal = React.lazy(() => import("./modal/AddNewModal"))
+const EditModal = React.lazy(() => import("./modal/EditModal"))
+// const ListUsersModal = React.lazy(() => import("./modal/ListUsersModal"))
 export default CheckingDocument

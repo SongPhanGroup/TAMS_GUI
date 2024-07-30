@@ -2,7 +2,7 @@ import mock from '../mock'
 
 const data = {
   orders_bar_chart: {
-    title: 'Orders',
+    title: 'Tổng số học viên qua các năm',
     statistics: '2,76k',
     series: [
       {

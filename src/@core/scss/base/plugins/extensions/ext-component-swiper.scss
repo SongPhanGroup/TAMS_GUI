@@ -47,7 +47,7 @@
       font-weight: $headings-font-weight;
       background-color: $white;
       height: auto;
-      width: auto !important;
+      // width: auto !important;
       padding: 2rem 5.5rem;
       cursor: pointer;
 
@@ -109,7 +109,7 @@
       font-weight: $headings-font-weight;
       background-color: $swiper-bg;
       height: auto;
-      width: auto !important;
+      // width: auto !important;
       cursor: pointer;
 
       &.swiper-slide-active {
@@ -135,7 +135,7 @@
 .swiper-coverflow {
   &.swiper-container {
     .swiper-slide {
-      width: 300px;
+      // width: 300px;
     }
   }
 }

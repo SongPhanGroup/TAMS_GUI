@@ -1,6 +1,6 @@
 // ** Dropdowns Imports
 import IntlDropdown from './IntlDropdown'
-import CartDropdown from './CartDropdown'
+import MenuDropDown from './MenuDropDown'
 import UserDropdown from './UserDropdown'
 import NavbarSearch from './NavbarSearch'
 import NotificationDropdown from './NotificationDropdown'
@@ -25,16 +25,17 @@ const NavbarUser = props => {
   }
 
   return (
-    <ul className='nav navbar-nav align-items-center ms-auto'>
-      {/* <IntlDropdown />
-      <NavItem className='d-none d-lg-block'>
+    <ul className='nav navbar-nav align-items-center'>
+      {/* <IntlDropdown /> */}
+      {/* <NavItem className='d-none d-lg-block'>
         <NavLink className='nav-link-style'>
           <ThemeToggler />
         </NavLink>
-      </NavItem>
-      <NavbarSearch />
-      <CartDropdown />
-      <NotificationDropdown /> */}
+      </NavItem> */}
+      {/* <NavbarSearch /> */}
+      {/* <SchoolYearControl/> */}
+      <MenuDropDown />
+      <NotificationDropdown />
       <UserDropdown />
     </ul>
   )

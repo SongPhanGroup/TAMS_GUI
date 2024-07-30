@@ -43,7 +43,8 @@
 .scroll-example {
   padding: 0.5rem;
   position: relative;
-  border: 2px solid darken($body-bg, 10%);
+  // border: 2px solid darken($body-bg, 10%);
+  // border: 2px solid #ccc;
   overflow: auto;
 
   .horz-scroll-content {
@@ -68,19 +69,6 @@
   background: #fff;
   height: 100%;
   width: 100%;
-}
-
-.loader-wrapper {
-  height: 8em;
-}
-
-.maintenance-icon {
-  font-size: 4rem;
-}
-
-.animationIcon {
-  right: 30px;
-  bottom: 10px;
 }
 
 // Breadcrumb page alignment demo

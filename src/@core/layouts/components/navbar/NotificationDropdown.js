@@ -1,5 +1,5 @@
 // ** React Imports
-import { Fragment } from 'react'
+import { Fragment, useState, useEffect } from 'react'
 
 // ** Custom Components
 import Avatar from '@components/avatar'
@@ -8,80 +8,31 @@ import Avatar from '@components/avatar'
 import classnames from 'classnames'
 import PerfectScrollbar from 'react-perfect-scrollbar'
 import { Bell, X, Check, AlertTriangle } from 'react-feather'
+import { NotificationOutlined, WarningOutlined } from '@ant-design/icons'
 
 // ** Reactstrap Imports
 import { Button, Badge, Input, DropdownMenu, DropdownItem, DropdownToggle, UncontrolledDropdown } from 'reactstrap'
-
+import dayjs from "dayjs"
 const NotificationDropdown = () => {
   // ** Notification Array
-  const notificationsArray = [
-    {
-      img: require('@src/assets/images/portrait/small/avatar-s-15.jpg').default,
-      subtitle: 'Won the monthly best seller badge.',
-      title: (
-        <p className='media-heading'>
-          <span className='fw-bolder'>Congratulation Sam 🎉</span>winner!
-        </p>
-      )
-    },
-    {
-      img: require('@src/assets/images/portrait/small/avatar-s-3.jpg').default,
-      subtitle: 'You have 10 unread messages.',
-      title: (
-        <p className='media-heading'>
-          <span className='fw-bolder'>New message</span>&nbsp;received
-        </p>
-      )
-    },
-    {
-      avatarContent: 'MD',
-      color: 'light-danger',
-      subtitle: 'MD Inc. order updated',
-      title: (
-        <p className='media-heading'>
-          <span className='fw-bolder'>Revised Order 👋</span>&nbsp;checkout
-        </p>
-      )
-    },
-    {
-      title: <h6 className='fw-bolder me-auto mb-0'>System Notifications</h6>,
-      switch: (
-        <div className='form-check form-switch'>
-          <Input type='switch' name='customSwitch' id='exampleCustomSwitch' defaultChecked />
-        </div>
-      )
-    },
-    {
-      avatarIcon: <X size={14} />,
-      color: 'light-danger',
-      subtitle: 'USA Server is down due to hight CPU usage',
-      title: (
-        <p className='media-heading'>
-          <span className='fw-bolder'>Server down</span>&nbsp;registered
-        </p>
-      )
-    },
-    {
-      avatarIcon: <Check size={14} />,
-      color: 'light-success',
-      subtitle: 'Last month sales report generated',
-      title: (
-        <p className='media-heading'>
-          <span className='fw-bolder'>Sales report</span>&nbsp;generated
-        </p>
-      )
-    },
-    {
-      avatarIcon: <AlertTriangle size={14} />,
-      color: 'light-warning',
-      subtitle: 'BLR Server using high memory',
-      title: (
-        <p className='media-heading'>
-          <span className='fw-bolder'>High memory</span>&nbsp;usage
-        </p>
-      )
-    }
-  ]
+  const [hvlqNotis, setHvlqNotis] = useState()
+  // const getHvlqNoti = () => {
+  //   getHvlqNotification({
+  //     params: {
+  //       page: 1,
+  //       limit: 100,
+  //     }
+  //   }).then(res => {
+  //     setHvlqNotis({
+  //       count: res?.count < 20 ? res.count : 20,
+  //       data: res?.list
+  //     })
+  //   })
+  // }
+  useEffect(() => {
+    // getHvlqNoti()
+  }, [])
+
 
   // ** Function to render Notifications
   /*eslint-disable */
@@ -94,17 +45,17 @@ const NotificationDropdown = () => {
           wheelPropagation: false
         }}
       >
-        {notificationsArray.map((item, index) => {
+        {hvlqNotis?.data?.map((item, index) => {
           return (
             <a
               key={index}
               className='d-flex'
-              href={item.switch ? '#' : '/'}
-              onClick={e => {
-                if (!item.switch) {
-                  e.preventDefault()
-                }
-              }}
+              href={`/quanlythongtindieuhanh/thongbaohocvien/${item?.ID}`}
+            // onClick={e => {
+            //   if (!item.switch) {
+            //     e.preventDefault()
+            //   }
+            // }}
             >
               <div
                 className={classnames('list-item d-flex', {
@@ -115,25 +66,41 @@ const NotificationDropdown = () => {
                 {!item.switch ? (
                   <Fragment>
                     <div className='me-1'>
-                      <Avatar
+                      {/* <Avatar
                         {...(item.img
                           ? { img: item.img, imgHeight: 32, imgWidth: 32 }
                           : item.avatarContent
-                          ? {
+                            ? {
                               content: item.avatarContent,
                               color: item.color
                             }
-                          : item.avatarIcon
-                          ? {
-                              icon: item.avatarIcon,
-                              color: item.color
-                            }
-                          : null)}
-                      />
+                            : item.avatarIcon
+                              ? {
+                                icon: item.avatarIcon,
+                                color: item.color
+                              }
+                              : null)}
+                      /> */}
+
+                      {
+                        item?.type === "IMPORTANT" ? <WarningOutlined style={{
+                          fontSize: "16px",
+                          color: "red"
+                        }}
+                        /> : <NotificationOutlined
+                          style={{
+                            fontSize: "16px"
+                          }}
+                        />
+                      }
+                      {/* <Bell /> */}
                     </div>
                     <div className='list-item-body flex-grow-1'>
-                      {item.title}
+                      <span style={{
+                        color: item?.type === "IMPORTANT" ? "red" : "#09a863"
+                      }}>{item.title}</span><br />
                       <small className='notification-text'>{item.subtitle}</small>
+                      <small className='notification-text'>{dayjs(item?.created_at).format("HH:mm DD-MM-YYYY")}</small>
                     </div>
                   </Fragment>
                 ) : (
@@ -156,24 +123,24 @@ const NotificationDropdown = () => {
       <DropdownToggle tag='a' className='nav-link' href='/' onClick={e => e.preventDefault()}>
         <Bell size={21} />
         <Badge pill color='danger' className='badge-up'>
-          5
+          {hvlqNotis?.count ?? 0}
         </Badge>
       </DropdownToggle>
       <DropdownMenu end tag='ul' className='dropdown-menu-media mt-0'>
         <li className='dropdown-menu-header'>
           <DropdownItem className='d-flex' tag='div' header>
-            <h4 className='notification-title mb-0 me-auto'>Notifications</h4>
-            <Badge tag='div' color='light-primary' pill>
+            <h4 className='notification-title mb-0 me-auto'>Thông báo</h4>
+            {/* <Badge tag='div' color='light-primary' pill>
               6 New
-            </Badge>
+            </Badge> */}
           </DropdownItem>
         </li>
         {renderNotificationItems()}
-        <li className='dropdown-menu-footer'>
+        {/* <li className='dropdown-menu-footer'>
           <Button color='primary' block>
             Read all notifications
           </Button>
-        </li>
+        </li> */}
       </DropdownMenu>
     </UncontrolledDropdown>
   )

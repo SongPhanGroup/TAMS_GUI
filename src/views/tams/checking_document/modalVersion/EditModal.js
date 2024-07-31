@@ -16,17 +16,17 @@ import {
 import { useForm, Controller } from 'react-hook-form'
 import * as yup from "yup"
 import { yupResolver } from '@hookform/resolvers/yup'
-import Select from 'react-select'
+// import Select from 'react-select'
 
 // ** Utils
 
 // ** Styles
 import '@styles/react/libs/react-select/_react-select.scss'
 import Swal from 'sweetalert2'
-import { useState } from "react"
+// import { useState } from "react"
 import { editCheckingDocumentVersion } from "../../../../api/checking_document_version"
 
-const EditCheckingDocumentVersion = ({ open, handleEditModalVersion, dataEdit, getData, dataTitle }) => {
+const EditCheckingDocumentVersion = ({ open, handleEditModalVersion, dataEdit, getData, dataTitle, dataId }) => {
     // ** States
     const EditCheckingDocumentVersionSchema = yup.object().shape({
         file: yup.mixed().required("Yêu cầu nhập file")
@@ -42,22 +42,21 @@ const EditCheckingDocumentVersion = ({ open, handleEditModalVersion, dataEdit, g
         resolver: yupResolver(EditCheckingDocumentVersionSchema)
     })
 
-    const [file, setFile] = useState()
+    // const [file, setFile] = useState()
 
     const handleCloseModal = () => {
         handleEditModalVersion()
     }
 
-    const handleChangeFile = (event) => {
-        const file = event.target.files[0]
-        setFile(file)
-    }
-    
+    // const handleChangeFile = (event) => {
+    //     const file = event.target.files[0]
+    //     setFile(file)
+    // }
+
     const onSubmit = (data) => {
         const formData = new FormData()
-        formData.append('file', file)
         formData.append('description', data.description)
-        formData.append('checkingDocumentId', data.checkingDocument.value)
+        formData.append('checkingDocumentId', dataId)
         editCheckingDocumentVersion(dataEdit?.id, formData).then(result => {
             if (result.status === 'success') {
                 Swal.fire({
@@ -94,7 +93,7 @@ const EditCheckingDocumentVersion = ({ open, handleEditModalVersion, dataEdit, g
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                     <Col xs={12}>
                         <Label className='form-label' for='checkingDocument'>
-                            phiên bản kiểm tra <span style={{color: 'red'}}>(*)</span>
+                            phiên bản kiểm tra <span style={{ color: 'red' }}>(*)</span>
                         </Label>
                         <Controller
                             disabled
@@ -122,14 +121,19 @@ const EditCheckingDocumentVersion = ({ open, handleEditModalVersion, dataEdit, g
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='file'>
-                            Tài liệu <span style={{color: 'red'}}>(*)</span>
+                            Tài liệu <span style={{ color: 'red' }}>(*)</span>
                         </Label>
                         <Controller
+                            disabled
+                            defaultValue={dataEdit?.fileName ?? ''}
                             name='file'
                             control={control}
                             render={({ field }) => (
-                                <Input {...field} id='file' type="file" placeholder='Chọn tài liệu' invalid={errors.file && true} onChange={handleChangeFile} />
-                            )}
+                                // <Input {...field} id='file' type='file' placeholder='Chọn tài liệu' invalid={errors.file && true} onChange={(event) => {
+                                //     handleChangeFile(event)
+                                //     field.onChange(event)
+                                // }} />)}
+                                <Input {...field} id="file" placeholder="Nhập tài liệu" />)}
                         />
                         {errors.file && <FormFeedback>{errors.file.message}</FormFeedback>}
                     </Col>

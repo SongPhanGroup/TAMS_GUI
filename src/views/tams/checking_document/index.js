@@ -197,7 +197,6 @@ const CheckingDocument = () => {
         },
         {
             name: "Tiêu đề",
-            center: true,
             minWidth: "400px",
             selector: row => <span style={{
                 whiteSpace: 'break-spaces'
@@ -206,21 +205,21 @@ const CheckingDocument = () => {
         {
             name: "Đợt kiểm tra",
             center: true,
-            minWidth: "150px",
-            selector: row => <span>{row?.course?.name}</span>
+            minWidth: "200px",
+            selector: row => <span style={{ whiteSpace: 'break-spaces' }}>{row?.course?.name}</span>
         },
         {
             name: "Tác giả",
             center: true,
-            minWidth: "100px",
+            minWidth: "250px",
             selector: row => <span style={{
                 whiteSpace: 'break-spaces'
             }}>{row.author}</span>
         },
         {
-            name: "Ngày kiểm tra",
+            name: "Ngày KT",
             center: true,
-            minWidth: "200px",
+            minWidth: "120px",
             cell: (row) => <span style={{ textAlign: 'center' }}>{toDateTimeString(row.createdAt)}</span>
         },
         // {
@@ -230,15 +229,15 @@ const CheckingDocument = () => {
         //     selector: row => row.description
         // },
         {
-            name: 'Trùng lặp theo đợt (%)',
+            name: 'Trùng với TL cùng đợt (%)',
             center: true,
-            minWidth: '200px',
+            minWidth: '150px',
             selector: row => <span>{row?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal}</span>
         },
         {
-            name: 'Trùng lặp theo tài liệu mẫu (%)',
+            name: 'Trùng với DL mẫu (%)',
             center: true,
-            minWidth: '200px',
+            minWidth: '150px',
             selector: row => <span>{row?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}</span>
         },
         {
@@ -274,14 +273,14 @@ const CheckingDocument = () => {
         }
     ]
 
-    const customStyles = {
-        rows: {
-            style: {
-                minHeight: '50px',
-                alignItems: 'center' // chiều cao tối thiểu của hàng
-            }
-        }
-    }
+    // const customStyles = {
+    //     rows: {
+    //         style: {
+    //             minHeight: '50px',
+    //             alignItems: 'center' // chiều cao tối thiểu của hàng
+    //         }
+    //     }
+    // }
 
     // const customStylesSelect = {
     //     option: (provided) => ({
@@ -432,7 +431,6 @@ const CheckingDocument = () => {
             },
             {
                 name: "Tên tài liệu",
-                center: true,
                 width: '500px',
                 selector: row => <span style={{
                     whiteSpace: 'break-spaces'
@@ -500,13 +498,13 @@ const CheckingDocument = () => {
                         <div className='d-flex mt-md-0 mt-1'>
                             {ability.can('add', 'nguoidung') &&
                                 <Button className='ms-2 btn-sub_add' color='primary' onClick={handleAddModalVersion}>
-                                    <Plus size={11} />
-                                    <span className='align-middle ms-50'>Thêm mới</span>
+                                    <Plus size={15} />
+                                    <span className='align-middle ms-50'>Thêm phiên bản mới</span>
                                 </Button>}
                         </div>
                     </CardHeader>
                     <Row className='justify-content-end mx-0'>
-                        <Col className='d-flex align-items-center justify-content-start mt-1 gap-2' md='12' sm='12' style={{ paddingRight: '20px' }}>
+                        <Col className='d-flex align-items-center justify-content-end mt-1 gap-2' md='12' sm='12' style={{ paddingRight: '21px' }}>
                             <div className='d-flex align-items-center'>
                                 <Label className='' for='search-input' style={{ minWidth: '65px' }}>
                                     Tìm kiếm
@@ -543,19 +541,18 @@ const CheckingDocument = () => {
                             selectableRowsComponent={BootstrapCheckbox}
                             // data={searchValue.length ? filteredData.data : data.data}
                             data={dataDetailById}
-                            // paginationServer
-                            // paginationTotalRows={totalCount}
-                            // paginationComponentOptions={{
-                            //     rowsPerPageText: 'Số hàng trên 1 trang:'
-                            // }}
-                            // onChangeRowsPerPage={handlePerRowsChange}
-                            // onChangePage={handlePagination}
-                            customStyles={customStyles}
+                        // paginationServer
+                        // paginationTotalRows={totalCount}
+                        // paginationComponentOptions={{
+                        //     rowsPerPageText: 'Số hàng trên 1 trang:'
+                        // }}
+                        // onChangeRowsPerPage={handlePerRowsChange}
+                        // onChangePage={handlePagination}
                         />}
                     </div>
                 </Card>
                 <AddNewCheckingDocumentVersion open={modalVersionAddNew} handleAddModalVersion={handleAddModalVersion} getData={fetchCheckingDocumentVersion} dataTitle={data?.title} dataId={data?.id} />
-                {dataDetailById && <EditCheckingDocumentVersion open={modalVersionEdit} handleEditModalVersion={handleEditModalVersion} getData={fetchCheckingDocumentVersion} dataEdit={dataEditVersion} dataTitle={data?.title} />}
+                {dataDetailById && <EditCheckingDocumentVersion open={modalVersionEdit} handleEditModalVersion={handleEditModalVersion} getData={fetchCheckingDocumentVersion} dataEdit={dataEditVersion} dataTitle={data?.title} dataId={data?.id} />}
                 {dataDetailById && <ResultCheckingDocument open={modalResult} handleResultModal={handleResultModal} getData={fetchCheckingDocumentVersion} dataDetailById={dataDetailById} />}
             </Fragment>
         )
@@ -599,7 +596,27 @@ const CheckingDocument = () => {
                     </div>
                 </CardHeader>
                 <Row className='justify-content-end mx-0'>
-                    <Col className='d-flex align-items-center justify-content-start mt-1 gap-2' md='12' sm='12' style={{ paddingRight: '20px' }}>
+                    <Col className='d-flex align-items-center justify-content-between mt-1 gap-2' md='12' sm='12' style={{ paddingRight: '21px', paddingLeft: '21px' }}>
+                        <div className='d-flex gap-2'>
+                            <Select placeholder="Chọn đợt kiểm tra" className='mb-50 select-custom' options={listCourse} isClearable onChange={(value) => handleChangeCourse(value)} />
+                            <div className='d-flex align-items-center'>
+                                <Label className='' for='search-input' style={{ minWidth: '100px' }}>
+                                    Ngày kiểm tra
+                                </Label>
+                                <Flatpickr
+                                    style={{ padding: '0.35rem 1rem' }}
+                                    className="form-control invoice-edit-input date-picker mb-50"
+                                    options={{
+                                        dateFormat: "d-m-Y", // format ngày giờ
+                                        locale: {
+                                            ...Vietnamese
+                                        },
+                                        defaultDate: new Date()
+                                    }}
+                                    placeholder="dd/mm/yyyy"
+                                />
+                            </div>
+                        </div>
                         <div className='d-flex align-items-center'>
                             <Label className='' for='search-input' style={{ minWidth: '65px' }}>
                                 Tìm kiếm
@@ -623,24 +640,6 @@ const CheckingDocument = () => {
                                 }}
                             />
                         </div>
-                        <Select placeholder="Chọn đợt kiểm tra" className='mb-50 select-custom' options={listCourse} isClearable onChange={(value) => handleChangeCourse(value)} />
-                        <div className='d-flex align-items-center'>
-                            <Label className='' for='search-input' style={{ minWidth: '100px' }}>
-                                Ngày kiểm tra
-                            </Label>
-                            <Flatpickr
-                                style={{ padding: '0.35rem 1rem' }}
-                                className="form-control invoice-edit-input date-picker mb-50"
-                                options={{
-                                    dateFormat: "d-m-Y", // format ngày giờ
-                                    locale: {
-                                        ...Vietnamese
-                                    },
-                                    defaultDate: new Date()
-                                }}
-                                placeholder="dd/mm/yyyy"
-                            />
-                        </div>
                     </Col>
                 </Row>
                 <div className='react-dataTable react-dataTable-selectable-rows' style={{ marginRight: '20px', marginLeft: '20px' }}>
@@ -661,7 +660,6 @@ const CheckingDocument = () => {
                         }}
                         onChangeRowsPerPage={handlePerRowsChange}
                         onChangePage={handlePagination}
-                        customStyles={customStyles}
                         expandableRows
                         expandableRowsComponent={(prev) => ExpandedComponent(prev)}
                         expandOnRowClicked

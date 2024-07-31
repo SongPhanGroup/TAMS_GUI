@@ -218,7 +218,6 @@ const Document = () => {
         },
         {
             name: "Tiêu đề",
-            center: true,
             minWidth: "200px",
             selector: row => <span style={{whiteSpace: 'break-spaces'}}>{row.title}</span>
         },

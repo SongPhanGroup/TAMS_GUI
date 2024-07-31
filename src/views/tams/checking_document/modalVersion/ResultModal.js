@@ -265,7 +265,7 @@ const ResultCheckingDocument = ({ open, handleResultModal, dataDetailById }) => 
             <Fragment>
                 <Card style={{ backgroundColor: 'white' }}>
                     <CardHeader className='flex-md-row flex-column align-md-items-center align-items-start border-bottom'>
-                        <CardTitle tag='h4'>Danh sách phiên bản kiểm tra</CardTitle>
+                        <CardTitle tag='h4'>Danh sách các câu trùng</CardTitle>
                     </CardHeader>
                     <Row className='justify-content-end mx-0'>
                         {/* <Col className='d-flex align-items-center justify-content-start mt-1 gap-2' md='12' sm='12' style={{ paddingRight: '20px' }}>

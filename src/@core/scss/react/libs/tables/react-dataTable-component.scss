@@ -13,6 +13,7 @@
 
       .rdt_TableCol {
         padding: 0.72rem 1.5rem;
+        justify-content: center !important;
         .rdt_TableCol_Sortable {
           height: max-content;
           color: $body-color;

@@ -57,6 +57,8 @@ const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDoc
         setFile(file)
     }
 
+    console.log(checkingDocumentSelected?.courseId)
+  
     const onSubmit = (data) => {
         setLoadingAdd(true)
         const formData = new FormData()
@@ -76,7 +78,7 @@ const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDoc
             } else {
                 Swal.fire({
                     title: "Thêm mới phiên bản kiểm tra thất bại",
-                    text: "Vui lòng kiểm tra thông tin!",
+                    text: "Không thể thêm phiên bản mới do đợt kiểm tra đã bị khóa!",
                     icon: "error",
                     customClass: {
                         confirmButton: "btn btn-danger"

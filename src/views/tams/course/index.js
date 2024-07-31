@@ -31,7 +31,7 @@ const LIST_STATUS = [
         label: "Đang tiến hành"
     },
     {
-        value: 0,
+        value: 2,
         label: "Bị khóa"
     }
 ]
@@ -44,7 +44,7 @@ const Course = () => {
     const [currentPage, setCurrentPage] = useState(1)
     const [rowsPerPage, setRowsPerpage] = useState(10)
     const [search, setSearch] = useState("")
-    const [status, setStatus] = useState()
+    const [isActive, setIsActive] = useState()
     const [isAdd, setIsAdd] = useState(false)
     const [isEdit, setIsEdit] = useState(false)
     const [info, setInfo] = useState()
@@ -55,7 +55,7 @@ const Course = () => {
                 page,
                 perPage: limit,
                 ...(search && search !== "" && { search }),
-                isActive,
+                ...(isActive && isActive !== undefined && isActive !== null && { isActive }),
             },
         })
             .then((res) => {
@@ -69,9 +69,9 @@ const Course = () => {
             })
     }
     useEffect(() => {
-        getData(currentPage, rowsPerPage, search, status)
-    }, [currentPage, rowsPerPage, search, status])
-
+        console.log(isActive)
+        getData(currentPage, rowsPerPage, search, isActive)
+    }, [currentPage, rowsPerPage, search, isActive])
 
     const handleModal = () => {
         setIsAdd(false)
@@ -143,9 +143,9 @@ const Course = () => {
 
     const handleChangeStatus = (value) => {
         if (value) {
-            setStatus(value)
+            setIsActive(value)
         } else {
-            setStatus()
+            setIsActive()
         }
     }
 

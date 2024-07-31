@@ -31,6 +31,7 @@ import {
     DeleteOutlined,
     EditOutlined,
     LockOutlined,
+    RightCircleOutlined,
 } from "@ant-design/icons"
 import { AbilityContext } from '@src/utility/context/Can'
 // import style from "../../../../assets/scss/index.module.scss"
@@ -166,10 +167,13 @@ const CheckingResult = () => {
     }
 
     useEffect(() => {
-        getData()
         getDataSameCourse(courseId)
-        getAllDataPromises()
     }, [params?.id, courseId])
+    
+    useEffect(() => {
+        getAllDataPromises()
+        getData()
+    }, [params?.id])
 
     const handleModal = () => {
         setIsAdd(false)
@@ -181,7 +185,7 @@ const CheckingResult = () => {
     const CloseBtn = (
         <X className="cursor-pointer" size={15} onClick={handleModal} />
     )
-    const handleEdit = (record) => {
+    const handleDe = (record) => {
         setCheckingDocumentSelected(record)
         setIsEdit(true)
     }
@@ -336,41 +340,16 @@ const CheckingResult = () => {
                 <div style={{ display: "flex", justifyContent: "center" }}>
                     {ability.can('update', 'PHAN_QUYEN_VAI_TRO') &&
                         <>
-                            <EditOutlined
-                                id={`tooltip_edit_${record._id}`}
+                            <RightCircleOutlined
+                                id={`tooltip_detail_${record._id}`}
                                 style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
-                                onClick={(e) => handleEdit(record)}
+                                onClick={(e) => handleDetail(record)}
                             />
-                            <UncontrolledTooltip placement="top" target={`tooltip_edit_${record._id}`}
+                            <UncontrolledTooltip placement="top" target={`tooltip_detail_${record._id}`}
                             >
-                                Chỉnh sửa
+                                Chi tiết
                             </UncontrolledTooltip>
                         </>}
-                    {/* { ability.can('update', 'PHAN_QUYEN_VAI_TRO') && 
-                              <>
-              <AppstoreAddOutlined
-                id={`tooltip_per_${record._id}`}
-                style={{ color: "#09A863", cursor: "pointer" }}
-                onClick={(e) => handlePer(record)}
-              />
-              <UncontrolledTooltip placement="top" target={`tooltip_per_${record._id}`}>
-                Phân quyền
-              </UncontrolledTooltip></>} */}
-                    {ability.can('delete', 'PHAN_QUYEN_VAI_TRO') &&
-                        <Popconfirm
-                            title="Bạn chắc chắn xóa?"
-                            onConfirm={() => handleDelete(record._id)}
-                            cancelText="Hủy"
-                            okText="Đồng ý"
-                        >
-                            <DeleteOutlined
-                                style={{ color: "red", cursor: "pointer" }}
-                                id={`tooltip_delete_${record._id}`}
-                            />
-                            <UncontrolledTooltip placement="top" target={`tooltip_delete_${record._id}`}>
-                                Xóa
-                            </UncontrolledTooltip>
-                        </Popconfirm>}
                 </div>
             ),
         },

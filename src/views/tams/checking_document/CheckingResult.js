@@ -24,7 +24,7 @@ import {
     CardBody,
     CardTitle,
 } from "reactstrap"
-import { Link, useLocation, useParams } from "react-router-dom"
+import { Link, NavLink, useLocation, useParams } from "react-router-dom"
 import { Plus, X } from "react-feather"
 import {
     AppstoreAddOutlined,
@@ -169,7 +169,7 @@ const CheckingResult = () => {
     useEffect(() => {
         getDataSameCourse(courseId)
     }, [params?.id, courseId])
-    
+
     useEffect(() => {
         getAllDataPromises()
         getData()
@@ -185,7 +185,7 @@ const CheckingResult = () => {
     const CloseBtn = (
         <X className="cursor-pointer" size={15} onClick={handleModal} />
     )
-    const handleDe = (record) => {
+    const handleDetail = () => {
         setCheckingDocumentSelected(record)
         setIsEdit(true)
     }
@@ -340,6 +340,7 @@ const CheckingResult = () => {
                 <div style={{ display: "flex", justifyContent: "center" }}>
                     {ability.can('update', 'PHAN_QUYEN_VAI_TRO') &&
                         <>
+
                             <RightCircleOutlined
                                 id={`tooltip_detail_${record._id}`}
                                 style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}

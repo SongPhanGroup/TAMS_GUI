@@ -19,11 +19,14 @@ import Select from 'react-select'
 import { useForm, Controller } from 'react-hook-form'
 import * as yup from "yup"
 import { yupResolver } from '@hookform/resolvers/yup'
+import Flatpickr from "react-flatpickr"
 
 // ** Utils
 
 // ** Styles
 import '@styles/react/libs/react-select/_react-select.scss'
+import { Vietnamese } from "flatpickr/dist/l10n/vn.js"
+import "@styles/react/libs/flatpickr/flatpickr.scss"
 import Swal from 'sweetalert2'
 import { postDocument } from "../../../../api/document"
 import { extractingFromFileUpload } from "../../../../api/sentence_doc"
@@ -41,9 +44,7 @@ const AddNewDocument = ({ open, handleModal, getData }) => {
         source: yup.string().required("Yêu cầu nhập nguồn tài liệu"),
         documentType: yup.object().required("Yêu cầu chọn loại tài liệu").nullable(),
         major: yup.object().required("Yêu cầu chọn chuyên ngành").nullable(),
-        author: yup.string().required("Yêu cầu nhập tác giả"),
-        coAuthor: yup.string().required("Yêu cầu nhập đồng tác giả"),
-        supervisor: yup.string().required("Yêu cầu nhập người giám sát")
+        author: yup.string().required("Yêu cầu nhập tác giả")
     })
 
     // ** Hooks
@@ -244,7 +245,7 @@ const AddNewDocument = ({ open, handleModal, getData }) => {
                     </Col>
                     <Col sm={6} xs={12}>
                         <Label className='form-label' for='coAuthor'>
-                            Đồng tác giả <span style={{ color: 'red' }}>(*)</span>
+                            Đồng tác giả
                         </Label>
                         <Controller
                             control={control}
@@ -260,11 +261,10 @@ const AddNewDocument = ({ open, handleModal, getData }) => {
                                 )
                             }}
                         />
-                        {errors.coAuthor && <FormFeedback>{errors.coAuthor.message}</FormFeedback>}
                     </Col>
                     <Col sm={6} xs={12}>
                         <Label className='form-label' for='supervisor'>
-                            Người hướng dẫn <span style={{ color: 'red' }}>(*)</span>
+                            Cán bộ hướng dẫn
                         </Label>
                         <Controller
                             control={control}
@@ -280,7 +280,6 @@ const AddNewDocument = ({ open, handleModal, getData }) => {
                                 )
                             }}
                         />
-                        {errors.supervisor && <FormFeedback>{errors.supervisor.message}</FormFeedback>}
                     </Col>
                     <Col sm={6} xs={12}>
                         <Label className='form-label' for='source'>
@@ -345,6 +344,52 @@ const AddNewDocument = ({ open, handleModal, getData }) => {
                         />
                         {errors.major && <FormFeedback>{errors.major.message}</FormFeedback>}
                     </Col>
+                    <Col sm={6} xs={12}>
+                        <Label className='form-label' for='date'>
+                            Năm xuất bản/Bảo vệ/Công bố
+                        </Label>
+                        <Controller
+                            control={control}
+                            name='date'
+                            render={() => {
+                                return (
+                                    <Flatpickr
+                                        className="form-control invoice-edit-input date-picker"
+                                        options={{
+                                            dateFormat: "d-m-Y", // format ngày giờ
+                                            locale: {
+                                                ...Vietnamese
+                                            },
+                                            defaultDate: new Date()
+                                        }}
+                                        placeholder="dd/mm/yyyy"
+                                    />
+
+                                )
+                            }}
+                        />
+                        {/* {errors.date && <FormFeedback>{errors.date.message}</FormFeedback>} */}
+                    </Col>
+                    <Col sm={6} xs={12}>
+                        <Label className='form-label' for='place'>
+                            Nơi xuất bản/Bảo vệ/Công bố
+                        </Label>
+                        <Controller
+                            control={control}
+                            name='place'
+                            render={({field}) => {
+                                return (
+                                    <Input
+                                        {...field}
+                                        id='source'
+                                        placeholder='Nhập nơi xuất bản/Bảo vệ/Công bố'
+                                        invalid={errors.source && true}
+                                    />
+                                )
+                            }}
+                        />
+                        {/* {errors.date && <FormFeedback>{errors.date.message}</FormFeedback>} */}
+                    </Col>
                     <Col sm={12} xs={12}>
                         <Label className='form-label' for='description'>
                             Mô tả
@@ -353,7 +398,7 @@ const AddNewDocument = ({ open, handleModal, getData }) => {
                             name='description'
                             control={control}
                             render={({ field }) => (
-                                <Input {...field} id='description' placeholder='Nhập mô tả' invalid={errors.description && true} />
+                                <Input type="textarea" {...field} id='description' placeholder='Nhập mô tả' invalid={errors.description && true} />
                             )}
                         />
                     </Col>

@@ -120,7 +120,9 @@ const CheckingDocument = () => {
                 setListCourse(null)
             }
         })
-        const courses = courseRes?.data?.map((res) => {
+
+        const resCourse = courseRes?.data?.filter(item => item.isActive === 1)
+        const courses = resCourse?.map((res) => {
             return {
                 value: res.id,
                 label: `${res.name}`
@@ -235,9 +237,6 @@ const CheckingDocument = () => {
             setEndDate()
         }
     }
-
-    console.log('start', startDate)
-    console.log('end', endDate)
 
     const handleViewUser = (role) => {
         setRoleSelected(role)

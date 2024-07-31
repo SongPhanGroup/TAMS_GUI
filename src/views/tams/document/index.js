@@ -28,7 +28,12 @@ import { toDateString, toDateTimeString } from "../../../utility/Utils"
 import { getCourse } from "../../../api/course"
 import { getDocumentType } from "../../../api/document_type"
 import { getMajor } from "../../../api/major"
-import { type } from "jquery"
+import Flatpickr from "react-flatpickr"
+import { Vietnamese } from "flatpickr/dist/l10n/vn.js"
+import "@styles/react/libs/flatpickr/flatpickr.scss"
+
+// const oneWeekAgo = new Date()
+// oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
 
 const Document = () => {
     const [loadingData, setLoadingData] = useState(false)
@@ -216,10 +221,34 @@ const Document = () => {
             title: "Tác giả",
             dataIndex: "author",
             align: 'left',
-            width: 150,
+            width: 200,
             render: (text, record, index) => (
                 <span style={{ whiteSpace: 'break-spaces' }}>{record.author}</span>
             ),
+        },
+        {
+            title: "Loại tài liệu",
+            dataIndex: "documentType",
+            align: 'left',
+            width: 200,
+            render: (text, record, index) => (
+                <span style={{ whiteSpace: 'break-spaces' }}>{record?.documentType?.name}</span>
+            ),
+        },
+        {
+            title: "Lĩnh vực",
+            dataIndex: "major",
+            align: 'left',
+            width: 200,
+            render: (text, record, index) => (
+                <span style={{ whiteSpace: 'break-spaces' }}>{record?.major?.name}</span>
+            ),
+        },
+        {
+            title: "Năm công bố",
+            dataIndex: "year",
+            align: 'left',
+            width: 150
         },
         {
             title: "Ngày tạo",
@@ -312,15 +341,6 @@ const Document = () => {
                     </Col>
                     <Col sm="3" className="mr-1" style={{ display: "flex", justifyContent: "flex-end" }}>
                         <Select
-                            placeholder="Chọn đợt kiểm tra"
-                            className='mb-50 select-custom'
-                            options={listCourse}
-                            allowClear
-                            onChange={(value) => handleChangeCourse(value)}
-                        />
-                    </Col>
-                    <Col sm="3" className="mr-1" style={{ display: "flex", justifyContent: "flex-end" }}>
-                        <Select
                             placeholder="Chọn loại tài liệu"
                             className='mb-50 select-custom'
                             options={listDocumentType}
@@ -335,6 +355,36 @@ const Document = () => {
                             options={listMajor}
                             allowClear
                             onChange={(value) => handleChangeMajor(value)}
+                        />
+                    </Col>
+                    <Col
+                        sm="3"
+                        style={{ display: "flex", justifyContent: "flex-start" }}
+                    >
+                        <Label
+                            className=""
+                            style={{
+                                width: "120px",
+                                fontSize: "14px",
+                                height: "34px",
+                                display: "flex",
+                                alignItems: "center",
+                            }}
+                        >
+                            Ngày tạo
+                        </Label>
+                        <Flatpickr
+                            style={{ padding: '0.35rem 1rem' }}
+                            className="form-control invoice-edit-input date-picker mb-50"
+                            options={{
+                                dateFormat: "d-m-Y", // format ngày giờ
+                                locale: {
+                                    ...Vietnamese
+                                },
+                                defaultDate: new Date()
+                            }}
+                            placeholder="dd/mm/yyyy"
+                            onChange={(value => handleChangeDate(value))}
                         />
                     </Col>
                 </Col>

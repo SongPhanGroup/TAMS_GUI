@@ -1,4 +1,4 @@
-import { Table, Input, Card, CardTitle, Tag, Popconfirm, Switch, Spin, Select } from "antd"
+import { Table, Input, Card, CardTitle, Tag, Popconfirm, Switch, Spin, Select, Tooltip } from "antd"
 import React, { useState, Fragment, useEffect, useRef, useContext } from "react"
 import {
     Label,
@@ -223,7 +223,7 @@ const Course = () => {
                         >
                             {
                                 record.isActive === 1 ? <LockOutlined
-                                    style={{ color: "#09A863", cursor: 'pointer', marginRight: '1rem' }}
+                                    style={{ color: "red", cursor: 'pointer', marginRight: '1rem' }}
                                 /> : <UnlockOutlined
                                     style={{ color: "#09A863", cursor: 'pointer', marginRight: '1rem' }}
                                 />
@@ -232,14 +232,13 @@ const Course = () => {
                     }
                     {ability.can('update', 'LOAI_DON_VI') &&
                         <>
-                            <EditOutlined
-                                id={`tooltip_edit${record.ID}`}
-                                style={{ color: "#09A863", cursor: 'pointer', marginRight: '1rem' }}
-                                onClick={(e) => handleEdit(record)}
-                            />
-                            <UncontrolledTooltip placement="top" target={`tooltip_edit${record.ID}`}>
-                                Chỉnh sửa
-                            </UncontrolledTooltip>
+
+                            <Tooltip placement="top" title="Chỉnh sửa" >
+                                <EditOutlined
+                                    style={{ color: "#09A863", cursor: 'pointer', marginRight: '1rem' }}
+                                    onClick={(e) => handleEdit(record)}
+                                />
+                            </Tooltip>
                         </>}
                     {ability.can('delete', 'LOAI_DON_VI') &&
                         <Popconfirm
@@ -248,10 +247,9 @@ const Course = () => {
                             cancelText="Hủy"
                             okText="Đồng ý"
                         >
-                            <DeleteOutlined style={{ color: "red", cursor: 'pointer' }} id={`tooltip_delete${record.ID}`} />
-                            <UncontrolledTooltip placement="top" target={`tooltip_delete${record.ID}`}>
-                                Xóa
-                            </UncontrolledTooltip>
+                            <Tooltip placement="top" title="Xóa" >
+                                <DeleteOutlined style={{ color: "red", cursor: 'pointer' }} />
+                            </Tooltip>
                         </Popconfirm>}
                 </div>
             ),

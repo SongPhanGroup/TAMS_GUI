@@ -11,7 +11,7 @@ export default [
     icon: <Shield size={12} />,
     action: 'read',
     resource: 'ACL',
-    navLink: '/access-control'
+    navLink: '/access-control',
   },
   {
     id: 'menuLevels',
@@ -41,7 +41,7 @@ export default [
           }
         ]
       }
-    ]
+    ],
   },
   {
     id: 'disabledMenu',
@@ -56,7 +56,7 @@ export default [
     icon: <Folder size={20} />,
     externalLink: true,
     newTab: true,
-    navLink: 'https://pixinvent.com/demo/vuexy-react-admin-dashboard-template/documentation'
+    navLink: 'https://pixinvent.com/demo/vuexy-react-admin-dashboard-template/documentation',
   },
   {
     id: 'raiseSupport',
@@ -64,6 +64,6 @@ export default [
     icon: <LifeBuoy size={20} />,
     externalLink: true,
     newTab: true,
-    navLink: 'https://pixinvent.ticksy.com/'
+    navLink: 'https://pixinvent.ticksy.com/',
   }
 ]

@@ -11,7 +11,8 @@ import {
     ModalHeader,
     Row,
     Button,
-    Form
+    Form,
+    Spinner
 } from "reactstrap"
 
 // ** Third Party Components
@@ -30,7 +31,7 @@ import { getCourse } from "../../../../api/course"
 import classNames from "classnames"
 import { postCheckingDocumentVersion } from "../../../../api/checking_document_version"
 
-const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
+const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
     const AddNewCheckingDocumentSchema = yup.object().shape({
         file: yup.mixed().required("Yêu cầu chọn file"),
         title: yup.string().required("Yêu cầu nhập tiêu đề"),
@@ -52,6 +53,7 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
     // ** State
     const [file, setFile] = useState()
     const [listCourse, setListCourse] = useState([])
+    const [loadingAdd, setLoadingAdd] = useState(false)
 
     const getAllDataPromises = async () => {
         const coursePromise = getCourse({ params: { page: 1, perPage: 10, search: '' } })
@@ -89,7 +91,7 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
     }, [open])
 
     const handleCloseModal = () => {
-        handleAddModal()
+        handleModal()
         reset()
     }
 
@@ -99,22 +101,25 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
     }
 
     const onSubmit = (data) => {
+        setLoadingAdd(true)
         postCheckingDocument({
             title: data.title,
             author: data.author,
             courseId: data.course.value,
-            description: data.description
+            description: data.description ?? ""
         }).then(result => {
             if (result.status === 'success') {
                 const formData = new FormData()
                 formData.append('file', file)
-                formData.append('description', data.description)
+                if (data.description) {
+                    formData.append('description', data.description)
+                }
                 formData.append('checkingDocumentId', result?.data?.id)
                 postCheckingDocumentVersion(formData).then(result => {
                     if (result.status === 'success') {
                         Swal.fire({
                             title: "Thêm mới kiểm tra tài liệu thành công",
-                            text: "Yêu cầu đã được phê duyệt!",
+                            text: "",
                             icon: "success",
                             customClass: {
                                 confirmButton: "btn btn-success"
@@ -136,15 +141,17 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
             handleCloseModal()
         }).catch(error => {
             console.log(error)
+        }).finally(() => {
+            setLoadingAdd(false)
         })
     }
 
     return (
-        <Modal isOpen={open} toggle={handleAddModal} className='modal-dialog-centered modal-lg'>
+        <Modal isOpen={open} toggle={handleModal} className='modal-dialog-top modal-lg'>
             <ModalHeader className='bg-transparent' toggle={handleCloseModal}></ModalHeader>
-            <ModalBody className='px-sm-5 mx-50 pb-5'>
-                <div className='text-center mb-2'>
-                    <h1 className='mb-1'>Thông tin tài liệu kiểm tra</h1>
+            <ModalBody className='px-sm-3 mx-50 pb-2' style={{ paddingTop: 0 }}>
+                <div className='text-center mb-1'>
+                    <h2 className='mb-1'>Thông tin tài liệu kiểm tra</h2>
                 </div>
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                     <Col xs={12}>
@@ -231,7 +238,9 @@ const AddNewCheckingDocument = ({ open, handleAddModal, getData }) => {
                     </Col>
                     <Col xs={12} className='text-center mt-2 pt-50'>
                         <Button type='submit' name='add' className='me-1' color='primary'>
-                            Thêm
+                            {
+                                loadingAdd === true ? <Spinner color="#fff" size="sm" /> : 'Thêm'
+                            }
                         </Button>
                         <Button type='reset' color='secondary' outline onClick={handleCloseModal}>
                             Hủy

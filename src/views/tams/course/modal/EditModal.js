@@ -9,7 +9,8 @@ import {
     ModalBody,
     ModalHeader,
     Row,
-    Button
+    Button,
+    Spinner
 } from "reactstrap"
 
 // ** Third Party Components
@@ -27,13 +28,17 @@ import "@styles/react/libs/flatpickr/flatpickr.scss"
 import Swal from 'sweetalert2'
 import { convertDateString, toDateStringv2 } from "../../../../utility/Utils"
 import { editCourse } from "../../../../api/course"
-import { useState } from "react"
-// import { editCourse } from "../../../../api/course"
+import { useEffect, useState } from "react"
+import { Spin } from "antd"
 
-const EditCourse = ({ open, handleEditModal, dataEdit, getData }) => {
+const EditCourse = ({ open, handleModal, infoEdit, getData }) => {
+    if (!infoEdit) return
+    useEffect(() => {
+
+    }, [infoEdit])
     // ** States
     const EditCourseSchema = yup.object().shape({
-        name: yup.string().required("Đây là trường bắt buộc")
+        name: yup.string().required("Yêu cầu nhập tên đợt kiểm tra")
     })
 
     // ** Hooks
@@ -46,63 +51,108 @@ const EditCourse = ({ open, handleEditModal, dataEdit, getData }) => {
         resolver: yupResolver(EditCourseSchema)
     })
 
-    const [picker, setPicker] = useState(new Date(dataEdit.date))
-
-    const handleCloseModal = () => {
-        handleEditModal()
-    }
+    const [picker, setPicker] = useState(new Date(infoEdit?.date))
+    const [isChangeDate, setIsChangeDate] = useState(false)
+    const [loadingEdit, setLoadingEdit] = useState(false)
 
     const handleChangeDate = (date) => {
-        setPicker(date[0])
-        console.log(date)
+        if (date) {
+            setPicker(date[0])
+        }
+        setIsChangeDate(true)
     }
 
     const onSubmit = data => {
-        editCourse(dataEdit?.id, {
-            date: toDateStringv2(picker),
-            name: data.name,
-            description: data.description
-        }).then(result => {
-            if (result.status === 'success') {
+        if (!isChangeDate) {
+            setLoadingEdit(true)
+            editCourse(infoEdit?.id, {
+                date: infoEdit?.date,
+                name: data.name,
+                description: data.description
+            }).then(result => {
+                if (result.status === 'success') {
+                    Swal.fire({
+                        title: "Cập nhật đợt kiểm tra thành công",
+                        text: "",
+                        icon: "success",
+                        customClass: {
+                            confirmButton: "btn btn-success"
+                        }
+                    })
+                } else {
+                    Swal.fire({
+                        title: "Cập nhật đợt kiểm tra thất bại",
+                        text: "Vui lòng kiểm tra lại thông tin!",
+                        icon: "error",
+                        customClass: {
+                            confirmButton: "btn btn-danger"
+                        }
+                    })
+                }
+                getData()
+                handleModal()
+            }).catch(error => {
                 Swal.fire({
-                    title: "Cập nhật tài liệu thành công",
-                    text: "Yêu cầu đã được phê duyệt!",
-                    icon: "success",
-                    customClass: {
-                        confirmButton: "btn btn-success"
-                    }
-                })
-            } else {
-                Swal.fire({
-                    title: "Cập nhật tài liệu thất bại",
-                    text: "Có lỗi xảy ra, vui lòng thử lại sau",
+                    title: "Cập nhật đợt kiểm tra thất bại",
+                    text: `Có lỗi xảy ra - ${error.message}!`,
                     icon: "error",
                     customClass: {
                         confirmButton: "btn btn-danger"
                     }
                 })
-            }
-            getData()
-            handleCloseModal()
-        }).catch(error => {
-            console.log(error)
-        })
+            }).finally(() => {
+                setLoadingEdit(false)
+            })
+        } else {
+            setLoadingEdit(true)
+            editCourse(infoEdit?.id, {
+                date: toDateStringv2(picker),
+                name: data.name,
+                description: data.description
+            }).then(result => {
+                if (result.status === 'success') {
+                    Swal.fire({
+                        title: "Cập nhật đợt kiểm tra thành công",
+                        text: "",
+                        icon: "success",
+                        customClass: {
+                            confirmButton: "btn btn-success"
+                        }
+                    })
+                } else {
+                    Swal.fire({
+                        title: "Cập nhật đợt kiểm tra thất bại",
+                        text: "Có lỗi xảy ra, vui lòng thử lại sau",
+                        icon: "error",
+                        customClass: {
+                            confirmButton: "btn btn-danger"
+                        }
+                    })
+                }
+                getData()
+                handleModal()
+            }).catch(error => {
+                console.log(error)
+            }).finally(() => {
+                setLoadingEdit(false)
+            })
+        }
     }
 
     return (
-        <Modal isOpen={open} toggle={handleEditModal} className='modal-dialog-centered modal-md'>
-            <ModalHeader className='bg-transparent' toggle={handleCloseModal}></ModalHeader>
-            <ModalBody className='px-sm-5 mx-50 pb-5'>
-                <div className='text-center mb-2'>
-                    <h1 className='mb-1'>Cập nhật đợt kiểm tra</h1>
+        <Modal isOpen={open} toggle={handleModal} className='modal-dialog-top modal-md'>
+            <ModalHeader className='bg-transparent' toggle={handleModal}></ModalHeader>
+            <ModalBody className='px-sm-3 mx-50 pb-2' style={{ paddingTop: 0 }}>
+                <div className='text-center mb-1'>
+                    <h2 className='mb-1'>Cập nhật đợt kiểm tra</h2>
                 </div>
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                     <Col xs={12}>
                         <Label className='form-label' for='name'>
-                            Tên đợt kiểm tra <span style={{color: 'red'}}>(*)</span>
+                            Tên đợt kiểm tra <span style={{ color: 'red' }}>(*)</span>
                         </Label>
                         <Controller
-                            defaultValue={dataEdit?.name ?? ''}
+                            defaultValue={infoEdit?.name ?? ''}
                             control={control}
                             name='name'
                             render={({ field }) => {
@@ -120,7 +170,7 @@ const EditCourse = ({ open, handleEditModal, dataEdit, getData }) => {
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='date'>
-                            Thời gian <span style={{color: 'red'}}>(*)</span>
+                            Thời gian <span style={{ color: 'red' }}>(*)</span>
                         </Label>
                         <Controller
                             control={control}
@@ -137,7 +187,7 @@ const EditCourse = ({ open, handleEditModal, dataEdit, getData }) => {
                                         }}
                                         placeholder="dd/mm/yyyy"
                                         onChange={handleChangeDate}
-                                        defaultValue={convertDateString(dataEdit.date).toUTCString()}
+                                        defaultValue={convertDateString(infoEdit?.date).toUTCString()}
                                     />
 
                                 )
@@ -150,7 +200,7 @@ const EditCourse = ({ open, handleEditModal, dataEdit, getData }) => {
                             Mô tả
                         </Label>
                         <Controller
-                            defaultValue={dataEdit?.description ?? ''}
+                            defaultValue={infoEdit?.description ?? ''}
                             name='description'
                             control={control}
                             render={({ field }) => (
@@ -160,9 +210,11 @@ const EditCourse = ({ open, handleEditModal, dataEdit, getData }) => {
                     </Col>
                     <Col xs={12} className='text-center mt-2 pt-50'>
                         <Button type='submit' className='me-1' color='primary'>
-                            Cập nhật
+                            {
+                                loadingEdit === true ? <Spinner color="#fff" size="sm" /> : 'Cập nhật'
+                            }
                         </Button>
-                        <Button type='reset' color='secondary' outline onClick={handleCloseModal}>
+                        <Button type='reset' color='secondary' outline onClick={handleModal}>
                             Hủy
                         </Button>
                     </Col>

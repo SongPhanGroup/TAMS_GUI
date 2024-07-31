@@ -17,12 +17,18 @@ const VerticalMenuHeader = props => {
 
   // ** Vars
   const user = getUserData()
-
   // ** Reset open group
   useEffect(() => {
     if (!menuHover && menuCollapsed) setGroupOpen([])
   }, [menuHover, menuCollapsed])
-
+  const userRoles = JSON.parse(localStorage.getItem('userRoles'))
+  const getDefaultRoute = () => {
+    if (userRoles && userRoles[0]?.description === 'BANGIAMDOC') {
+      return "/default/homepage"
+    } else {
+      return "#"
+    }
+  }
   // ** Menu toggler component
   const Toggler = () => {
     if (!menuCollapsed) {
@@ -48,13 +54,13 @@ const VerticalMenuHeader = props => {
 
   return (
     <div className='navbar-header'>
-      <ul className='nav navbar-nav flex-row flex-nowrap'>
+      <ul className='nav navbar-nav flex-row' style={{alignItems: 'center'}}>
         <li className='nav-item me-auto'>
-          <NavLink to={user ? getHomeRouteForLoggedInUser(user.role) : '/'} className='navbar-brand'>
+          <NavLink to={getDefaultRoute()} className='navbar-brand' style={{marginTop: '0'}}>
             <span className='brand-logo'>
-              <img style={{scale: 2}} src={themeConfig.app.appLogoImage} alt='logo' />
+              <img src={themeConfig.app.appLogoImage} alt='logo' />
             </span>
-            <h2 style={{whiteSpace: 'break-spaces', fontSize: '16px'}} className='brand-text mb-0'>{themeConfig.app.appName}</h2>
+            <h2 className='brand-text mb-0'>{themeConfig.app.appName}</h2>
           </NavLink>
         </li>
         <li className='nav-item nav-toggle'>

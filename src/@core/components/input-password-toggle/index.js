@@ -9,6 +9,8 @@ import { Eye, EyeOff } from 'react-feather'
 // ** Reactstrap Imports
 import { InputGroup, Input, InputGroupText, Label } from 'reactstrap'
 
+import style from '../../../assets/scss/index.module.scss'
+
 const InputPasswordToggle = forwardRef((props, ref) => {
   // ** Props
   const {
@@ -51,15 +53,16 @@ const InputPasswordToggle = forwardRef((props, ref) => {
           [className]: className,
           'is-invalid': invalid
         })}
+        style={{flexWrap: 'nowrap'}}
       >
-        <Input
+        <input
           ref={ref}
           invalid={invalid}
           type={inputVisibility === false ? 'password' : 'text'}
           placeholder={placeholder ? placeholder : '············'}
-          className={classnames({
+          className={`${classnames({
             [inputClassName]: inputClassName
-          })}
+          })} ${style.inputForm}`}
           /*eslint-disable */
           {...(label && htmlFor
             ? {

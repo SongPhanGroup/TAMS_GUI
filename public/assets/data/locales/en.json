@@ -1,5 +1,5 @@
 {
-  "Dashboards": "Dashboards",
+  "Dashboards": "Trang tin tức",
   "Analytics": "Analytics",
   "Apps": "Apps",
   "eCommerce": "eCommerce",
@@ -175,12 +175,12 @@
   "Apps & Pages": "Apps & Pages",
   "User Interface": "User Interface",
   "Misc": "Misc",
-  "Roles": "Roles",
+  "Roles": "Phân quyền",
   "License": "License",
   "API Key": "API Key",
   "Accordion": "Accordion",
   "OffCanvas": "OffCanvas",
-  "Permissions": "Permissions",
+  "Permissions": "Danh sách quyền",
   "Modal Examples": "Modal Examples",
-  "Roles & Permissions": "Roles & Permissions"
+  "Roles & Permissions": "Quản lý người dùng và phân quyền"
 }

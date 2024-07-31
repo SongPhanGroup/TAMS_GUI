@@ -5,7 +5,7 @@
   border-radius: 0;
   .rdt_TableHead {
     .rdt_TableHeadRow {
-      background-color: $table-head-bg;
+      background-color: #09A863;
       border-top: 1px solid;
       border-color: $border-color;
       min-height: 0;
@@ -13,25 +13,26 @@
 
       .rdt_TableCol {
         padding: 0.72rem 1.5rem;
-        justify-content: center !important;
+        border-width: 1px;
+        border-style: solid;
+        border-color: #afafaf;
+        justify-content: center;
         .rdt_TableCol_Sortable {
-          height: max-content;
-          color: $body-color;
+          color: white;
           font-weight: bold;
           font-style: 0.857rem;
           letter-spacing: 0.5px;
           text-transform: uppercase;
-          .sc-cwHptR.brFloq {
-            white-space: break-spaces;
-            color: #fff;
-          }
+
           &:hover {
             opacity: 1;
           }
+
           span {
             margin-left: 0.35rem;
           }
         }
+
         &:first-child {
           .form-check {
             transform: translateX(-10px);
@@ -44,9 +45,19 @@
   .rdt_TableBody {
     .rdt_TableRow {
       color: $body-color;
+
       .rdt_TableCell {
         height: 53px;
         padding: 0.72rem 1.5rem;
+        border-right-width: 1px;
+        border-right-color: #afafaf;
+        border-right-style: solid;
+        border-left-width: 1px;
+        border-left-color: #afafaf;
+        border-left-style: solid;
+        border-bottom-width: 1px;
+        border-bottom-color: #afafaf;
+        border-bottom-style: solid;
 
         .column-action {
           svg {
@@ -71,6 +82,7 @@
 
   .react-paginate {
     &.separated-pagination {
+
       .page-item:first-child .page-link,
       .page-item:last-child .page-link {
         border-radius: 50%;
@@ -82,6 +94,7 @@
     .rdt_TableHead .rdt_TableHeadRow .rdt_TableCol:first-child .form-check {
       transform: translateX(0);
     }
+
     .rdt_TableBody .rdt_TableRow .rdt_TableCell:first-child .form-check {
       transform: translateX(10px);
     }
@@ -90,10 +103,10 @@
   &.react-dataTable-selectable-rows {
     .rdt_TableHead {
       .rdt_TableHeadRow {
-        height: max-content;
-        text-align: center;
         .rdt_TableCol:not(:first-child) {
-          // padding-left: 0.2rem;
+          border-width: 1px;
+          border-style: solid;
+          border-color: #afafaf;
         }
       }
     }
@@ -111,6 +124,7 @@
 .rdt_Pagination {
   select {
     min-width: 30px;
+
     &:focus,
     &:active {
       outline: 0;
@@ -124,6 +138,7 @@
 
 .dataTable-select {
   width: 5rem;
+
   &:not([multiple='multiple']) {
     margin-left: 0.25rem;
     margin-right: 0.25rem;
@@ -143,6 +158,7 @@
     .hlidmt {
       background-color: $theme-dark-card-bg;
     }
+
     .khKjDK {
       background-color: $theme-dark-card-bg;
       color: $theme-dark-body-color;
@@ -152,21 +168,25 @@
       background: $theme-dark-table-header-bg;
       color: $theme-dark-body-color;
 
-      & > div:first-child:not(.rdt_TableHead):not(.rdt_TableBody) {
+      &>div:first-child:not(.rdt_TableHead):not(.rdt_TableBody) {
         color: $theme-dark-body-color;
         background-color: $theme-dark-card-bg;
       }
     }
+
     .rdt_TableHead {
       .rdt_TableHeadRow {
         background-color: $theme-dark-table-header-bg;
         border-color: $theme-dark-border-color;
+
         .rdt_TableCol {
           color: $theme-dark-body-color;
+
           div[role='button'] {
             color: $theme-dark-body-color;
           }
         }
+
         .rdt_TableCol_Sortable {
           color: $theme-dark-headings-color;
 
@@ -176,31 +196,38 @@
         }
       }
     }
+
     .rdt_TableBody {
       .expandable-content {
         background-color: $theme-dark-table-bg;
         color: $theme-dark-body-color;
       }
+
       .rdt_TableRow {
         background-color: $theme-dark-table-bg;
         color: $theme-dark-body-color;
         border-color: $theme-dark-border-color;
+
         .rdt_TableCell {
           color: $theme-dark-body-color;
+
           .column-action {
             svg {
               stroke: $theme-dark-body-color;
             }
           }
         }
+
         button {
           &:hover:not(:disabled) {
             background-color: $theme-dark-body-bg;
           }
+
           svg {
             color: $theme-dark-body-color;
           }
         }
+
         .permissions-actions {
           button:hover {
             background-color: transparent;
@@ -208,6 +235,7 @@
         }
       }
     }
+
     .rdt_Pagination {
       color: $theme-dark-body-color;
       border-color: $theme-dark-border-color;
@@ -222,10 +250,12 @@
   .rdt_Pagination {
     color: $theme-dark-body-color;
     background-color: $theme-dark-card-bg;
+
     button {
       svg {
         fill: $theme-dark-body-color;
       }
+
       &[disabled] svg {
         fill: $theme-dark-text-muted-color;
       }

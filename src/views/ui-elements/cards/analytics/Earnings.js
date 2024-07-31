@@ -18,7 +18,7 @@ const Earnings = ({ success }) => {
     comparedResult: [2, -3, 8],
     labels: ['App', 'Service', 'Product'],
     stroke: { width: 0 },
-    colors: ['#28c76f66', '#28c76f33', success],
+    colors: ['#09a86366', '#09a86333', success],
     grid: {
       padding: {
         right: -20,

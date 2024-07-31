@@ -1,9 +1,10 @@
-# Hệ thống phát hiện sao chép tài liệu - TAMSV3
+# Phần mềm Quản lý nhà trường thông minh - HVCT
 
 ### Công nghệ sử dụng
 
-- [VueJS] Xây dựng web app
+- [ReactJs] Xây dựng web app
 - Node version: 16.15.0
+- Yarn version: 1.22.19
 
 ### Chạy dự án trên local
 
@@ -11,13 +12,13 @@
 
 ```sh
 // Bước 1: Di chuyển vào thư mục làm việc
-cd TAMS_GUI
+cd QLNT_HVCT
 
 // Bước 2: cài đặt package thư viện
-npm install
+yarn install
 
 // Bước 3: chạy ứng dụng
-npm start
+yarn start
 ```
 
 - local app: http://localhost:3000
@@ -26,17 +27,18 @@ npm start
 ### Các scripts 
 ```sh
 "scripts": {
-    "start": "craco start",
-    "build": "craco build",
-    "test": "craco test",
-    "eject": "react-scripts eject",
-    "format": "prettier --write \"src/**/*.js\"",
-    "lint": "eslint src/**/*.js src/**/*.js",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
+    "eject": "react-app-rewired eject",
+    "lint": "eslint src/**/*.js src/**/*.jsx",
     "lint:fix": "eslint src/**/*.js --fix"
   },
 // Khởi chạy app
-npm start
+yarn start
 ### Sửa lỗi
+yarn remove postcss-custom-properties
+yarn add postcss-custom-properties@8.0.11
 
 ### Cấu trúc dự án
 #### Thư mục gốc
@@ -49,6 +51,7 @@ Sau đây là một số quy chuẩn đặt tên thường dùng trong dự án:
 - Tên hàm và phương thức sử dụng camelCase, ví dụ getUser, getCategory…
 - Tên biến cũng sử dụng camelCase loginUser, categoryList…
 - Tên hằng số thì đặc biệt, viết hoa hết và cách nhau bởi dấu gạch dưới LIST_SUBJECTS,...
+
 ```
 #### Reactjs 
 Gợi ý code reactjs: https://github.com/airbnb/javascript/tree/master/react

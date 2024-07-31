@@ -58,7 +58,7 @@ const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDoc
     }
 
     console.log(checkingDocumentSelected?.courseId)
-
+  
     const onSubmit = (data) => {
         setLoadingAdd(true)
         const formData = new FormData()

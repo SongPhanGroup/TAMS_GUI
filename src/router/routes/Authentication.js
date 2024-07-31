@@ -23,6 +23,8 @@ const VerifyEmailCover = lazy(() => import('../../views/pages/authentication/Ver
 const TwoStepsBasic = lazy(() => import('../../views/pages/authentication/TwoStepsBasic'))
 const TwoStepsCover = lazy(() => import('../../views/pages/authentication/TwoStepsCover'))
 
+const SelectFunction = lazy(() => import('../../views/pages/authentication/SelectFunction'))
+
 const AuthenticationRoutes = [
   {
     path: '/login',
@@ -140,6 +142,13 @@ const AuthenticationRoutes = [
   {
     path: '/pages/two-steps-cover',
     element: <TwoStepsCover />,
+    meta: {
+      layout: 'blank'
+    }
+  },
+  {
+    path: '/pages/select-function',
+    element: <SelectFunction />,
     meta: {
       layout: 'blank'
     }

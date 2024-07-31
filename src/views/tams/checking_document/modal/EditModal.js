@@ -9,7 +9,8 @@ import {
     ModalBody,
     ModalHeader,
     Row,
-    Button
+    Button,
+    Spinner
 } from "reactstrap"
 
 // ** Third Party Components
@@ -27,20 +28,15 @@ import { useEffect, useState } from "react"
 import { detailCheckingDocument, editCheckingDocument } from "../../../../api/checking_document"
 import { getCourse } from "../../../../api/course"
 import classNames from "classnames"
+import { detailCheckingDocumentVersion, editCheckingDocumentVersion, getCheckingDocumentVersion } from "../../../../api/checking_document_version"
+import { PAGE_DEFAULT, PER_PAGE_DEFAULT } from "../../../../utility/constant"
 
-const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
-    // ** States
-    const [dataDetail, setDataDetail] = useState()
-
+const EditCheckingDocument = ({ open, handleModal, infoEdit, getData }) => {
+    if (!infoEdit) return
     useEffect(() => {
-        detailCheckingDocument(dataEdit?.id).then((result) => {
-            setDataDetail(result)
-        }).catch(error => {
-            console.log(error)
-        })
-    }, [dataEdit?.id])
-    console.log(dataDetail)
 
+    }, [infoEdit])
+    // ** States
     const EditCheckingDocumentSchema = yup.object().shape({
         title: yup.string().required("Yêu cầu nhập tiêu đề"),
         author: yup.string().required("Yêu cầu nhập tác giả"),
@@ -58,11 +54,14 @@ const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
     })
 
     const [listCourse, setListCourse] = useState([])
+    const [listCheckingDocumentVersion, setListCheckingDocumentVersion] = useState([])
+    const [loadingEdit, setLoadingEdit] = useState(false)
 
     const getAllDataPromises = async () => {
-        const coursePromise = getCourse({ params: { page: 1, perPage: 10, search: '' } })
+        const coursePromise = getCourse({ params: { page: PAGE_DEFAULT, perPage: PER_PAGE_DEFAULT, search: '' } })
+        const checkingDocumentVersionPromise = detailCheckingDocument(infoEdit?.id)
 
-        const promises = [coursePromise]
+        const promises = [coursePromise, checkingDocumentVersionPromise]
         const results = await Promise.allSettled(promises)
         const responseData = promises.reduce((acc, promise, index) => {
             if (results[index].status === 'fulfilled') {
@@ -74,6 +73,7 @@ const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
         }, [])
 
         const courseRes = responseData[0]
+        const checkingDocumentVersionRes = responseData[1]
         results.map((res) => {
             if (res.status !== 'fulfilled') {
                 setListCourse(null)
@@ -85,11 +85,14 @@ const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
                 label: `${res.name}`
             }
         })
+        const checkingDocumentVersions = checkingDocumentVersionRes?.data?.checkingDocumentVersion
+        setListCheckingDocumentVersion(checkingDocumentVersions)
         setListCourse(courses)
     }
 
+
     const handleCloseModal = () => {
-        handleEditModal()
+        handleModal()
     }
 
     useEffect(() => {
@@ -99,16 +102,22 @@ const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
     }, [open])
 
     const onSubmit = (data) => {
-        editCheckingDocument(dataEdit?.id, {
+        setLoadingEdit(true)
+        editCheckingDocument(infoEdit?.id, {
             title: data.title,
             author: data.author,
             courseId: data.course.value,
             description: data.description
         }).then(result => {
             if (result.status === 'success') {
+                const id = listCheckingDocumentVersion[listCheckingDocumentVersion.length - 1]?.id
+                editCheckingDocumentVersion(id, {
+                    checkingDocumentId: infoEdit?.id,
+                    description: data.description
+                })
                 Swal.fire({
                     title: "Cập nhật kiểm tra tài liệu thành công",
-                    text: "Yêu cầu đã được phê duyệt!",
+                    text: "",
                     icon: "success",
                     customClass: {
                         confirmButton: "btn btn-success"
@@ -117,7 +126,7 @@ const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
             } else {
                 Swal.fire({
                     title: "Cập nhật kiểm tra tài liệu thất bại",
-                    text: "Vui lòng thử lại sau!",
+                    text: "Vui lòng kiểm tra lại thông tin!",
                     icon: "error",
                     customClass: {
                         confirmButton: "btn btn-danger"
@@ -128,22 +137,24 @@ const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
             handleCloseModal()
         }).catch(error => {
             console.log(error)
+        }).finally(() => {
+            setLoadingEdit(false)
         })
     }
     return (
-        <Modal isOpen={open} toggle={handleEditModal} className='modal-dialog-centered modal-lg'>
+        <Modal isOpen={open} toggle={handleModal} className='modal-dialog-top modal-lg'>
             <ModalHeader className='bg-transparent' toggle={handleCloseModal}></ModalHeader>
-            <ModalBody className='px-sm-5 mx-50 pb-5'>
-                <div className='text-center mb-2'>
-                    <h1 className='mb-1'>Cập nhật tài liệu</h1>
+            <ModalBody className='px-sm-3 mx-50 pb-2' style={{ paddingTop: 0 }}>
+                <div className='text-center mb-1'>
+                    <h2 className='mb-1'>Cập nhật tài liệu</h2>
                 </div>
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                     <Col xs={12}>
                         <Label className='form-label' for='title'>
-                            Tiêu đề <span style={{color: 'red'}}>(*)</span>
+                            Tiêu đề <span style={{ color: 'red' }}>(*)</span>
                         </Label>
                         <Controller
-                            defaultValue={dataEdit?.title}
+                            defaultValue={infoEdit?.title}
                             control={control}
                             name='title'
                             render={({ field }) => {
@@ -162,11 +173,11 @@ const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='course'>
-                            Đợt kiểm tra <span style={{color: 'red'}}>(*)</span>
+                            Đợt kiểm tra <span style={{ color: 'red' }}>(*)</span>
                         </Label>
                         <Controller
                             id='react-select'
-                            defaultValue={{ value: dataEdit?.course?.id, label: dataEdit?.course?.name }}
+                            defaultValue={{ value: infoEdit?.course?.id, label: infoEdit?.course?.name }}
                             name='course'
                             control={control}
                             render={({ field }) => (
@@ -184,10 +195,10 @@ const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='author'>
-                            Tác giả <span style={{color: 'red'}}>(*)</span>
+                            Tác giả <span style={{ color: 'red' }}>(*)</span>
                         </Label>
                         <Controller
-                            defaultValue={dataEdit?.author}
+                            defaultValue={infoEdit?.author}
                             name='author'
                             control={control}
                             render={({ field }) => (
@@ -201,7 +212,7 @@ const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
                             Mô tả
                         </Label>
                         <Controller
-                            defaultValue={dataEdit?.description}
+                            defaultValue={infoEdit?.description}
                             name='description'
                             control={control}
                             render={({ field }) => (
@@ -215,7 +226,7 @@ const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
                             Tài liệu
                         </Label>
                         <Controller
-                            defaultValue={dataEdit?.name}
+                            defaultValue={infoEdit?.name}
                             name='file'
                             control={control}
                             render={({ field }) => (
@@ -226,7 +237,9 @@ const EditCheckingDocument = ({ open, handleEditModal, dataEdit, getData }) => {
                     </Col> */}
                     <Col xs={12} className='text-center mt-2 pt-50'>
                         <Button type='submit' className='me-1' color='primary'>
-                            Cập nhật
+                            {
+                                loadingEdit === true ? <Spinner color="#fff" size="sm" /> : 'Cập nhật'
+                            }
                         </Button>
                         <Button type='reset' color='secondary' outline onClick={handleCloseModal}>
                             Hủy

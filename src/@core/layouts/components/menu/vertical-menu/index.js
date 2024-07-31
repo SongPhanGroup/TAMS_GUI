@@ -54,6 +54,7 @@ const Sidebar = props => {
         onMouseEnter={onMouseEnter}
         onMouseLeave={() => setMenuHover(false)}
       >
+
         {menu ? (
           menu({ ...props })
         ) : (
@@ -84,6 +85,10 @@ const Sidebar = props => {
                   setCurrentActiveGroup={setCurrentActiveGroup}
                 />
               </ul>
+              {/* demo here */}
+              {/* <ul className='nav navbar-nav' id='main-menu-navigation'>
+        <HorizontalNavMenuItems submenu={false} items={menuData} />
+      </ul> */}
             </PerfectScrollbar>
           </Fragment>
         )}

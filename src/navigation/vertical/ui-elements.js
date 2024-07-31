@@ -9,13 +9,13 @@ export default [
     id: 'typography',
     title: 'Typography',
     icon: <Type size={12} />,
-    navLink: '/ui-element/typography'
+    navLink: '/ui-element/typography',
   },
   {
     id: 'feather',
     title: 'Feather',
     icon: <Eye size={20} />,
-    navLink: '/icons/reactfeather'
+    navLink: '/icons/reactfeather',
   },
   {
     id: 'cards',
@@ -54,7 +54,7 @@ export default [
         icon: <Circle size={12} />,
         navLink: '/cards/action'
       }
-    ]
+    ],
   },
   {
     id: 'components',

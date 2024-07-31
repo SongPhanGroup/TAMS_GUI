@@ -55,9 +55,50 @@ export const appEcommerceSlice = createSlice({
     products: [],
     wishlist: [],
     totalProducts: 0,
-    productDetail: {}
+    productDetail: {},
+    roleId: 0,
+    timeTable: [],
+    schoolYear: {},
+    selectedYear: 0
   },
-  reducers: {},
+  reducers: {
+    setSelectedRole: (state, action) => {
+      state.roleId = action.payload
+    },
+    clearSelectedRole: (state) => {
+      state.roleId = null
+    },
+    getSelectedRole: (state) => {
+      return state.roleId
+    },
+    setTimetable: (state, action) => {
+      state.timeTable = action.payload
+    },
+    clearTimetable: (state) => {
+      state.timeTable = null
+    },
+    getTimetable: (state) => {
+      return state.timeTables
+    },
+    setSchoolYear: (state, action) => {
+      state.schoolYear = action.payload
+    },
+    clearSchoolYear: (state) => {
+      state.schoolYear = null
+    },
+    getSchoolYear: (state) => {
+      return state.schoolYear
+    },
+    setSelectedYear: (state, action) => {
+      state.selectedYear = action.payload
+    },
+    clearSelectedYear: (state) => {
+      state.selectedYear = null
+    },
+    getSelectedYear: (state) => {
+      return state.selectedYear
+    },
+  },
   extraReducers: builder => {
     builder
       .addCase(getProducts.fulfilled, (state, action) => {
@@ -76,5 +117,6 @@ export const appEcommerceSlice = createSlice({
       })
   }
 })
+export const { setSelectedRole, clearSelectedRole, getSelectedRole, setTimetable, clearTimetable, getTimetable, setSchoolYear, getSchoolYear, clearSchoolYear, setSelectedYear, clearSelectedYear, getSelectedYear } = appEcommerceSlice.actions
 
 export default appEcommerceSlice.reducer

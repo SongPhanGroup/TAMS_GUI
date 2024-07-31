@@ -85,17 +85,17 @@ export default [
         icon: <Shield size={20} />,
         children: [
           {
+            id: 'permissions',
+            title: 'Permissions',
+            icon: <Circle size={12} />,
+            navLink: '/apps/permissions'
+          },
+          {
             id: 'roles',
             title: 'Roles',
             icon: <Circle size={12} />,
             navLink: '/apps/roles'
           },
-          {
-            id: 'permissions',
-            title: 'Permissions',
-            icon: <Circle size={12} />,
-            navLink: '/apps/permissions'
-          }
         ]
       },
       {

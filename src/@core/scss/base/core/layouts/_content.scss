@@ -58,7 +58,7 @@ html {
         z-index: -1;
       }
       .content-area-wrapper {
-        display: flex;
+        // display: flex;
         position: relative;
         overflow: hidden; // Required in apps
         .content-wrapper,
@@ -118,19 +118,19 @@ html {
   // kanban app uses kanban-wrapper class as not having content-layout so added this class with all the options
   // For floating navbar
   .navbar-floating {
-    &.footer-static {
-      .app-content {
-        .content-area-wrapper,
-        .kanban-wrapper {
-          @include content-area-wrapper-height(
-            #{$content-padding},
-            #{$navbar-height},
-            #{$footer-height},
-            #{$floating-nav-margin}
-          );
-        }
-      }
-    }
+    // &.footer-static {
+    //   .app-content {
+    //     .content-area-wrapper,
+    //     .kanban-wrapper {
+    //       @include content-area-wrapper-height(
+    //         #{$content-padding},
+    //         #{$navbar-height},
+    //         #{$footer-height},
+    //         #{$floating-nav-margin}
+    //       );
+    //     }
+    //   }
+    // }
     &.footer-hidden {
       .app-content {
         .content-area-wrapper,

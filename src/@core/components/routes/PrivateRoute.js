@@ -29,7 +29,7 @@ const PrivateRoute = ({ children, route }) => {
     if (user && restrictedRoute && user.role === 'client') {
       return <Navigate to='/access-control' />
     }
-    if (user && !ability.can(action || 'read', resource)) {
+    if (user && (!ability.can(action || 'read', resource) && !(ability.l === 'manage' && ability.p === 'all'))) {
       return <Navigate to='/misc/not-authorized' replace />
     }
   }

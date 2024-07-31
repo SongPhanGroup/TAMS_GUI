@@ -29,10 +29,6 @@ const PagesRoutes = [
     element: <Faq />
   },
   {
-    path: '/pages/knowledge-base',
-    element: <KnowledgeBase />
-  },
-  {
     path: '/pages/knowledge-base/:category',
     element: <KnowledgeBaseCategory />
   },

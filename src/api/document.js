@@ -1,9 +1,9 @@
-import { API } from "./API"
+import { API_TAMS } from "./API_TAMS"
 import { API_FormData } from "./API_FormData"
 
 export const getDocument = async (query) => {
   const uri = `/document`
-  const res = await API.get(uri, query)
+  const res = await API_TAMS.get(uri, query)
   return res
 }
 
@@ -21,13 +21,13 @@ export const editDocument = async (id, body) => {
 
 export const detailDocument = async (id) => {
   const uri = `/document/${id}`
-  const res = await API.get(uri)
+  const res = await API_TAMS.get(uri)
   return res
 }
 
 
 export const deleteDocument = async (id) => {
   const uri = `/document/${id}`
-  const res = await API.delete(uri)
+  const res = await API_TAMS.delete(uri)
   return res
 }

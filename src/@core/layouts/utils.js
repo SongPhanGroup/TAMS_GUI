@@ -83,7 +83,8 @@ export const removeChildren = (children, openGroup, currentActiveGroup) => {
 }
 
 const checkForVisibleChild = (arr, ability) => {
-  return arr.some(i => {
+  if (ability.l === 'manage' && ability.p === 'all') return true
+  else return arr.some(i => {
     if (i.children) {
       return checkForVisibleChild(i.children, ability)
     } else {
@@ -95,8 +96,9 @@ const checkForVisibleChild = (arr, ability) => {
 export const canViewMenuGroup = item => {
   const ability = useContext(AbilityContext)
   // ! This same logic is used in canViewHorizontalNavMenuGroup and canViewHorizontalNavMenuHeaderGroup. So make sure to update logic in them as well
-  const hasAnyVisibleChild = item.children && checkForVisibleChild(item.children, ability)
-
+  // cmt 2 dòng dưới đây
+  // const hasAnyVisibleChild = item.children && checkForVisibleChild(item.children, ability)
+  const hasAnyVisibleChild = item.children && item.children.some(i => ability.can(i.action, i.resource))
   // ** If resource and action is defined in item => Return based on children visibility (Hide group if no child is visible)
   // ** Else check for ability using provided resource and action along with checking if has any visible child
   if (!(item.action && item.resource)) {

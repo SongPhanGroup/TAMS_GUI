@@ -29,14 +29,14 @@ export default [
         permissions: ['admin', 'editor'],
         navLink: '/pages/faq'
       },
-      {
-        id: 'knowledgeBase',
-        title: 'Knowledge Base',
-        icon: <Circle size={12} />,
-        permissions: ['admin', 'editor'],
-        navLink: '/pages/knowledge-base',
-        parentOf: ['/pages/knowledge-base/category/questions', '/pages/knowledge-base/category']
-      },
+      // {
+      //   id: 'knowledgeBase',
+      //   title: 'Knowledge Base',
+      //   icon: <Circle size={12} />,
+      //   permissions: ['admin', 'editor'],
+      //   navLink: '/pages/knowledge-base',
+      //   parentOf: ['/pages/knowledge-base/category/questions', '/pages/knowledge-base/category']
+      // },
       {
         id: 'pricing',
         title: 'Pricing',
@@ -174,7 +174,7 @@ export default [
           }
         ]
       }
-    ]
+    ],
   },
   {
     id: 'authentication',
@@ -314,13 +314,13 @@ export default [
           }
         ]
       }
-    ]
+    ],
   },
   {
     id: 'modal-examples',
     title: 'Modal Examples',
     icon: <Square size={12} />,
     permissions: ['admin', 'editor'],
-    navLink: '/pages/modal-examples'
+    navLink: '/pages/modal-examples',
   }
 ]

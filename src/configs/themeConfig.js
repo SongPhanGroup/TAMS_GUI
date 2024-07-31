@@ -3,7 +3,7 @@
 //Template config options
 const themeConfig = {
   app: {
-    appName: 'Phần mềm phát hiện đạo văn',
+    appName: 'HVCT',
     appLogoImage: require('@src/assets/images/logo/logo.png').default
   },
   layout: {

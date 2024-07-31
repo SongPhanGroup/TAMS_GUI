@@ -9,7 +9,8 @@ export default [
     id: 'document',
     title: 'QL kho tài liệu mẫu',
     icon: <FileText size={20} />,
-    navLink: '/tams/document'
+    navLink: '/tams/document',
+    role: 0
   },
   {
     header: 'Kiểm tra tài liệu'
@@ -18,13 +19,15 @@ export default [
     id: 'course',
     title: 'Đợt kiểm tra',
     icon: <Calendar size={20} />,
-    navLink: '/tams/course'
+    navLink: '/tams/course',
+    role: 0
   },
   {
     id: 'checking-document',
     title: 'Kiểm tra tài liệu',
     icon: <Clipboard size={20} />,
-    navLink: '/tams/checking-document'
+    navLink: ['/tams/checking-document', '/tams/checking-result/:id'],
+    role: 0
   },
   {
     header: 'Quản lý danh mục'
@@ -33,7 +36,8 @@ export default [
     id: 'document-type',
     title: 'Loại tài liệu',
     icon: <Book size={20} />,
-    navLink: '/tams/document-type'
+    navLink: '/tams/document-type',
+    role: 0
   },
   // {
   //   id: 'type-checking',
@@ -51,13 +55,15 @@ export default [
     id: 'major',
     title: 'Lĩnh vực',
     icon: <Grid size={20} />,
-    navLink: '/tams/major'
+    navLink: '/tams/major',
+    role: 0
   },
   {
     id: 'organization',
     title: 'Đơn vị',
     icon: <Menu size={20} />,
-    navLink: '/tams/organization'
+    navLink: '/tams/organization',
+    role: 0
   },
   {
     header: 'Quản lý người dùng'
@@ -66,13 +72,15 @@ export default [
     id: 'user',
     title: 'QL Tài khoản',
     icon: <Users size={20} />,
-    navLink: '/tams/user'
+    navLink: '/tams/user',
+    role: 0
   },
   {
     id: 'role',
     title: 'Vai trò, phân quyền',
-    icon: <UserCheck size={20} />,
-    navLink: '/tams/role'
+    icon: <Users size={20} />,
+    navLink: '/tams/role',
+    role: 0
   },
   // {
   //   id: 'permission',
@@ -84,6 +92,7 @@ export default [
     id: 'permissions',
     title: 'QL các quyền cơ bản',
     icon: <UserPlus size={20} />,
-    navLink: '/tams/permission'
+    navLink: '/tams/permission',
+    role: 0
   }
 ]

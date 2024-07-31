@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+import { useSelector } from 'react-redux'
 // ** Vertical Menu Components
 import VerticalNavMenuLink from './VerticalNavMenuLink'
 import VerticalNavMenuGroup from './VerticalNavMenuGroup'
@@ -11,6 +13,7 @@ import {
 } from '@layouts/utils'
 
 const VerticalMenuNavItems = props => {
+  const { roleId } = useSelector(state => state.ecommerce)
   // ** Components Object
   const Components = {
     VerticalNavMenuLink,
@@ -22,7 +25,7 @@ const VerticalMenuNavItems = props => {
   const RenderNavItems = props.items.map((item, index) => {
     const TagName = Components[resolveNavItemComponent(item)]
     if (item.children) {
-      return canViewMenuGroup(item) && <TagName c item={item} index={index} key={item.id} {...props} />
+      return canViewMenuGroup(item) && <TagName item={item} index={index} key={item.id} {...props} />
     }
     return canViewMenuItem(item) && <TagName key={item.id || item.header} item={item} {...props} />
   })

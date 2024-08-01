@@ -31,7 +31,8 @@ import {
     DeleteOutlined,
     EditOutlined,
     LockOutlined,
-    AppstoreOutlined
+    AppstoreOutlined,
+    RightCircleOutlined
 
 } from "@ant-design/icons"
 import { AbilityContext } from "@src/utility/context/Can"
@@ -66,6 +67,7 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
     const [isAdd, setIsAdd] = useState(false)
     const [isEdit, setIsEdit] = useState(false)
     const [checkingDocumentVersionSelected, setCheckingDocumentVersionSelected] = useState()
+    const [showIframe, setShowIframe] = useState(false)
 
     const getData = () => {
         setLoadingData(true)
@@ -94,6 +96,19 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
 
     const handleResult = (record) => {
         navigate(`/tams/checking-result/${record?.id}`, { state: record })
+    }
+
+    const handleButtonClick = () => {
+        const width = window.innerWidth / 4
+        const height = window.innerHeight / 1.5
+        const left = (window.innerWidth - width) / 2
+        const top = (window.innerHeight - height) / 2
+        const url = '/tams/checking-document' // Đảm bảo rằng output.html nằm trong thư mục public
+        window.open(
+            url,
+            "_blank",
+            `width=${width},height=${height},left=${left},top=${top},toolbar=no,location=no`
+        )    
     }
 
     // const getInfo = () => {
@@ -329,6 +344,15 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
                         >
                             Kết quả kiểm tra
                         </UncontrolledTooltip>
+                        <RightCircleOutlined
+                            id={`tooltip_detail_${record._id}`}
+                            style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
+                            onClick={handleButtonClick}
+                        />
+                        <UncontrolledTooltip placement="top" target={`tooltip_detail_${record._id}`}
+                        >
+                            Chi tiết
+                        </UncontrolledTooltip>
                         <Popconfirm
                             title="Bạn chắc chắn xóa?"
                             onConfirm={() => handleDelete(record)}
@@ -417,6 +441,7 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
                     }
                 }}
             />}
+            
             <AddNewCheckingDocumentVersion open={isAdd} handleModal={handleModal} getData={getData} rowsPerPage={rowsPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} checkingDocumentSelected={checkingDocumentSelected} listSubmit={listSubmit} />
             {checkingDocumentVersionSelected && <EditCheckingDocumentVersion open={isEdit} handleModal={handleModal} getData={getData} rowsPerPage={rowsPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} infoEditVersion={checkingDocumentVersionSelected} listSubmit={listSubmit} dataCheckingDocument={checkingDocumentSelected} />}
         </Card>

@@ -44,9 +44,7 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
     source: yup.string().required("Yêu cầu nhập nguồn tài liệu"),
     documentType: yup.object().required("Yêu cầu chọn loại tài liệu").nullable(),
     major: yup.object().required("Yêu cầu chọn chuyên ngành").nullable(),
-    author: yup.string().required("Yêu cầu nhập tác giả"),
-    coAuthor: yup.string().required("Yêu cầu nhập đồng tác giả"),
-    supervisor: yup.string().required("Yêu cầu nhập người giám sát")
+    author: yup.string().required("Yêu cầu nhập tác giả")
   })
 
   // ** Hooks
@@ -209,7 +207,7 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
           </Col>
           <Col sm={6} xs={12}>
             <Label className='form-label' for='coAuthor'>
-              Đồng tác giả <span style={{ color: 'red' }}>(*)</span>
+              Đồng tác giả
             </Label>
             <Controller
               defaultValue={infoEdit?.coAuthor ?? ''}
@@ -226,11 +224,10 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
                 )
               }}
             />
-            {errors.coAuthor && <FormFeedback>{errors.coAuthor.message}</FormFeedback>}
           </Col>
           <Col sm={6} xs={12}>
             <Label className='form-label' for='supervisor'>
-              Người hướng dẫn <span style={{ color: 'red' }}>(*)</span>
+              Người hướng dẫn
             </Label>
             <Controller
               defaultValue={infoEdit?.supervisor ?? ''}
@@ -247,7 +244,6 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
                 )
               }}
             />
-            {errors.supervisor && <FormFeedback>{errors.supervisor.message}</FormFeedback>}
           </Col>
           <Col sm={6} xs={12}>
             <Label className='form-label' for='source'>
@@ -323,7 +319,7 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
               name='description'
               control={control}
               render={({ field }) => (
-                <Input {...field} id='description' placeholder='Nhập mô tả' invalid={errors.description && true} />
+                <Input type="textarea" {...field} id='description' placeholder='Nhập mô tả' invalid={errors.description && true} />
               )}
             />
           </Col>

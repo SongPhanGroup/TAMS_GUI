@@ -35,13 +35,15 @@ import { getMajor } from "../../../../api/major"
 import { getDocumentType } from "../../../../api/document_type"
 import classNames from "classnames"
 import { Spin } from "antd"
+import { getDocumentSource } from "../../../../api/document_source"
+import { toDateStringv2 } from "../../../../utility/Utils"
 
 const AddNewDocument = ({ open, handleModal, getData }) => {
     // ** States
     const AddNewDocumentSchema = yup.object().shape({
         file: yup.mixed().required("Yêu cầu chọn file"),
         title: yup.string().required("Yêu cầu nhập tiêu đề"),
-        source: yup.string().required("Yêu cầu nhập nguồn tài liệu"),
+        source: yup.object().required("Yêu cầu chọn nguồn tài liệu").nullable(),
         documentType: yup.object().required("Yêu cầu chọn loại tài liệu").nullable(),
         major: yup.object().required("Yêu cầu chọn chuyên ngành").nullable(),
         author: yup.string().required("Yêu cầu nhập tác giả")
@@ -62,14 +64,17 @@ const AddNewDocument = ({ open, handleModal, getData }) => {
     const [file, setFile] = useState()
     const [listDocumentType, setListDocumentType] = useState([])
     const [listMajor, setListMajor] = useState([])
+    const [listDocumentSource, setListDocumentSource] = useState([])
+    const [picker, setPicker] = useState(new Date())
     const [loadingAdd, setLoadingAdd] = useState(false)
     // const [loadingExtract, setLoadingExtract] = useState(false)
 
     const getAllDataPromises = async () => {
         const majorPromise = getMajor({ params: { page: 1, perPage: 10, search: '' } })
         const documentTypePromise = getDocumentType({ params: { page: 1, perPage: 10, search: '' } })
+        const documentSourcePromise = getDocumentSource({ params: { page: 1, perPage: 10, search: '' } })
 
-        const promises = [documentTypePromise, majorPromise]
+        const promises = [documentTypePromise, majorPromise, documentSourcePromise]
         const results = await Promise.allSettled(promises)
         const responseData = promises.reduce((acc, promise, index) => {
             if (results[index].status === 'fulfilled') {
@@ -82,10 +87,12 @@ const AddNewDocument = ({ open, handleModal, getData }) => {
 
         const documentTypeRes = responseData[0]
         const majorRes = responseData[1]
+        const documentSourceRes = responseData[2]
         results.map((res) => {
             if (res.status !== 'fulfilled') {
                 setListDocumentType(null)
                 setListMajor(null)
+                setListDocumentSource(null)
             }
         })
         const documentTypes = documentTypeRes?.data?.map((res) => {
@@ -100,8 +107,15 @@ const AddNewDocument = ({ open, handleModal, getData }) => {
                 label: `${res.name}`
             }
         })
+        const documentSources = documentSourceRes?.data?.map((res) => {
+            return {
+                value: res.id,
+                label: `${res.name}`
+            }
+        })
         setListDocumentType(documentTypes)
         setListMajor(majors)
+        setListDocumentSource(documentSources)
     }
 
     useEffect(() => {
@@ -119,6 +133,10 @@ const AddNewDocument = ({ open, handleModal, getData }) => {
         setFile(event.target.files[0])
     }
 
+    const handleChangeDate = (date) => {
+        setPicker(date[0])
+    }
+
     const onSubmit = (data, event) => {
         const formData = new FormData()
         formData.append("file", file)
@@ -130,9 +148,12 @@ const AddNewDocument = ({ open, handleModal, getData }) => {
         formData.append("courseId", 0)
         formData.append("majorId", data.major.value)
         formData.append("typeId", data.documentType.value)
+        formData.append("sourceId", data.source.value)
         formData.append("author", data.author)
         formData.append("coAuthor", data.coAuthor)
         formData.append("supervisor", data.supervisor)
+        formData.append("publish_date", toDateStringv2(picker))
+        formData.append("publish_place", data.place)
         setLoadingAdd(true)
         postDocument(formData).then(result => {
             if (result.status === "success") {
@@ -260,18 +281,20 @@ const AddNewDocument = ({ open, handleModal, getData }) => {
                             Nguồn tài liệu <span style={{ color: 'red' }}>(*)</span>
                         </Label>
                         <Controller
-                            control={control}
+                            id="react-select"
                             name='source'
-                            render={({ field }) => {
-                                return (
-                                    <Input
-                                        {...field}
-                                        id='source'
-                                        placeholder='Nhập tiêu đề'
-                                        invalid={errors.source && true}
-                                    />
-                                )
-                            }}
+                            control={control}
+                            render={({ field }) => (
+                                <Select
+                                    placeholder="Chọn nguồn tài liệu"
+                                    classNamePrefix='select'
+                                    name='clear'
+                                    options={listDocumentSource}
+                                    isClearable
+                                    className={classNames('react-select', { 'is-invalid': errors.source && true })}
+                                    {...field}
+                                />
+                            )}
                         />
                         {errors.source && <FormFeedback>{errors.source.message}</FormFeedback>}
                     </Col>
@@ -337,6 +360,7 @@ const AddNewDocument = ({ open, handleModal, getData }) => {
                                             defaultDate: new Date()
                                         }}
                                         placeholder="dd/mm/yyyy"
+                                        onChange={handleChangeDate}
                                     />
 
                                 )

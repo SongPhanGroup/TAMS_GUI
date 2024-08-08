@@ -18,11 +18,14 @@ import { useForm, Controller } from 'react-hook-form'
 import * as yup from "yup"
 import { yupResolver } from '@hookform/resolvers/yup'
 import Select from 'react-select'
+import Flatpickr from "react-flatpickr"
 
 // ** Utils
 
 // ** Styles
 import '@styles/react/libs/react-select/_react-select.scss'
+import { Vietnamese } from "flatpickr/dist/l10n/vn.js"
+import "@styles/react/libs/flatpickr/flatpickr.scss"
 import Swal from 'sweetalert2'
 import { editDocument } from "../../../../api/document"
 import { useEffect, useState } from "react"
@@ -310,6 +313,50 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
             />
             {errors.major && <FormFeedback>{errors.major.message}</FormFeedback>}
           </Col>
+          <Col sm={6} xs={12}>
+                        <Label className='form-label' for='date'>
+                            Năm xuất bản/Bảo vệ/Công bố
+                        </Label>
+                        <Controller
+                            control={control}
+                            name='date'
+                            render={() => {
+                                return (
+                                    <Flatpickr
+                                        className="form-control invoice-edit-input date-picker"
+                                        options={{
+                                            dateFormat: "d-m-Y", // format ngày giờ
+                                            locale: {
+                                                ...Vietnamese
+                                            },
+                                            defaultDate: new Date()
+                                        }}
+                                        placeholder="dd/mm/yyyy"
+                                    />
+
+                                )
+                            }}
+                        />
+                    </Col>
+                    <Col sm={6} xs={12}>
+                        <Label className='form-label' for='place'>
+                            Nơi xuất bản/Bảo vệ/Công bố
+                        </Label>
+                        <Controller
+                            control={control}
+                            name='place'
+                            render={({ field }) => {
+                                return (
+                                    <Input
+                                        {...field}
+                                        id='place'
+                                        placeholder='Nhập nơi xuất bản/Bảo vệ/Công bố'
+                                        invalid={errors.place && true}
+                                    />
+                                )
+                            }}
+                        />
+                    </Col>
           <Col sm={12} xs={12}>
             <Label className='form-label' for='description'>
               Mô tả

@@ -202,8 +202,11 @@ const CheckingDocument = () => {
         if ((startDate && endDate) || (!startDate && !endDate)) {
             getData(currentPage, rowsPerPage, search, courseId, startDate, endDate)
         }
-        getAllDataPromises()
     }, [currentPage, rowsPerPage, search, courseId, startDate, endDate])
+
+    useEffect(() => {
+        getAllDataPromises()
+    }, [])
 
     const handleModal = () => {
         setIsAdd(false)

@@ -47,6 +47,15 @@ export default [
     role: 0
   },
   {
+    id: 'document-source',
+    title: 'Nguồn tài liệu',
+    icon: <BookOutlined size={12} />,
+    navLink: '/tams/document-source',
+    action: 'read',
+    resource: 'NGUON_TAI_LIEU',
+    role: 0
+  },
+  {
     id: 'major',
     title: 'Lĩnh vực',
     icon: <Sliders size={12} />,

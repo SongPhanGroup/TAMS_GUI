@@ -384,7 +384,7 @@ const ListOrganizations = () => {
           </Col>}
       </Row>
       {
-        loading && <div className="flex" style={{width: "100%"}}>
+        loading && <div className="flex" style={{width: "100%", position: 'relative', left: '50%'}}>
           <Spin />
         </div>
       }

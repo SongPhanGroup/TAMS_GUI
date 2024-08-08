@@ -32,8 +32,8 @@ import Flatpickr from "react-flatpickr"
 import { Vietnamese } from "flatpickr/dist/l10n/vn.js"
 import "@styles/react/libs/flatpickr/flatpickr.scss"
 
-// const oneWeekAgo = new Date()
-// oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
+const oneWeekAgo = new Date()
+oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
 
 const Document = () => {
     const [loadingData, setLoadingData] = useState(false)
@@ -104,7 +104,7 @@ const Document = () => {
         setListMajor(majors)
     }
 
-    const getData = (page, limit, search, courseId, typeId, majorId) => {
+    const getData = (page, limit, search, courseId, typeIds, majorIds) => {
         setLoadingData(true)
         getDocument({
             params: {
@@ -112,8 +112,8 @@ const Document = () => {
                 perPage: limit,
                 ...(search && search !== "" && { search }),
                 ...(courseId && { courseId }),
-                ...(typeId && { typeId }),
-                ...(majorId && { majorId })
+                ...(typeIds && { typeIds }),
+                ...(majorIds && { majorIds })
             },
         })
             .then((res) => {
@@ -128,8 +128,11 @@ const Document = () => {
     }
     useEffect(() => {
         getData(currentPage, rowsPerPage, search, courseId, typeId, majorId)
-        getAllDataPromises()
     }, [currentPage, rowsPerPage, search, courseId, typeId, majorId])
+
+    useEffect(() => {
+        getAllDataPromises()
+    }, [])
 
     const handleModal = () => {
         setIsAdd(false)
@@ -183,8 +186,9 @@ const Document = () => {
     }
 
     const handleChangeDocumentType = (value) => {
+        console.log(value)
         if (value) {
-            setTypeId(value)
+            setTypeId(value.join(','))
         } else {
             setTypeId()
         }
@@ -192,7 +196,7 @@ const Document = () => {
 
     const handleChangeMajor = (value) => {
         if (value) {
-            setMajorId(value)
+            setMajorId(value.join(','))
         } else {
             setMajorId()
         }
@@ -345,6 +349,7 @@ const Document = () => {
                             className='mb-50 select-custom'
                             options={listDocumentType}
                             allowClear
+                            mode="multiple"
                             onChange={(value) => handleChangeDocumentType(value)}
                         />
                     </Col>
@@ -354,6 +359,7 @@ const Document = () => {
                             className='mb-50 select-custom'
                             options={listMajor}
                             allowClear
+                            mode="multiple"
                             onChange={(value) => handleChangeMajor(value)}
                         />
                     </Col>
@@ -364,7 +370,7 @@ const Document = () => {
                         <Label
                             className=""
                             style={{
-                                width: "120px",
+                                width: "90px",
                                 fontSize: "14px",
                                 height: "34px",
                                 display: "flex",
@@ -377,14 +383,15 @@ const Document = () => {
                             style={{ padding: '0.35rem 1rem' }}
                             className="form-control invoice-edit-input date-picker mb-50"
                             options={{
+                                mode:"range",
                                 dateFormat: "d-m-Y", // format ngày giờ
                                 locale: {
                                     ...Vietnamese
                                 },
-                                defaultDate: new Date()
+                                defaultDate: [oneWeekAgo, new Date()]
                             }}
                             placeholder="dd/mm/yyyy"
-                            onChange={(value => handleChangeDate(value))}
+                            // onChange={(value => handleChangeDate(value))}
                         />
                     </Col>
                 </Col>

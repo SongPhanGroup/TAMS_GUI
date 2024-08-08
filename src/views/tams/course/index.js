@@ -13,7 +13,7 @@ import {
     UncontrolledTooltip,
 } from "reactstrap"
 import { Plus, X } from "react-feather"
-import { DeleteOutlined, EditOutlined, LockOutlined, UnlockOutlined } from "@ant-design/icons"
+import { BarsOutlined, DeleteOutlined, EditOutlined, LockOutlined, UnlockOutlined } from "@ant-design/icons"
 // import style from "../../../../assets/scss/index.module.scss"
 import Swal from "sweetalert2"
 import withReactContent from "sweetalert2-react-content"
@@ -25,6 +25,7 @@ import classnames from "classnames"
 import { AbilityContext } from '@src/utility/context/Can'
 import { deleteCourse, getCourse, toggleActiveCourse } from "../../../api/course"
 import { toDateString, toDateTimeString } from "../../../utility/Utils"
+import { useNavigate } from "react-router-dom"
 const LIST_STATUS = [
     {
         value: 1,
@@ -36,6 +37,7 @@ const LIST_STATUS = [
     }
 ]
 const Course = () => {
+    const navigate = useNavigate()
     const [loadingData, setLoadingData] = useState(false)
     const ability = useContext(AbilityContext)
     const MySwal = withReactContent(Swal)
@@ -69,7 +71,6 @@ const Course = () => {
             })
     }
     useEffect(() => {
-        console.log(isActive)
         getData(currentPage, rowsPerPage, search, isActive)
     }, [currentPage, rowsPerPage, search, isActive])
 
@@ -86,6 +87,10 @@ const Course = () => {
     const handleEdit = (record) => {
         setInfo(record)
         setIsEdit(true)
+    }
+
+    const handleSupervisor = (record) => {
+        navigate(`/tams/checking-document`, {state: record})
     }
 
     const handleDelete = (key) => {
@@ -230,6 +235,16 @@ const Course = () => {
                             }
                         </Popconfirm>
                     }
+                    {ability.can('update', 'LOAI_DON_VI') &&
+                        <>
+
+                            <Tooltip placement="top" title="Kiểm tra trong khóa" >
+                                <BarsOutlined
+                                    style={{ color: "#09A863", cursor: 'pointer', marginRight: '1rem' }}
+                                    onClick={(e) => handleSupervisor(record)}
+                                />
+                            </Tooltip>
+                        </>}
                     {ability.can('update', 'LOAI_DON_VI') &&
                         <>
 

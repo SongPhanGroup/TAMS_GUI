@@ -24,7 +24,7 @@ import {
     CardBody,
     CardTitle,
 } from "reactstrap"
-import { Link, NavLink, useLocation, useParams } from "react-router-dom"
+import { Link, NavLink, useLocation, useNavigate, useParams } from "react-router-dom"
 import { Plus, X } from "react-feather"
 import {
     AppstoreAddOutlined,
@@ -32,6 +32,7 @@ import {
     EditOutlined,
     LockOutlined,
     RightCircleOutlined,
+    UnorderedListOutlined,
 } from "@ant-design/icons"
 import { AbilityContext } from '@src/utility/context/Can'
 // import style from "../../../../assets/scss/index.module.scss"
@@ -97,6 +98,7 @@ const CheckingResult = () => {
     const [listCourse, setListCourse] = useState([])
 
     const location = useLocation()
+    const navigate = useNavigate()
 
     const getAllDataPromises = async () => {
         const coursePromise = getCourse({ params: { page: PAGE_DEFAULT, perPage: PER_PAGE_DEFAULT, search: '' } })
@@ -185,9 +187,8 @@ const CheckingResult = () => {
     const CloseBtn = (
         <X className="cursor-pointer" size={15} onClick={handleModal} />
     )
-    const handleDetail = () => {
-        setCheckingDocumentSelected(record)
-        setIsEdit(true)
+    const handleDetail = (record) => {
+        navigate(`/tams/detail-comparation/${location?.state?.id}`, {state: record})
     }
     const handleViewUser = (role) => {
         setRoleSelected(role)
@@ -224,7 +225,7 @@ const CheckingResult = () => {
     }
 
     const rowClassName = (record) => {
-        if (record.similarity > 15) {
+        if (record.similarity > 50) {
             return 'highlighted-row'
         }
         return ''
@@ -237,9 +238,13 @@ const CheckingResult = () => {
             width: 30,
             align: "center",
             render: (text, record, index) => {
-                if (record?.similarity > 15) {
+                if (record?.similarity >= 50) {
                     return (
                         <span style={{ color: 'red', fontWeight: '600' }}>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
+                    )
+                } else if (record?.similarity >= 30 && record?.similarity < 50) {
+                    return (
+                        <span style={{ color: 'yellowgreen', fontWeight: '600' }}>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
                     )
                 } else {
                     return (
@@ -254,9 +259,13 @@ const CheckingResult = () => {
             width: 500,
             align: "left",
             render: (text, record, index) => {
-                if (record?.similarity > 15) {
+                if (record?.similarity >= 50) {
                     return (
                         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.document?.title}</span>
+                    )
+                } else if (record?.similarity >= 30 && record?.similarity < 50) {
+                    return (
+                        <span style={{ color: 'yellowgreen', fontWeight: '600' }}>{record?.document?.title}</span>
                     )
                 } else {
                     return (
@@ -271,9 +280,13 @@ const CheckingResult = () => {
             width: 180,
             align: "left",
             render: (text, record, index) => {
-                if (record?.similarity > 15) {
+                if (record?.similarity >= 50) {
                     return (
                         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.document?.author}</span>
+                    )
+                } else if (record?.similarity >= 30 && record?.similarity < 50) {
+                    return (
+                        <span style={{ color: 'yellowgreen', fontWeight: '600' }}>{record?.document?.author}</span>
                     )
                 } else {
                     return (
@@ -288,13 +301,17 @@ const CheckingResult = () => {
             width: 150,
             align: "left",
             render: (text, record, index) => {
-                if (record?.similarity > 15) {
+                if (record?.similarity >= 50) {
                     return (
-                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.document?.major}</span>
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.document?.major?.name}</span>
+                    )
+                } else if (record?.similarity >= 30 && record?.similarity < 50) {
+                    return (
+                        <span style={{ color: 'yellowgreen', fontWeight: '600' }}>{record?.document?.major?.name}</span>
                     )
                 } else {
                     return (
-                        <span>{record?.document?.major}</span>
+                        <span>{record?.document?.major?.name}</span>
                     )
                 }
             }
@@ -305,9 +322,13 @@ const CheckingResult = () => {
             width: 120,
             align: "center",
             render: (text, record, index) => {
-                if (record?.similarity > 15) {
+                if (record?.similarity >= 50) {
                     return (
                         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.document?.documentType?.name}</span>
+                    )
+                } else if (record?.similarity >= 30 && record?.similarity < 50) {
+                    return (
+                        <span style={{ color: 'yellowgreen', fontWeight: '600' }}>{record?.document?.documentType?.name}</span>
                     )
                 } else {
                     return (
@@ -321,9 +342,13 @@ const CheckingResult = () => {
             width: 120,
             align: "center",
             render: (text, record, index) => {
-                if (record?.similarity > 15) {
+                if (record?.similarity >= 50) {
                     return (
                         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.similarity}</span>
+                    )
+                } else if (record?.similarity >= 30 && record?.similarity < 50) {
+                    return (
+                        <span style={{ color: 'yellowgreen', fontWeight: '600' }}>{record?.similarity}</span>
                     )
                 } else {
                     return (
@@ -340,10 +365,9 @@ const CheckingResult = () => {
                 <div style={{ display: "flex", justifyContent: "center" }}>
                     {ability.can('update', 'PHAN_QUYEN_VAI_TRO') &&
                         <>
-
-                            <RightCircleOutlined
+                            <UnorderedListOutlined
                                 id={`tooltip_detail_${record._id}`}
-                                style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
+                                style={{ color: "#09A863", cursor: "pointer" }}
                                 onClick={(e) => handleDetail(record)}
                             />
                             <UncontrolledTooltip placement="top" target={`tooltip_detail_${record._id}`}
@@ -417,7 +441,7 @@ const CheckingResult = () => {
                                 showSizeChanger: true,
                                 showTotal: (total, range) => <span>Tổng số: {total}</span>,
                             }}
-                            rowClassName={rowClassName}
+                        // rowClassName={rowClassName}
                         />}
                     </Col>
                     <Col md="12">
@@ -442,7 +466,7 @@ const CheckingResult = () => {
                                 showSizeChanger: true,
                                 showTotal: (total, range) => <span>Tổng số: {total}</span>,
                             }}
-                            rowClassName={rowClassName}
+                        // rowClassName={rowClassName}
                         />}
                     </Col>
                 </Row>

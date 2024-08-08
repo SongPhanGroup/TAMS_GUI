@@ -22,6 +22,7 @@ import { AbilityContext } from '@src/utility/context/Can'
 const Error = lazy(() => import('../views/pages/misc/Error'))
 const Login = lazy(() => import('../views/pages/authentication/Login'))
 const NotAuthorized = lazy(() => import('../views/pages/misc/NotAuthorized'))
+const DetailCheckingDocumentResult = lazy(() => import('../views/tams/checking_document/DetailResult'))
 
 const _handlePermission = (memberInfo) => {
   const permissionArr = memberInfo.permission ? JSON.parse(memberInfo.permission) : []
@@ -72,6 +73,11 @@ const Router = () => {
       path: '/auth/not-auth',
       element: <BlankLayout />,
       children: [{ path: '/auth/not-auth', element: <NotAuthorized /> }]
+    },
+    {
+      path: '/tams/detail-result/:id',
+      element: <BlankLayout />,
+      children: [{ path: '/tams/detail-result/:id', element: <DetailCheckingDocumentResult /> }]
     },
     {
       path: '*',

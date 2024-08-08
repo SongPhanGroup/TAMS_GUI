@@ -3,9 +3,11 @@ import { lazy } from 'react'
 const Document = lazy(() => import('../../views/tams/document'))
 const CheckingDocument = lazy(() => import('../../views/tams/checking_document'))
 const CheckingDocumentResult = lazy(() => import('../../views/tams/checking_document/CheckingResult'))
+const DetailComparationResult = lazy(() => import('../../views/tams/checking_document/DetailComparation'))
 const Course = lazy(() => import('../../views/tams/course'))
 const Major = lazy(() => import('../../views/tams/major'))
 const DocumentType = lazy(() => import('../../views/tams/document_type'))
+const DocumentSource = lazy(() => import('../../views/tams/document_source'))
 // const TypeChecking = lazy(() => import('../../views/tams/type_checking'))
 // const Role = lazy(() => import('../../views/tams/role'))
 // const Permission = lazy(() => import('../../views/tams/permission'))
@@ -30,6 +32,10 @@ const TamsRoutes = [
         element: <CheckingDocumentResult />
     },
     {
+        path: '/tams/detail-comparation/:id',
+        element: <DetailComparationResult />
+    },
+    {
         path: '/tams/course',
         element: <Course />
     },
@@ -40,6 +46,10 @@ const TamsRoutes = [
     {
         path: '/tams/document-type',
         element: <DocumentType />
+    },
+    {
+        path: '/tams/document-source',
+        element: <DocumentSource />
     },
     //   {
     //     path: '/tams/type-checking',

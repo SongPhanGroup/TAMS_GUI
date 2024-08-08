@@ -120,9 +120,6 @@ const AddNewDocument = ({ open, handleModal, getData }) => {
     }
 
     const onSubmit = (data, event) => {
-        // Lấy nút submit đã được nhấn
-        const submitter = event.nativeEvent.submitter
-        const action = submitter.getAttribute('name')
         const formData = new FormData()
         formData.append("file", file)
         if (data.description) {
@@ -136,64 +133,41 @@ const AddNewDocument = ({ open, handleModal, getData }) => {
         formData.append("author", data.author)
         formData.append("coAuthor", data.coAuthor)
         formData.append("supervisor", data.supervisor)
-        if (action === "add") {
-            setLoadingAdd(true)
-            postDocument(formData).then(result => {
-                if (result.status === "success") {
-                    Swal.fire({
-                        title: "Thêm mới tài liệu thành công",
-                        text: "",
-                        icon: "success",
-                        customClass: {
-                            confirmButton: "btn btn-success"
-                        }
-                    })
-                } else {
-                    Swal.fire({
-                        title: "Thêm mới tài liệu thất bại",
-                        text: "Vui lòng kiểm tra lại thông tin!",
-                        icon: "error",
-                        customClass: {
-                            confirmButton: "btn btn-danger"
-                        }
-                    })
-                }
-                handleCloseModal()
-                getData()
-            }).catch(error => {
+        setLoadingAdd(true)
+        postDocument(formData).then(result => {
+            if (result.status === "success") {
+                Swal.fire({
+                    title: "Thêm mới tài liệu thành công",
+                    text: "",
+                    icon: "success",
+                    customClass: {
+                        confirmButton: "btn btn-success"
+                    }
+                })
+            } else {
                 Swal.fire({
                     title: "Thêm mới tài liệu thất bại",
-                    text: `Có lỗi xảy ra - ${error.message}!`,
+                    text: "Vui lòng kiểm tra lại thông tin!",
                     icon: "error",
                     customClass: {
                         confirmButton: "btn btn-danger"
                     }
                 })
-            }).finally(() => {
-                setLoadingAdd(false)
-            })
-        } else {
-            setLoadingExtract(true)
-            extractingFromFileUpload(formData).then(result => {
-                if (!result.errors) {
-                    Swal.fire({
-                        title: "Tách câu thành công",
-                        text: "",
-                        icon: "success",
-                        customClass: {
-                            confirmButton: "btn btn-success"
-                        }
-                    }).then(() => {
-                        handleCloseModal()
-                    })
+            }
+            handleCloseModal()
+            getData()
+        }).catch(error => {
+            Swal.fire({
+                title: "Thêm mới tài liệu thất bại",
+                text: `Có lỗi xảy ra - ${error.message}!`,
+                icon: "error",
+                customClass: {
+                    confirmButton: "btn btn-danger"
                 }
-                getData()
-            }).catch(error => {
-                console.log(error)
-            }).finally(() => {
-                setLoadingExtract(false)
             })
-        }
+        }).finally(() => {
+            setLoadingAdd(false)
+        })
     }
     return (
         <Modal isOpen={open} toggle={handleModal} className='modal-dialog-top modal-lg'>
@@ -368,7 +342,6 @@ const AddNewDocument = ({ open, handleModal, getData }) => {
                                 )
                             }}
                         />
-                        {/* {errors.date && <FormFeedback>{errors.date.message}</FormFeedback>} */}
                     </Col>
                     <Col sm={6} xs={12}>
                         <Label className='form-label' for='place'>
@@ -377,18 +350,17 @@ const AddNewDocument = ({ open, handleModal, getData }) => {
                         <Controller
                             control={control}
                             name='place'
-                            render={({field}) => {
+                            render={({ field }) => {
                                 return (
                                     <Input
                                         {...field}
-                                        id='source'
+                                        id='place'
                                         placeholder='Nhập nơi xuất bản/Bảo vệ/Công bố'
-                                        invalid={errors.source && true}
+                                        invalid={errors.place && true}
                                     />
                                 )
                             }}
                         />
-                        {/* {errors.date && <FormFeedback>{errors.date.message}</FormFeedback>} */}
                     </Col>
                     <Col sm={12} xs={12}>
                         <Label className='form-label' for='description'>

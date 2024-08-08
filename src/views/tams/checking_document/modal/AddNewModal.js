@@ -33,7 +33,11 @@ import { postCheckingDocumentVersion } from "../../../../api/checking_document_v
 
 const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
     const AddNewCheckingDocumentSchema = yup.object().shape({
-        file: yup.mixed().required("Yêu cầu chọn file"),
+        file: yup.mixed().required("Yêu cầu chọn file").nullable().test(
+            "is-not-empty",
+            "Yêu cầu chọn file",
+            value => value !== null && value !== ''
+        ),
         title: yup.string().required("Yêu cầu nhập tiêu đề"),
         author: yup.string().required("Yêu cầu nhập tác giả"),
         course: yup.object().required("Yêu cầu nhập đợt kiểm tra").nullable()
@@ -44,6 +48,8 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
         reset,
         control,
         handleSubmit,
+        getValues,
+        setValue,
         formState: { errors }
     } = useForm({
         mode: 'onChange',
@@ -138,7 +144,10 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
                 })
             }
             getData()
-            handleCloseModal()
+            setValue('title', '')
+            setValue('author', '')
+            setValue('description', '')
+            setValue('file', '')
         }).catch(error => {
             console.log(error)
         }).finally(() => {

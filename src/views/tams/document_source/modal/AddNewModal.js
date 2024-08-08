@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState } from "react"
+import { useState } from 'react'
 // ** Reactstrap Imports
 import {
     Col,
@@ -10,26 +10,28 @@ import {
     ModalBody,
     ModalHeader,
     Row,
-    Button,
-    Form,
-    Spinner
+    Button
 } from "reactstrap"
 
 // ** Third Party Components
+import Select from 'react-select'
 import { useForm, Controller } from 'react-hook-form'
 import * as yup from "yup"
 import { yupResolver } from '@hookform/resolvers/yup'
-
+import {
+    Spin
+} from 'antd'
 // ** Utils
 
 // ** Styles
 import '@styles/react/libs/react-select/_react-select.scss'
 import Swal from 'sweetalert2'
-import { postCheckingDocumentVersion } from "../../../../api/checking_document_version"
+import { postDocumentSource } from "../../../../api/document_source"
 
-const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDocumentSelected }) => {
-    const AddNewCheckingDocumentVersionSchema = yup.object().shape({
-        file: yup.mixed().required("Yêu cầu nhập file")
+const AddNewDocumentSource = ({ open, handleModal, getData }) => {
+    // ** States
+    const AddNewDocumentSourceSchema = yup.object().shape({
+        name: yup.string().required("Yêu cầu nhập tên nguồn tài liệu")
     })
 
     // ** Hooks
@@ -37,15 +39,13 @@ const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDoc
         reset,
         control,
         handleSubmit,
-        getValues,
         formState: { errors }
     } = useForm({
         mode: 'onChange',
-        resolver: yupResolver(AddNewCheckingDocumentVersionSchema)
+        resolver: yupResolver(AddNewDocumentSourceSchema)
     })
 
     // ** State
-    const [file, setFile] = useState()
     const [loadingAdd, setLoadingAdd] = useState(false)
 
     const handleCloseModal = () => {
@@ -53,21 +53,13 @@ const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDoc
         reset()
     }
 
-    const handleChangeFile = (event) => {
-        const file = event.target.files[0]
-        setFile(file)
-    }
-    
     const onSubmit = (data) => {
+        // Lấy nút submit đã được nhấn
         setLoadingAdd(true)
-        const formData = new FormData()
-        formData.append('file', file)
-        formData.append('description', data.description)
-        formData.append('checkingDocumentId', checkingDocumentSelected?.id)
-        postCheckingDocumentVersion(formData).then(result => {
+        postDocumentSource(data).then(result => {
             if (result.status === 'success') {
                 Swal.fire({
-                    title: "Thêm mới phiên bản kiểm tra thành công",
+                    title: "Thêm mới nguồn tài liệu thành công",
                     text: "",
                     icon: "success",
                     customClass: {
@@ -76,8 +68,8 @@ const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDoc
                 })
             } else {
                 Swal.fire({
-                    title: "Thêm mới phiên bản kiểm tra thất bại",
-                    text: "Không thể thêm phiên bản mới do đợt kiểm tra đã bị khóa!",
+                    title: "Thêm mới nguồn tài liệu thất bại",
+                    text: "Vui lòng kiểm tra lại thông tin!",
                     icon: "error",
                     customClass: {
                         confirmButton: "btn btn-danger"
@@ -88,7 +80,7 @@ const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDoc
             handleCloseModal()
         }).catch(error => {
             Swal.fire({
-                title: "Thêm mới phiên bản kiểm tra thất bại",
+                title: "Thêm mới nguồn tài liệu thất bại",
                 text: `Có lỗi xảy ra - ${error.message}!`,
                 icon: "error",
                 customClass: {
@@ -99,28 +91,33 @@ const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDoc
             setLoadingAdd(false)
         })
     }
-
     return (
-        <Modal isOpen={open} toggle={handleModal} className='modal-dialog-top modal-lg'>
+        <Modal isOpen={open} toggle={handleModal} className='modal-dialog-top modal-md'>
             <ModalHeader className='bg-transparent' toggle={handleCloseModal}></ModalHeader>
             <ModalBody className='px-sm-3 mx-50 pb-2' style={{ paddingTop: 0 }}>
                 <div className='text-center mb-1'>
-                    <h2 className='mb-1'>Thêm mới phiên bản kiểm tra</h2>
+                    <h2 className='mb-1'>Thêm mới nguồn tài liệu</h2>
                 </div>
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                     <Col xs={12}>
-                        <Label className='form-label' for='checkingDocument'>
-                            phiên bản kiểm tra <span style={{ color: 'red' }}>(*)</span>
+                        <Label className='form-label' for='name'>
+                            Tên nguồn tài liệu <span style={{ color: 'red' }}>(*)</span>
                         </Label>
                         <Controller
-                            disabled
-                            defaultValue={checkingDocumentSelected?.title}
-                            name='checkingDocument'
                             control={control}
-                            render={({ field }) => (
-                                <Input {...field} id='checkingDocument' placeholder='Nhập phiên bản kiểm tra' invalid={errors.checkingDocument && true} />
-                            )}
+                            name='name'
+                            render={({ field }) => {
+                                return (
+                                    <Input
+                                        {...field}
+                                        id='name'
+                                        placeholder='Nhập tên nguồn tài liệu'
+                                        invalid={errors.name && true}
+                                    />
+                                )
+                            }}
                         />
+                        {errors.name && <FormFeedback>{errors.name.message}</FormFeedback>}
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='description'>
@@ -134,26 +131,10 @@ const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDoc
                             )}
                         />
                     </Col>
-                    <Col xs={12}>
-                        <Label className='form-label' for='file'>
-                            Tài liệu <span style={{ color: 'red' }}>(*)</span>
-                        </Label>
-                        <Controller
-                            name='file'
-                            control={control}
-                            render={({ field }) => (
-                                <Input {...field} id='file' type='file' placeholder='Chọn tài liệu' invalid={errors.file && true} onChange={(event) => {
-                                    handleChangeFile(event)
-                                    field.onChange(event)
-                                }} />
-                            )}
-                        />
-                        {errors.file && <FormFeedback>{errors.file.message}</FormFeedback>}
-                    </Col>
                     <Col xs={12} className='text-center mt-2 pt-50'>
-                        <Button type='submit' name='add' className='me-1' color='primary'>
+                        <Button type='submit' name="add" className='me-1' color='primary'>
                             {
-                                loadingAdd === true ? <Spinner color="#fff" size="sm" /> : 'Thêm'
+                                loadingAdd === true ? <Spin className="spin" /> : 'Thêm'
                             }
                         </Button>
                         <Button type='reset' color='secondary' outline onClick={handleCloseModal}>
@@ -166,4 +147,4 @@ const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDoc
     )
 }
 
-export default AddNewCheckingDocumentVersion
+export default AddNewDocumentSource

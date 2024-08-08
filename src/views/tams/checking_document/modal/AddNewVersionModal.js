@@ -57,7 +57,7 @@ const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDoc
         const file = event.target.files[0]
         setFile(file)
     }
-
+    
     const onSubmit = (data) => {
         setLoadingAdd(true)
         const formData = new FormData()

@@ -74,7 +74,6 @@ const Course = () => {
         getData(currentPage, rowsPerPage, search, isActive)
     }, [currentPage, rowsPerPage, search, isActive])
 
-
     const handleModal = () => {
         setIsAdd(false)
         setIsEdit(false)

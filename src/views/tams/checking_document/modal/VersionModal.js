@@ -210,13 +210,11 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
                         >
                             Chỉnh sửa
                         </UncontrolledTooltip>
-                        {/* <NavLink to={`/tams/checking-result/${record.id}`}> */}
                         <AppstoreOutlined
                             id={`tooltip_result_${record._id}`}
                             style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
                             onClick={(e) => handleResult(record)}
                         />
-                        {/* </NavLink> */}
                         <UncontrolledTooltip placement="top" target={`tooltip_result_${record._id}`}
                         >
                             Kết quả kiểm tra
@@ -228,7 +226,7 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
                         />
                         <UncontrolledTooltip placement="top" target={`tooltip_detail_${record._id}`}
                         >
-                            Chi tiết
+                            Kết quả kiểm tra
                         </UncontrolledTooltip>
                         <Popconfirm
                             title="Bạn chắc chắn xóa?"

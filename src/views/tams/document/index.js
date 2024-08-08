@@ -24,7 +24,7 @@ import { yupResolver } from "@hookform/resolvers/yup"
 import classnames from "classnames"
 import { AbilityContext } from '@src/utility/context/Can'
 import { deleteDocument, getDocument } from "../../../api/document"
-import { toDateString, toDateTimeString } from "../../../utility/Utils"
+import { toDateString, toDateStringv2, toDateTimeString } from "../../../utility/Utils"
 import { getCourse } from "../../../api/course"
 import { getDocumentType } from "../../../api/document_type"
 import { getMajor } from "../../../api/major"
@@ -47,6 +47,8 @@ const Document = () => {
     const [courseId, setCourseId] = useState()
     const [typeId, setTypeId] = useState()
     const [majorId, setMajorId] = useState()
+    const [startDate, setStartDate] = useState()
+    const [endDate, setEndDate] = useState()
     const [isAdd, setIsAdd] = useState(false)
     const [isEdit, setIsEdit] = useState(false)
     const [info, setInfo] = useState()
@@ -104,7 +106,7 @@ const Document = () => {
         setListMajor(majors)
     }
 
-    const getData = (page, limit, search, courseId, typeIds, majorIds) => {
+    const getData = (page, limit, search, courseId, typeIds, majorIds, startDate, endDate) => {
         setLoadingData(true)
         getDocument({
             params: {
@@ -113,7 +115,9 @@ const Document = () => {
                 ...(search && search !== "" && { search }),
                 ...(courseId && { courseId }),
                 ...(typeIds && { typeIds }),
-                ...(majorIds && { majorIds })
+                ...(majorIds && { majorIds }),
+                ...(startDate && { startDate }),
+                ...(endDate && { endDate })
             },
         })
             .then((res) => {
@@ -127,8 +131,10 @@ const Document = () => {
             })
     }
     useEffect(() => {
-        getData(currentPage, rowsPerPage, search, courseId, typeId, majorId)
-    }, [currentPage, rowsPerPage, search, courseId, typeId, majorId])
+        if ((startDate && endDate) || (!startDate && !endDate)) {
+            getData(currentPage, rowsPerPage, search, courseId, typeId, majorId, startDate, endDate)
+        }
+    }, [currentPage, rowsPerPage, search, courseId, typeId, majorId, startDate, endDate])
 
     useEffect(() => {
         getAllDataPromises()
@@ -186,7 +192,6 @@ const Document = () => {
     }
 
     const handleChangeDocumentType = (value) => {
-        console.log(value)
         if (value) {
             setTypeId(value.join(','))
         } else {
@@ -199,6 +204,16 @@ const Document = () => {
             setMajorId(value.join(','))
         } else {
             setMajorId()
+        }
+    }
+
+    const handleChangeDate = (value) => {
+        if (value) {
+            setStartDate(toDateStringv2(value[0]))
+            setEndDate(toDateStringv2(value[1]))
+        } else {
+            setStartDate()
+            setEndDate()
         }
     }
 
@@ -250,9 +265,12 @@ const Document = () => {
         },
         {
             title: "Năm công bố",
-            dataIndex: "year",
+            dataIndex: "publish_date",
             align: 'left',
-            width: 150
+            width: 150,
+            render: (text, record, index) => (
+                <span style={{ whiteSpace: 'break-spaces' }}>{toDateString(record?.publish_date)}</span>
+            ),
         },
         {
             title: "Ngày tạo",
@@ -383,7 +401,7 @@ const Document = () => {
                             style={{ padding: '0.35rem 1rem' }}
                             className="form-control invoice-edit-input date-picker mb-50"
                             options={{
-                                mode:"range",
+                                mode: "range",
                                 dateFormat: "d-m-Y", // format ngày giờ
                                 locale: {
                                     ...Vietnamese
@@ -391,7 +409,7 @@ const Document = () => {
                                 defaultDate: [oneWeekAgo, new Date()]
                             }}
                             placeholder="dd/mm/yyyy"
-                            // onChange={(value => handleChangeDate(value))}
+                            onChange={(value => handleChangeDate(value))}
                         />
                     </Col>
                 </Col>

@@ -24,7 +24,7 @@ import {
     UncontrolledTooltip,
     CardBody,
 } from "reactstrap"
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import { Plus, X } from "react-feather"
 import {
     AppstoreAddOutlined,
@@ -46,25 +46,6 @@ import { useForm, Controller } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import classnames from "classnames"
 import { toDateString, toDateStringv2, toDateTimeString } from "../../../utility/Utils"
-// import {
-//     getRole,
-//     createRole,
-//     updateRole,
-//     deleteRole,
-//     listAllRoleUserCount,
-// } from "../../../../api/roles"
-// import {
-//     listAllUser,
-//     getListUserByRole
-// } from "../../../../api/users"
-// import { getGroupPermission } from "../../../../api/permissionGroups"
-// import {
-//     getPerByRoleId,
-//     getAllRolePer,
-//     updateRoleManyPer,
-// } from "../../../../api/rolePermissions"
-// import { getPermission } from "../../../../api/permissions"
-// import ListPermission from './detail'
 import { deleteCheckingDocument, getCheckingDocument } from "../../../api/checking_document"
 import VersionModal from "./modal/VersionModal"
 import { PAGE_DEFAULT, PER_PAGE_DEFAULT } from "../../../utility/constant"
@@ -74,6 +55,7 @@ const oneWeekAgo = new Date()
 oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
 
 const CheckingDocument = () => {
+    const location = useLocation()
     const [loadingData, setLoadingData] = useState(false)
     const ability = useContext(AbilityContext)
     const selected = useRef()
@@ -99,6 +81,8 @@ const CheckingDocument = () => {
     const [listAllRole, setListAllRole] = useState([])
 
     const [listCourse, setListCourse] = useState([])
+
+    console.log(location)
 
     const getAllDataPromises = async () => {
         const coursePromise = getCourse({ params: { page: PAGE_DEFAULT, perPage: PER_PAGE_DEFAULT, search: '' } })
@@ -131,73 +115,57 @@ const CheckingDocument = () => {
         setListCourse(courses)
     }
 
-    const getData = (page, limit, search, courseId, startDate, endDate) => {
+    const getData = (page, limit, search, courseIds, startDate, endDate) => {
         setLoadingData(true)
-        getCheckingDocument({
-            params: {
-                page,
-                limit,
-                ...(search && search !== "" && { search }),
-                courseId,
-                ...(startDate && { startDate }),
-                ...(endDate && { endDate })
-            }
-        })
-            .then((res) => {
-                const result = res?.data?.map(((item, index) => {
-                    return { ...item, _id: item.id, key: index }
-                }))
-                setData(result)
-                setCount(res?.pagination?.totalRecords)
+        if (location?.state) {
+            getCheckingDocument({
+                params: {
+                    page,
+                    limit,
+                    ...(search && search !== "" && { search }),
+                    courseIds: location?.state?.id,
+                    ...(startDate && { startDate }),
+                    ...(endDate && { endDate })
+                }
             })
-            .catch((err) => {
-                console.log(err)
-            }).finally(() => {
-                setLoadingData(false)
+                .then((res) => {
+                    const result = res?.data?.map(((item, index) => {
+                        return { ...item, _id: item.id, key: index }
+                    }))
+                    setData(result)
+                    setCount(res?.pagination?.totalRecords)
+                })
+                .catch((err) => {
+                    console.log(err)
+                }).finally(() => {
+                    setLoadingData(false)
+                })
+        } else {
+            getCheckingDocument({
+                params: {
+                    page,
+                    limit,
+                    ...(search && search !== "" && { search }),
+                    ...(courseIds && { courseIds }),
+                    ...(startDate && { startDate }),
+                    ...(endDate && { endDate })
+                }
             })
+                .then((res) => {
+                    const result = res?.data?.map(((item, index) => {
+                        return { ...item, _id: item.id, key: index }
+                    }))
+                    setData(result)
+                    setCount(res?.pagination?.totalRecords)
+                })
+                .catch((err) => {
+                    console.log(err)
+                }).finally(() => {
+                    setLoadingData(false)
+                })
+        }
     }
 
-    // const getInfo = () => {
-    //     getAllRolePer({
-    //         params: {
-    //             page: 1,
-    //             limit: 5000,
-    //         },
-    //     })
-    //         .then((res) => {
-    //             const { count, data } = res[0]
-    //             setListPermissionSelected(data)
-    //         })
-    //         .catch((err) => {
-    //             console.log(err)
-    //         })
-    //     getGroupPermission({
-    //         params: {
-    //             page: 1,
-    //             limit: 500,
-    //         },
-    //     })
-    //         .then((res) => {
-    //             const { count, data } = res[0]
-    //             setListPerGroup(data ?? [])
-    //         })
-    //         .catch((err) => {
-    //             console.log(err)
-    //         })
-    //     getPermission({
-    //         params: {
-    //             page: 1,
-    //             limit: 5000,
-    //         },
-    //     })
-    //         .then((res) => {
-    //             const { count, data } = res[0]
-    //             setListAllPer(data ?? [])
-    //         })
-    //         .catch((err) => {
-    //             console.log(err)
-    //         })
-    // }
     useEffect(() => {
         if ((startDate && endDate) || (!startDate && !endDate)) {
             getData(currentPage, rowsPerPage, search, courseId, startDate, endDate)
@@ -224,7 +192,7 @@ const CheckingDocument = () => {
     }
     const handleChangeCourse = (value) => {
         if (value) {
-            setCourseId(value)
+            setCourseId(value.join(','))
             setCurrentPage(1)
         } else {
             setCourseId()
@@ -275,113 +243,6 @@ const CheckingDocument = () => {
             })
     }
 
-    // const _handleSelectAll = (e) => {
-    //     let listPermitFormat = []
-    //     if (e.target.checked) {
-    //         rolesArr.map((item) => {
-    //             listPermitFormat = listPermitFormat.concat(item.actions)
-    //         })
-    //     }
-    //     setListPermissionSelected(listPermitFormat)
-    // }
-
-    // const _handleCheckRoleAction = (e, act, permission, role) => {
-    //     setListPermissionSelected((pre) => {
-    //         const isChecked = listPermissionSelected.find(
-    //             (per) => per.permissionID === permission._id &&
-    //                 per.roleID === role?._id &&
-    //                 per.actionContent === act.value
-    //         )
-    //         if (isChecked) {
-    //             if (act.value === 'read') {
-    //                 return listPermissionSelected.filter(
-    //                     (per) => !(per.permissionID === permission._id &&
-    //                         per.roleID === role?._id)
-    //                 )
-    //             }
-    //             return listPermissionSelected.filter(
-    //                 (per) => !(per.permissionID === permission._id &&
-    //                     per.roleID === role?._id &&
-    //                     per.actionContent === act.value)
-    //             )
-    //         } else {
-    //             if (act.value !== 'read') {
-    //                 const isChecked_ = listPermissionSelected.find(
-    //                     (per) => per.permissionID === permission._id &&
-    //                         per.roleID === role?._id &&
-    //                         per.actionContent === 'read'
-    //                 )
-    //                 if (isChecked_) {
-    //                     return [
-    //                         ...pre,
-    //                         {
-    //                             permissionID: permission._id,
-    //                             roleID: role._id,
-    //                             actionContent: act.value,
-    //                             isActive: 1,
-    //                         }
-    //                     ]
-    //                 } else {
-    //                     return [
-    //                         ...pre,
-    //                         {
-    //                             permissionID: permission._id,
-    //                             roleID: role._id,
-    //                             actionContent: 'read',
-    //                             isActive: 1,
-    //                         },
-    //                         {
-    //                             permissionID: permission._id,
-    //                             roleID: role._id,
-    //                             actionContent: act.value,
-    //                             isActive: 1,
-    //                         },
-    //                     ]
-    //                 }
-    //             }
-    //             return [
-    //                 ...pre,
-    //                 {
-    //                     permissionID: permission._id,
-    //                     roleID: role._id,
-    //                     actionContent: act.value,
-    //                     isActive: 1,
-    //                 },
-    //             ]
-    //         }
-    //     })
-    // }
-
-    // const _renderRoleItem = (act, ind, permission, role) => {
-    //     const permissionData = listPermissionSelected?.find(
-    //         (lstPer) => lstPer.permissionID === permission._id &&
-    //             lstPer.actionContent === act.value &&
-    //             lstPer.roleID === role?._id
-    //     )
-    //     return (
-    //         <div className="form-check me-2" key={ind} style={{ minWidth: "6rem" }}>
-    //             <Input
-    //                 type="checkbox"
-    //                 style={{ cursor: "pointer", marginRight: "1rem" }}
-    //                 className="action-cb"
-    //                 id={`${permission._id}_${act.id}`}
-    //                 checked={permissionData || false}
-    //                 onChange={(e) => _handleCheckRoleAction(e, act, permission, role)}
-    //             />
-    //             <Label
-    //                 className="form-check-label"
-    //                 style={{ cursor: "pointer", fontSize: "0.875rem" }}
-    //                 for={`${permission._id}_${act.id}`}
-    //             >
-    //                 {act.label}
-    //             </Label>
-    //         </div>
-    //     )
-    // }
-    // const handlePer = (role) => {
-    //     setRoleSelected(role)
-    //     setIsPer(true)
-    // }
     const columns = [
         {
             title: "STT",
@@ -498,52 +359,6 @@ const CheckingDocument = () => {
         },
     ]
 
-    // const handleUpDateManyPer = () => {
-    //     const listSelected = listPermissionSelected.filter(x => x.roleID === roleSelected._id)
-    //     const arr = listSelected.map((per, index) => {
-    //         if (per.roleID === roleSelected._id) {
-    //             return {
-    //                 permissionID: per.permissionID,
-    //                 actionContent: per.actionContent,
-    //             }
-    //         }
-    //     })
-    //     const dataSubmit = {
-    //         roleID: roleSelected?._id,
-    //         isActive: 1,
-    //         arrContent: arr,
-    //         actionTime: "2023-09-13T04:08:14.369Z",
-    //     }
-    //     updateRoleManyPer(dataSubmit)
-    //         .then((res) => {
-    //             MySwal.fire({
-    //                 title: "Chỉnh sửa thành công",
-
-    //                 icon: "success",
-    //                 customClass: {
-    //                     confirmButton: "btn btn-success",
-    //                 },
-    //             }).then((result) => {
-    //                 if (currentPage === 1) {
-    //                     getData(1, rowsPerPage)
-    //                 } else {
-    //                     setCurrentPage(1)
-    //                 }
-    //                 handleModal()
-    //             })
-    //         })
-    //         .catch((err) => {
-    //             MySwal.fire({
-    //                 title: "Chỉnh sửa thất bại",
-    //                 icon: "error",
-    //                 customClass: {
-    //                     confirmButton: "btn btn-danger",
-    //                 },
-    //             })
-    //         })
-    // }
-    // const showTotal = (count) => `Tổng số: ${count}`
-
     return (
         <Fragment>
             <Card
@@ -608,6 +423,8 @@ const CheckingDocument = () => {
                                         Chọn đợt kiểm tra
                                     </Label>
                                     <Select
+                                        defaultValue={location?.state?.id}
+                                        mode="multiple"
                                         placeholder="Chọn đợt kiểm tra"
                                         className='mb-50 select-custom flex-1'
                                         options={listCourse}

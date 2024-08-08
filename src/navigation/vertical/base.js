@@ -1,4 +1,4 @@
-import { FileOutlined, MenuOutlined, UnorderedListOutlined, MoneyCollectOutlined, BookOutlined, ScheduleOutlined, ApartmentOutlined, CheckOutlined, DiffOutlined } from '@ant-design/icons'
+import { FileOutlined, MenuOutlined, UnorderedListOutlined, MoneyCollectOutlined, BookOutlined, ScheduleOutlined, ApartmentOutlined, CheckOutlined, DiffOutlined, GlobalOutlined } from '@ant-design/icons'
 import { Mail, MessageSquare, CheckSquare, Calendar, FileText, Circle, ShoppingCart, User, Shield, Users, Airplay, Columns, Settings, Bold, Bell, Aperture, Home, Book, Grid, Menu, UserPlus, Sliders } from 'react-feather'
 
 export default [
@@ -49,7 +49,7 @@ export default [
   {
     id: 'document-source',
     title: 'Nguồn tài liệu',
-    icon: <BookOutlined size={12} />,
+    icon: <GlobalOutlined size={12} />,
     navLink: '/tams/document-source',
     action: 'read',
     resource: 'NGUON_TAI_LIEU',

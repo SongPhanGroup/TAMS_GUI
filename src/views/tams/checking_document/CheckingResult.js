@@ -363,7 +363,7 @@ const CheckingResult = () => {
             align: "center",
             render: (record) => (
                 <div style={{ display: "flex", justifyContent: "center" }}>
-                    {ability.can('update', 'PHAN_QUYEN_VAI_TRO') &&
+                    {/* {ability.can('update', 'PHAN_QUYEN_VAI_TRO') &&
                         <>
                             <UnorderedListOutlined
                                 id={`tooltip_detail_${record._id}`}
@@ -374,7 +374,7 @@ const CheckingResult = () => {
                             >
                                 Chi tiết
                             </UncontrolledTooltip>
-                        </>}
+                        </>} */}
                 </div>
             ),
         },

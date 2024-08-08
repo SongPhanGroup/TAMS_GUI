@@ -230,7 +230,6 @@ const CheckingDocument = () => {
             setCourseId()
         }
     }
-
     const handleChangeDate = (value) => {
         if (value) {
             setStartDate(toDateStringv2(value[0]))

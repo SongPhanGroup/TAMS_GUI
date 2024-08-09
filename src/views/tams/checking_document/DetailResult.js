@@ -39,12 +39,12 @@ const DetailResult = () => {
             }}
         >
             <Layout>
-                <Header
+                {/* <Header
                     style={{
                         padding: 0,
                         background: colorBgContainer,
                     }}
-                />
+                /> */}
                 <Content
                     style={{
                         margin: '0 16px',
@@ -55,18 +55,28 @@ const DetailResult = () => {
                             margin: '16px 0',
                         }}
                     >
-                        <Breadcrumb.Item>User</Breadcrumb.Item>
-                        <Breadcrumb.Item>Bill</Breadcrumb.Item>
+                        {/* <Breadcrumb.Item>User</Breadcrumb.Item>
+                        <Breadcrumb.Item>Bill</Breadcrumb.Item> */}
                     </Breadcrumb>
                     <div
                         style={{
                             padding: 24,
-                            minHeight: 360,
+                            minHeight: '80vh',
                             background: colorBgContainer,
                             borderRadius: borderRadiusLG,
                         }}
                     >
-                        Bill is a cat.
+                        <iframe
+                            src="/output.html"  // Đường dẫn tới file HTML trong thư mục public
+                            style={{
+                                width: '100%',
+                                height: '80vh',
+                                border: 'none',
+                                overflow: 'auto',
+                            }}
+                            title="Nhúng file HTML"
+                            frameBorder="0"
+                        ></iframe>
                     </div>
                 </Content>
                 <Footer
@@ -74,7 +84,6 @@ const DetailResult = () => {
                         textAlign: 'center',
                     }}
                 >
-                    Ant Design ©{new Date().getFullYear()} Created by Ant UED
                 </Footer>
             </Layout>
             <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>

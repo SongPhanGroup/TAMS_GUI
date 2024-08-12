@@ -98,17 +98,8 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
         navigate(`/tams/checking-result/${record?.id}`, { state: record })
     }
 
-    const handleButtonClick = (id) => {
-        const width = window.innerWidth / 3
-        const height = window.innerHeight / 1.5
-        const left = (window.innerWidth - width) / 2
-        const top = (window.innerHeight - height) / 2
-        const url = `/tams/detail-result/${id}` // Đảm bảo rằng output.html nằm trong thư mục public
-        window.open(
-            url,
-            "_blank",
-            `width=${width},height=${height},left=${left},top=${top},toolbar=no,location=no`
-        )    
+    const handleButtonClick = (record) => {
+        navigate(`/tams/detail-result/${record?.id}`, { state: record }) 
     }
 
     useEffect(() => {
@@ -222,11 +213,11 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
                         <RightCircleOutlined
                             id={`tooltip_detail_${record._id}`}
                             style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
-                            onClick={() => handleButtonClick(record?.id)}
+                            onClick={() => handleButtonClick(record)}
                         />
                         <UncontrolledTooltip placement="top" target={`tooltip_detail_${record._id}`}
                         >
-                            Kết quả kiểm tra
+                            Kết quả chi tiết
                         </UncontrolledTooltip>
                         <Popconfirm
                             title="Bạn chắc chắn xóa?"

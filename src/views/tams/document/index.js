@@ -24,11 +24,16 @@ import { yupResolver } from "@hookform/resolvers/yup"
 import classnames from "classnames"
 import { AbilityContext } from '@src/utility/context/Can'
 import { deleteDocument, getDocument } from "../../../api/document"
-import { toDateString, toDateTimeString } from "../../../utility/Utils"
+import { toDateString, toDateStringv2, toDateTimeString } from "../../../utility/Utils"
 import { getCourse } from "../../../api/course"
 import { getDocumentType } from "../../../api/document_type"
 import { getMajor } from "../../../api/major"
-import { type } from "jquery"
+import Flatpickr from "react-flatpickr"
+import { Vietnamese } from "flatpickr/dist/l10n/vn.js"
+import "@styles/react/libs/flatpickr/flatpickr.scss"
+
+const oneWeekAgo = new Date()
+oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
 
 const Document = () => {
     const [loadingData, setLoadingData] = useState(false)
@@ -42,6 +47,8 @@ const Document = () => {
     const [courseId, setCourseId] = useState()
     const [typeId, setTypeId] = useState()
     const [majorId, setMajorId] = useState()
+    const [startDate, setStartDate] = useState()
+    const [endDate, setEndDate] = useState()
     const [isAdd, setIsAdd] = useState(false)
     const [isEdit, setIsEdit] = useState(false)
     const [info, setInfo] = useState()
@@ -99,7 +106,7 @@ const Document = () => {
         setListMajor(majors)
     }
 
-    const getData = (page, limit, search, courseId, typeId, majorId) => {
+    const getData = (page, limit, search, courseId, typeIds, majorIds, startDate, endDate) => {
         setLoadingData(true)
         getDocument({
             params: {
@@ -107,8 +114,10 @@ const Document = () => {
                 perPage: limit,
                 ...(search && search !== "" && { search }),
                 ...(courseId && { courseId }),
-                ...(typeId && { typeId }),
-                ...(majorId && { majorId })
+                ...(typeIds && { typeIds }),
+                ...(majorIds && { majorIds }),
+                ...(startDate && { startDate }),
+                ...(endDate && { endDate })
             },
         })
             .then((res) => {
@@ -122,9 +131,14 @@ const Document = () => {
             })
     }
     useEffect(() => {
-        getData(currentPage, rowsPerPage, search, courseId, typeId, majorId)
+        if ((startDate && endDate) || (!startDate && !endDate)) {
+            getData(currentPage, rowsPerPage, search, courseId, typeId, majorId, startDate, endDate)
+        }
+    }, [currentPage, rowsPerPage, search, courseId, typeId, majorId, startDate, endDate])
+
+    useEffect(() => {
         getAllDataPromises()
-    }, [currentPage, rowsPerPage, search, courseId, typeId, majorId])
+    }, [])
 
     const handleModal = () => {
         setIsAdd(false)
@@ -179,7 +193,7 @@ const Document = () => {
 
     const handleChangeDocumentType = (value) => {
         if (value) {
-            setTypeId(value)
+            setTypeId(value.join(','))
         } else {
             setTypeId()
         }
@@ -187,9 +201,19 @@ const Document = () => {
 
     const handleChangeMajor = (value) => {
         if (value) {
-            setMajorId(value)
+            setMajorId(value.join(','))
         } else {
             setMajorId()
+        }
+    }
+
+    const handleChangeDate = (value) => {
+        if (value) {
+            setStartDate(toDateStringv2(value[0]))
+            setEndDate(toDateStringv2(value[1]))
+        } else {
+            setStartDate()
+            setEndDate()
         }
     }
 
@@ -216,9 +240,36 @@ const Document = () => {
             title: "Tác giả",
             dataIndex: "author",
             align: 'left',
-            width: 150,
+            width: 200,
             render: (text, record, index) => (
                 <span style={{ whiteSpace: 'break-spaces' }}>{record.author}</span>
+            ),
+        },
+        {
+            title: "Loại tài liệu",
+            dataIndex: "documentType",
+            align: 'left',
+            width: 200,
+            render: (text, record, index) => (
+                <span style={{ whiteSpace: 'break-spaces' }}>{record?.documentType?.name}</span>
+            ),
+        },
+        {
+            title: "Lĩnh vực",
+            dataIndex: "major",
+            align: 'left',
+            width: 200,
+            render: (text, record, index) => (
+                <span style={{ whiteSpace: 'break-spaces' }}>{record?.major?.name}</span>
+            ),
+        },
+        {
+            title: "Năm công bố",
+            dataIndex: "publish_date",
+            align: 'left',
+            width: 150,
+            render: (text, record, index) => (
+                <span style={{ whiteSpace: 'break-spaces' }}>{toDateString(record?.publish_date)}</span>
             ),
         },
         {
@@ -312,19 +363,11 @@ const Document = () => {
                     </Col>
                     <Col sm="3" className="mr-1" style={{ display: "flex", justifyContent: "flex-end" }}>
                         <Select
-                            placeholder="Chọn đợt kiểm tra"
-                            className='mb-50 select-custom'
-                            options={listCourse}
-                            allowClear
-                            onChange={(value) => handleChangeCourse(value)}
-                        />
-                    </Col>
-                    <Col sm="3" className="mr-1" style={{ display: "flex", justifyContent: "flex-end" }}>
-                        <Select
                             placeholder="Chọn loại tài liệu"
                             className='mb-50 select-custom'
                             options={listDocumentType}
                             allowClear
+                            mode="multiple"
                             onChange={(value) => handleChangeDocumentType(value)}
                         />
                     </Col>
@@ -334,7 +377,39 @@ const Document = () => {
                             className='mb-50 select-custom'
                             options={listMajor}
                             allowClear
+                            mode="multiple"
                             onChange={(value) => handleChangeMajor(value)}
+                        />
+                    </Col>
+                    <Col
+                        sm="3"
+                        style={{ display: "flex", justifyContent: "flex-start" }}
+                    >
+                        <Label
+                            className=""
+                            style={{
+                                width: "90px",
+                                fontSize: "14px",
+                                height: "34px",
+                                display: "flex",
+                                alignItems: "center",
+                            }}
+                        >
+                            Ngày tạo
+                        </Label>
+                        <Flatpickr
+                            style={{ padding: '0.35rem 1rem' }}
+                            className="form-control invoice-edit-input date-picker mb-50"
+                            options={{
+                                mode: "range",
+                                dateFormat: "d-m-Y", // format ngày giờ
+                                locale: {
+                                    ...Vietnamese
+                                },
+                                defaultDate: [oneWeekAgo, new Date()]
+                            }}
+                            placeholder="dd/mm/yyyy"
+                            onChange={(value => handleChangeDate(value))}
                         />
                     </Col>
                 </Col>

@@ -31,7 +31,8 @@ import {
     DeleteOutlined,
     EditOutlined,
     LockOutlined,
-    AppstoreOutlined
+    AppstoreOutlined,
+    RightCircleOutlined
 
 } from "@ant-design/icons"
 import { AbilityContext } from "@src/utility/context/Can"
@@ -66,6 +67,7 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
     const [isAdd, setIsAdd] = useState(false)
     const [isEdit, setIsEdit] = useState(false)
     const [checkingDocumentVersionSelected, setCheckingDocumentVersionSelected] = useState()
+    const [showIframe, setShowIframe] = useState(false)
 
     const getData = () => {
         setLoadingData(true)
@@ -96,133 +98,23 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
         navigate(`/tams/checking-result/${record?.id}`, { state: record })
     }
 
-    // const getInfo = () => {
-    //     getGroupPermission({
-    //         params: {
-    //             page: 1,
-    //             limit: 500,
-    //         },
-    //     })
-    //         .then((res) => {
-    //             const { count, data } = res[0]
-    //             const listData = data.map((item, index) => ({ ...item, key: index }))
-    //             setListPerGroup(listData ?? [])
-    //         })
-    //         .catch((err) => {
-    //             console.log(err)
-    //         })
-    //     getPermission({
-    //         params: {
-    //             page: 1,
-    //             limit: 5000,
-    //         },
-    //     })
-    //         .then((res) => {
-    //             const { count, data } = res[0]
-    //             setListAllPer(data ?? [])
-    //         })
-    //         .catch((err) => {
-    //             console.log(err)
-    //         })
-    // }
+    const handleButtonClick = (id) => {
+        const width = window.innerWidth / 3
+        const height = window.innerHeight / 1.5
+        const left = (window.innerWidth - width) / 2
+        const top = (window.innerHeight - height) / 2
+        const url = `/tams/detail-result/${id}` // Đảm bảo rằng output.html nằm trong thư mục public
+        window.open(
+            url,
+            "_blank",
+            `width=${width},height=${height},left=${left},top=${top},toolbar=no,location=no`
+        )    
+    }
+
     useEffect(() => {
-        // getInfo()
         getData()
     }, [currentPage, rowsPerPage, search, checkingDocumentSelected])
 
-    // const _handleCheckRoleAction = (e, act, permission, role) => {
-    //     setListSubmit((pre) => {
-    //         const isChecked = listSubmit.find(
-    //             (per) => per.permissionID === permission._id && per.roleID === role?._id && per.actionContent === act)
-    //         if (isChecked) {
-    //             if (act === "read") {
-    //                 return listSubmit.filter(
-    //                     (per) => !(per.permissionID === permission._id && per.roleID === role?._id)
-    //                 )
-    //             }
-    //             return listSubmit.filter(
-    //                 (per) => !(
-    //                     per.permissionID === permission._id &&
-    //                     per.roleID === role?._id &&
-    //                     per.actionContent === act
-    //                 )
-    //             )
-    //         } else {
-    //             if (act !== "read") {
-    //                 const isChecked_ = listSubmit.find(
-    //                     (per) => per.permissionID === permission._id &&
-    //                         per.roleID === role?._id &&
-    //                         per.actionContent === act
-    //                 )
-    //                 if (isChecked_) {
-    //                     return listSubmit.filter(
-    //                         (per) => !(per.permissionID === permission._id && per.roleID === role?._id && per.actionContent === act))
-    //                 } else {
-    //                     const isRead = listSubmit.find(
-    //                         (per) => per.permissionID === permission._id &&
-    //                             per.roleID === role?._id &&
-    //                             per.actionContent === 'read'
-    //                     )
-    //                     if (isRead) {
-    //                         return [
-    //                             ...pre,
-    //                             {
-    //                                 permissionID: permission._id,
-    //                                 roleID: role._id,
-    //                                 actionContent: act,
-    //                                 isActive: 1,
-    //                             },
-    //                         ]
-    //                     } else {
-    //                         return [
-    //                             ...pre,
-    //                             {
-    //                                 permissionID: permission._id,
-    //                                 roleID: role._id,
-    //                                 actionContent: "read",
-    //                                 isActive: 1,
-    //                             },
-    //                             {
-    //                                 permissionID: permission._id,
-    //                                 roleID: role._id,
-    //                                 actionContent: act,
-    //                                 isActive: 1,
-    //                             },
-    //                         ]
-    //                     }
-    //                 }
-    //             }
-    //             return [
-    //                 ...pre,
-    //                 {
-    //                     permissionID: permission._id,
-    //                     roleID: role._id,
-    //                     actionContent: act,
-    //                     isActive: 1,
-    //                 },
-    //             ]
-    //         }
-    //     })
-    // }
-    // const _renderRoleItem = (act, permission, role) => {
-    //     // const permissionData = listPermissionSelected?.find(
-    //     //   (lstPer) => lstPer.permissionID === permission._id &&
-    //     //     lstPer.actionContent === act &&
-    //     //     lstPer.roleID === role?._id
-    //     // )
-    //     // const isCheck = permission.actionContents?.find(x => x === act)
-    //     const isCheck = listSubmit.find(x => x.permissionID === permission._id && x.actionContent === act)
-    //     return (
-    //         <Checkbox
-    //             type="checkbox"
-    //             style={{ cursor: "pointer" }}
-    //             className="action-cb"
-    //             id={`${permission._id}_${act}`}
-    //             checked={isCheck || false}
-    //             onChange={(e) => _handleCheckRoleAction(e, act, permission, role)}
-    //         />
-    //     )
-    // }
     const handleDelete = (record) => {
         deleteCheckingDocumentVersion(record?.id)
             .then((res) => {
@@ -318,16 +210,23 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
                         >
                             Chỉnh sửa
                         </UncontrolledTooltip>
-                        {/* <NavLink to={`/tams/checking-result/${record.id}`}> */}
                         <AppstoreOutlined
                             id={`tooltip_result_${record._id}`}
                             style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
                             onClick={(e) => handleResult(record)}
                         />
-                        {/* </NavLink> */}
                         <UncontrolledTooltip placement="top" target={`tooltip_result_${record._id}`}
                         >
                             Kết quả kiểm tra
+                        </UncontrolledTooltip>
+                        <RightCircleOutlined
+                            id={`tooltip_detail_${record._id}`}
+                            style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
+                            onClick={() => handleButtonClick(record?.id)}
+                        />
+                        <UncontrolledTooltip placement="top" target={`tooltip_detail_${record._id}`}
+                        >
+                            Kết quả kiểm tra
                         </UncontrolledTooltip>
                         <Popconfirm
                             title="Bạn chắc chắn xóa?"
@@ -417,6 +316,7 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
                     }
                 }}
             />}
+            
             <AddNewCheckingDocumentVersion open={isAdd} handleModal={handleModal} getData={getData} rowsPerPage={rowsPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} checkingDocumentSelected={checkingDocumentSelected} listSubmit={listSubmit} />
             {checkingDocumentVersionSelected && <EditCheckingDocumentVersion open={isEdit} handleModal={handleModal} getData={getData} rowsPerPage={rowsPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} infoEditVersion={checkingDocumentVersionSelected} listSubmit={listSubmit} dataCheckingDocument={checkingDocumentSelected} />}
         </Card>

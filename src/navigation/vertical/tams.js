@@ -39,18 +39,13 @@ export default [
     navLink: '/tams/document-type',
     role: 0
   },
-  // {
-  //   id: 'type-checking',
-  //   title: 'Loại kiểm tra',
-  //   icon: <FileMinus size={20} />,
-  //   navLink: '/tams/type-checking'
-  // },
-  // {
-  //   id: 'checking-document-version',
-  //   title: 'Phiên bản KT tài liệu',
-  //   icon: <FilePlus size={20} />,
-  //   navLink: '/tams/checking-document-version'
-  // },
+  {
+    id: 'document-source',
+    title: 'Nguồn tài liệu',
+    icon: <FileMinus size={20} />,
+    navLink: '/tams/document-source',
+    role: 0
+  },
   {
     id: 'major',
     title: 'Lĩnh vực',

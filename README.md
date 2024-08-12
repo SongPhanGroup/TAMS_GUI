@@ -1,4 +1,4 @@
-# Phần mềm Quản lý nhà trường thông minh - HVCT
+# Phần mềm phát hiện đạo văn - HVCT
 
 ### Công nghệ sử dụng
 
@@ -12,7 +12,7 @@
 
 ```sh
 // Bước 1: Di chuyển vào thư mục làm việc
-cd QLNT_HVCT
+cd TAMS_GUI
 
 // Bước 2: cài đặt package thư viện
 yarn install

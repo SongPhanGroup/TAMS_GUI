@@ -1,4 +1,4 @@
-import { Table, Input, Card, CardTitle, Tag, Popconfirm, Switch, Spin, Select } from "antd"
+import { Table, Input, Card, CardTitle, Tag, Popconfirm, Switch, Spin, Select, Tooltip } from "antd"
 import React, { useState, Fragment, useEffect, useRef, useContext } from "react"
 import {
     Label,
@@ -13,7 +13,7 @@ import {
     UncontrolledTooltip,
 } from "reactstrap"
 import { Plus, X } from "react-feather"
-import { DeleteOutlined, EditOutlined, LockOutlined, UnlockOutlined } from "@ant-design/icons"
+import { BarsOutlined, DeleteOutlined, EditOutlined, LockOutlined, UnlockOutlined } from "@ant-design/icons"
 // import style from "../../../../assets/scss/index.module.scss"
 import Swal from "sweetalert2"
 import withReactContent from "sweetalert2-react-content"
@@ -25,17 +25,19 @@ import classnames from "classnames"
 import { AbilityContext } from '@src/utility/context/Can'
 import { deleteCourse, getCourse, toggleActiveCourse } from "../../../api/course"
 import { toDateString, toDateTimeString } from "../../../utility/Utils"
+import { useNavigate } from "react-router-dom"
 const LIST_STATUS = [
     {
         value: 1,
         label: "Đang tiến hành"
     },
     {
-        value: 0,
+        value: 2,
         label: "Bị khóa"
     }
 ]
 const Course = () => {
+    const navigate = useNavigate()
     const [loadingData, setLoadingData] = useState(false)
     const ability = useContext(AbilityContext)
     const MySwal = withReactContent(Swal)
@@ -44,7 +46,7 @@ const Course = () => {
     const [currentPage, setCurrentPage] = useState(1)
     const [rowsPerPage, setRowsPerpage] = useState(10)
     const [search, setSearch] = useState("")
-    const [status, setStatus] = useState()
+    const [isActive, setIsActive] = useState()
     const [isAdd, setIsAdd] = useState(false)
     const [isEdit, setIsEdit] = useState(false)
     const [info, setInfo] = useState()
@@ -55,7 +57,7 @@ const Course = () => {
                 page,
                 perPage: limit,
                 ...(search && search !== "" && { search }),
-                isActive,
+                ...(isActive && isActive !== undefined && isActive !== null && { isActive }),
             },
         })
             .then((res) => {
@@ -69,9 +71,8 @@ const Course = () => {
             })
     }
     useEffect(() => {
-        getData(currentPage, rowsPerPage, search, status)
-    }, [currentPage, rowsPerPage, search, status])
-
+        getData(currentPage, rowsPerPage, search, isActive)
+    }, [currentPage, rowsPerPage, search, isActive])
 
     const handleModal = () => {
         setIsAdd(false)
@@ -85,6 +86,10 @@ const Course = () => {
     const handleEdit = (record) => {
         setInfo(record)
         setIsEdit(true)
+    }
+
+    const handleSupervisor = (record) => {
+        navigate(`/tams/checking-document`, {state: record})
     }
 
     const handleDelete = (key) => {
@@ -143,9 +148,9 @@ const Course = () => {
 
     const handleChangeStatus = (value) => {
         if (value) {
-            setStatus(value)
+            setIsActive(value)
         } else {
-            setStatus()
+            setIsActive()
         }
     }
 
@@ -222,7 +227,7 @@ const Course = () => {
                         >
                             {
                                 record.isActive === 1 ? <LockOutlined
-                                    style={{ color: "#09A863", cursor: 'pointer', marginRight: '1rem' }}
+                                    style={{ color: "red", cursor: 'pointer', marginRight: '1rem' }}
                                 /> : <UnlockOutlined
                                     style={{ color: "#09A863", cursor: 'pointer', marginRight: '1rem' }}
                                 />
@@ -231,14 +236,23 @@ const Course = () => {
                     }
                     {ability.can('update', 'LOAI_DON_VI') &&
                         <>
-                            <EditOutlined
-                                id={`tooltip_edit${record.ID}`}
-                                style={{ color: "#09A863", cursor: 'pointer', marginRight: '1rem' }}
-                                onClick={(e) => handleEdit(record)}
-                            />
-                            <UncontrolledTooltip placement="top" target={`tooltip_edit${record.ID}`}>
-                                Chỉnh sửa
-                            </UncontrolledTooltip>
+
+                            <Tooltip placement="top" title="Kiểm tra trong khóa" >
+                                <BarsOutlined
+                                    style={{ color: "#09A863", cursor: 'pointer', marginRight: '1rem' }}
+                                    onClick={(e) => handleSupervisor(record)}
+                                />
+                            </Tooltip>
+                        </>}
+                    {ability.can('update', 'LOAI_DON_VI') &&
+                        <>
+
+                            <Tooltip placement="top" title="Chỉnh sửa" >
+                                <EditOutlined
+                                    style={{ color: "#09A863", cursor: 'pointer', marginRight: '1rem' }}
+                                    onClick={(e) => handleEdit(record)}
+                                />
+                            </Tooltip>
                         </>}
                     {ability.can('delete', 'LOAI_DON_VI') &&
                         <Popconfirm
@@ -247,10 +261,9 @@ const Course = () => {
                             cancelText="Hủy"
                             okText="Đồng ý"
                         >
-                            <DeleteOutlined style={{ color: "red", cursor: 'pointer' }} id={`tooltip_delete${record.ID}`} />
-                            <UncontrolledTooltip placement="top" target={`tooltip_delete${record.ID}`}>
-                                Xóa
-                            </UncontrolledTooltip>
+                            <Tooltip placement="top" title="Xóa" >
+                                <DeleteOutlined style={{ color: "red", cursor: 'pointer' }} />
+                            </Tooltip>
                         </Popconfirm>}
                 </div>
             ),

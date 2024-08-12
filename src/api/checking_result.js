@@ -23,3 +23,9 @@ export const getCheckingResult = async (query) => {
   const res = await API_TAMS.get(uri, query)
   return res
 }
+
+export const getCheckingResultHTML = async (query) => {
+  const uri = `/getHtmlResult`
+  const res = await API_TAMS.get(uri, query)
+  return res
+}

@@ -18,11 +18,14 @@ import { useForm, Controller } from 'react-hook-form'
 import * as yup from "yup"
 import { yupResolver } from '@hookform/resolvers/yup'
 import Select from 'react-select'
+import Flatpickr from "react-flatpickr"
 
 // ** Utils
 
 // ** Styles
 import '@styles/react/libs/react-select/_react-select.scss'
+import { Vietnamese } from "flatpickr/dist/l10n/vn.js"
+import "@styles/react/libs/flatpickr/flatpickr.scss"
 import Swal from 'sweetalert2'
 import { editDocument } from "../../../../api/document"
 import { useEffect, useState } from "react"
@@ -31,6 +34,8 @@ import { getMajor } from "../../../../api/major"
 import { getDocumentType } from "../../../../api/document_type"
 import classNames from "classnames"
 import { Spin } from "antd"
+import { getDocumentSource } from "../../../../api/document_source"
+import { convertDateString, toDateStringv2 } from "../../../../utility/Utils"
 
 const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
   if (!infoEdit) return
@@ -41,12 +46,10 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
   const EditDocumentSchema = yup.object().shape({
     file: yup.mixed().required("Yêu cầu chọn file"),
     title: yup.string().required("Yêu cầu nhập tiêu đề"),
-    source: yup.string().required("Yêu cầu nhập nguồn tài liệu"),
+    source: yup.object().required("Yêu cầu chọn nguồn tài liệu").nullable(),
     documentType: yup.object().required("Yêu cầu chọn loại tài liệu").nullable(),
     major: yup.object().required("Yêu cầu chọn chuyên ngành").nullable(),
-    author: yup.string().required("Yêu cầu nhập tác giả"),
-    coAuthor: yup.string().required("Yêu cầu nhập đồng tác giả"),
-    supervisor: yup.string().required("Yêu cầu nhập người giám sát")
+    author: yup.string().required("Yêu cầu nhập tác giả")
   })
 
   // ** Hooks
@@ -61,14 +64,18 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
 
   const [listDocumentType, setListDocumentType] = useState([])
   const [listMajor, setListMajor] = useState([])
+  const [listDocumentSource, setListDocumentSource] = useState([])
+  const [picker, setPicker] = useState(new Date(infoEdit?.publish_date))
+  const [isChangeDate, setIsChangeDate] = useState(false)
   const [loadingEdit, setLoadingEdit] = useState()
   // const [dataDetail, setDataDetail] = useState()
 
   const getAllDataPromises = async () => {
     const majorPromise = getMajor({ params: { page: 1, perPage: 10, search: '' } })
     const documentTypePromise = getDocumentType({ params: { page: 1, perPage: 10, search: '' } })
+    const documentSourcePromise = getDocumentSource({ params: { page: 1, perPage: 10, search: '' } })
 
-    const promises = [documentTypePromise, majorPromise]
+    const promises = [documentTypePromise, majorPromise, documentSourcePromise]
     const results = await Promise.allSettled(promises)
     const responseData = promises.reduce((acc, promise, index) => {
       if (results[index].status === 'fulfilled') {
@@ -81,10 +88,12 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
 
     const documentTypeRes = responseData[0]
     const majorRes = responseData[1]
+    const documentSourceRes = responseData[2]
     results.map((res) => {
       if (res.status !== 'fulfilled') {
         setListDocumentType(null)
         setListMajor(null)
+        setListDocumentSource(null)
       }
     })
     const documentTypes = documentTypeRes?.data?.map((res) => {
@@ -99,8 +108,15 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
         label: `${res.name}`
       }
     })
+    const documentSources = documentSourceRes?.data?.map((res) => {
+      return {
+        value: res.id,
+        label: `${res.name}`
+      }
+    })
     setListDocumentType(documentTypes)
     setListMajor(majors)
+    setListDocumentSource(documentSources)
   }
 
   useEffect(() => {
@@ -109,52 +125,113 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
     }
   }, [open])
 
+  const handleChangeDate = (date) => {
+    if (date) {
+      setPicker(date[0])
+    }
+    setIsChangeDate(true)
+  }
+
   const onSubmit = data => {
-    setLoadingEdit(true)
-    const formData = new FormData()
-    formData.append("description", data.description)
-    formData.append("title", data.title)
-    formData.append("source", data.source)
-    formData.append("majorId", data?.major?.value)
-    formData.append("typeId", data?.documentType?.value)
-    formData.append("courseId", 0)
-    formData.append("author", data.author)
-    formData.append("coAuthor", data.coAuthor)
-    formData.append("supervisor", data.supervisor)
-    editDocument(infoEdit?.id, formData).then(result => {
-      if (result.status === "success") {
-        Swal.fire({
-          title: "Cập nhật tài liệu thành công",
-          text: "",
-          icon: "success",
-          customClass: {
-            confirmButton: "btn btn-success"
-          }
-        })
-      } else {
+    if (!isChangeDate) {
+      setLoadingEdit(true)
+      const formData = new FormData()
+      formData.append("description", data.description)
+      formData.append("title", data.title)
+      formData.append("source", data.source)
+      formData.append("majorId", data?.major?.value)
+      formData.append("typeId", data?.documentType?.value)
+      formData.append("sourceId", data?.source?.value)
+      formData.append("courseId", 0)
+      formData.append("author", data.author)
+      formData.append("coAuthor", data.coAuthor)
+      formData.append("supervisor", data.supervisor)
+      formData.append("publish_date", infoEdit?.publish_date)
+      formData.append("publish_place", data.place)
+      editDocument(infoEdit?.id, formData).then(result => {
+        if (result.status === "success") {
+          Swal.fire({
+            title: "Cập nhật tài liệu thành công",
+            text: "",
+            icon: "success",
+            customClass: {
+              confirmButton: "btn btn-success"
+            }
+          })
+        } else {
+          Swal.fire({
+            title: "Cập nhật tài liệu thất bại",
+            text: "Vui lòng kiểm tra lại thông tin!",
+            icon: "error",
+            customClass: {
+              confirmButton: "btn btn-danger"
+            }
+          })
+        }
+        handleModal()
+        getData()
+      }).catch(error => {
         Swal.fire({
           title: "Cập nhật tài liệu thất bại",
-          text: "Vui lòng kiểm tra lại thông tin!",
+          text: `Có lỗi xảy ra - ${error.message}!`,
           icon: "error",
           customClass: {
             confirmButton: "btn btn-danger"
           }
         })
-      }
-      handleModal()
-      getData()
-    }).catch(error => {
-      Swal.fire({
-        title: "Cập nhật tài liệu thất bại",
-        text: `Có lỗi xảy ra - ${error.message}!`,
-        icon: "error",
-        customClass: {
-          confirmButton: "btn btn-danger"
-        }
+      }).finally(() => {
+        setLoadingEdit(false)
       })
-    }).finally(() => {
-      setLoadingEdit(false)
-    })
+    } else {
+      setLoadingEdit(true)
+      const formData = new FormData()
+      formData.append("description", data.description)
+      formData.append("title", data.title)
+      formData.append("source", data.source)
+      formData.append("majorId", data?.major?.value)
+      formData.append("typeId", data?.documentType?.value)
+      formData.append("sourceId", data?.source?.value)
+      formData.append("courseId", 0)
+      formData.append("author", data.author)
+      formData.append("coAuthor", data.coAuthor)
+      formData.append("supervisor", data.supervisor)
+      formData.append("publish_date", toDateStringv2(picker))
+      formData.append("publish_place", data.place)
+      editDocument(infoEdit?.id, formData).then(result => {
+        if (result.status === "success") {
+          Swal.fire({
+            title: "Cập nhật tài liệu thành công",
+            text: "",
+            icon: "success",
+            customClass: {
+              confirmButton: "btn btn-success"
+            }
+          })
+        } else {
+          Swal.fire({
+            title: "Cập nhật tài liệu thất bại",
+            text: "Vui lòng kiểm tra lại thông tin!",
+            icon: "error",
+            customClass: {
+              confirmButton: "btn btn-danger"
+            }
+          })
+        }
+        handleModal()
+        getData()
+      }).catch(error => {
+        Swal.fire({
+          title: "Cập nhật tài liệu thất bại",
+          text: `Có lỗi xảy ra - ${error.message}!`,
+          icon: "error",
+          customClass: {
+            confirmButton: "btn btn-danger"
+          }
+        })
+      }).finally(() => {
+        setLoadingEdit(false)
+      })
+    }
   }
 
   return (
@@ -209,7 +286,7 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
           </Col>
           <Col sm={6} xs={12}>
             <Label className='form-label' for='coAuthor'>
-              Đồng tác giả <span style={{ color: 'red' }}>(*)</span>
+              Đồng tác giả
             </Label>
             <Controller
               defaultValue={infoEdit?.coAuthor ?? ''}
@@ -226,11 +303,10 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
                 )
               }}
             />
-            {errors.coAuthor && <FormFeedback>{errors.coAuthor.message}</FormFeedback>}
           </Col>
           <Col sm={6} xs={12}>
             <Label className='form-label' for='supervisor'>
-              Người hướng dẫn <span style={{ color: 'red' }}>(*)</span>
+              Người hướng dẫn
             </Label>
             <Controller
               defaultValue={infoEdit?.supervisor ?? ''}
@@ -247,26 +323,27 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
                 )
               }}
             />
-            {errors.supervisor && <FormFeedback>{errors.supervisor.message}</FormFeedback>}
           </Col>
           <Col sm={6} xs={12}>
             <Label className='form-label' for='source'>
               Nguồn tài liệu <span style={{ color: 'red' }}>(*)</span>
             </Label>
             <Controller
-              defaultValue={infoEdit?.source ?? ''}
-              control={control}
+              defaultValue={{ value: infoEdit?.source?.id, label: infoEdit?.source?.name }}
+              id="react-select"
               name='source'
-              render={({ field }) => {
-                return (
-                  <Input
-                    {...field}
-                    id='source'
-                    placeholder='Nhập tiêu đề'
-                    invalid={errors.source && true}
-                  />
-                )
-              }}
+              control={control}
+              render={({ field }) => (
+                <Select
+                  placeholder="Chọn nguồn tài liệu"
+                  classNamePrefix='select'
+                  name='clear'
+                  options={listDocumentSource}
+                  isClearable
+                  className={classNames('react-select', { 'is-invalid': errors.source && true })}
+                  {...field}
+                />
+              )}
             />
             {errors.source && <FormFeedback>{errors.source.message}</FormFeedback>}
           </Col>
@@ -314,6 +391,51 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
             />
             {errors.major && <FormFeedback>{errors.major.message}</FormFeedback>}
           </Col>
+          <Col sm={6} xs={12}>
+            <Label className='form-label' for='date'>
+              Năm xuất bản/Bảo vệ/Công bố
+            </Label>
+            <Controller
+              control={control}
+              name='date'
+              render={() => {
+                return (
+                  <Flatpickr
+                    className="form-control invoice-edit-input date-picker"
+                    options={{
+                      dateFormat: "d-m-Y", // format ngày giờ
+                      locale: {
+                        ...Vietnamese
+                      }
+                    }}
+                    placeholder="dd/mm/yyyy"
+                    onChange={handleChangeDate}
+                    defaultValue={convertDateString(infoEdit?.publish_date).toUTCString()}
+                  />
+                )
+              }}
+            />
+          </Col>
+          <Col sm={6} xs={12}>
+            <Label className='form-label' for='place'>
+              Nơi xuất bản/Bảo vệ/Công bố
+            </Label>
+            <Controller
+              defaultValue={infoEdit?.publish_place ?? ''}
+              control={control}
+              name='place'
+              render={({ field }) => {
+                return (
+                  <Input
+                    {...field}
+                    id='place'
+                    placeholder='Nhập nơi xuất bản/Bảo vệ/Công bố'
+                    invalid={errors.place && true}
+                  />
+                )
+              }}
+            />
+          </Col>
           <Col sm={12} xs={12}>
             <Label className='form-label' for='description'>
               Mô tả
@@ -323,7 +445,7 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
               name='description'
               control={control}
               render={({ field }) => (
-                <Input {...field} id='description' placeholder='Nhập mô tả' invalid={errors.description && true} />
+                <Input type="textarea" {...field} id='description' placeholder='Nhập mô tả' invalid={errors.description && true} />
               )}
             />
           </Col>

@@ -82,8 +82,6 @@ const CheckingDocument = () => {
 
     const [listCourse, setListCourse] = useState([])
 
-    console.log(location)
-
     const getAllDataPromises = async () => {
         const coursePromise = getCourse({ params: { page: PAGE_DEFAULT, perPage: PER_PAGE_DEFAULT, search: '' } })
 

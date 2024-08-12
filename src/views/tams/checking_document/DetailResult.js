@@ -8,7 +8,7 @@ import {
 } from '@ant-design/icons'
 import { Breadcrumb, Layout, Menu, theme, Row, Col, Card, Badge, Tag, Progress } from 'antd'
 import { useLocation } from 'react-router-dom'
-import { getCheckingResultHTML } from '../../../api/checking_result'
+import { getCheckingResultHTML, getListTheSameSentence } from '../../../api/checking_result'
 import { getListDocFromSetenceId } from '../../../api/checking_sentence'
 import HTMLContent from './modal/HTMLContent'
 const { Header, Content, Footer, Sider } = Layout
@@ -19,6 +19,7 @@ const DetailResult = () => {
     const [htmlResult, setHTMLResult] = useState()
     const [listDocument, setListDocument] = useState([])
     const [sentence, setSentence] = useState('')
+    const [listSentence, setListSentence] = useState([])
 
     const getData = () => {
         getCheckingResultHTML({
@@ -33,6 +34,16 @@ const DetailResult = () => {
         getListDocFromSetenceId(380).then(result => {
             setListDocument(result?.data?.documents)
             setSentence(result.data[0]?.sentences?.content)
+        })
+
+        getListTheSameSentence({
+            params: {
+                id: location?.state?.id,
+                type: 1
+            }
+        }).then(result => {
+            const sentences = result?.data?.map(item => item?.checkingDocumentSentence?.order)
+            setListSentence(sentences)
         })
     }
 
@@ -58,7 +69,7 @@ const DetailResult = () => {
                     <h4>
                         {location?.state?.fileName}
                     </h4>
-                    <HTMLContent htmlResult={htmlResult}/>
+                    <HTMLContent htmlResult={htmlResult} sentences={listSentence}/>
                 </Row>
             </Col>
             <Col md={12}>

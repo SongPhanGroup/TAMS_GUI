@@ -10,6 +10,7 @@ import { Breadcrumb, Layout, Menu, theme, Row, Col, Card, Badge, Tag, Progress }
 import { useLocation } from 'react-router-dom'
 import { getCheckingResultHTML } from '../../../api/checking_result'
 import { getListDocFromSetenceId } from '../../../api/checking_sentence'
+import HTMLContent from './modal/HTMLContent'
 const { Header, Content, Footer, Sider } = Layout
 
 const DetailResult = () => {
@@ -30,7 +31,7 @@ const DetailResult = () => {
         })
 
         getListDocFromSetenceId(380).then(result => {
-            setListDocument((result.data)[0]?.sentences?.documentSentenceOrder)
+            setListDocument(result?.data?.documents)
             setSentence(result.data[0]?.sentences?.content)
         })
     }
@@ -57,15 +58,13 @@ const DetailResult = () => {
                     <h4>
                         {location?.state?.fileName}
                     </h4>
-                    <Content  dangerouslySetInnerHTML={{ __html: htmlResult }}>
-
-                    </Content>
+                    <HTMLContent htmlResult={htmlResult}/>
                 </Row>
             </Col>
             <Col md={12}>
                 <Row className='p-1 gap-1' style={{ justifyContent: 'center' }}>
-                    <Progress type="circle" strokeColor='yellow' strokeWidth={15} percent={75} format={(percent) => <div style={{display: 'flex', justifyContent: 'center'}} ><span style={{fontSize: '20px', whiteSpace: 'break-spaces', fontWeight: '600', flex: '0 0 60%'}}>{`${percent}% trùng lặp`}</span></div>} size={150} />
-                    <Progress type="circle" strokeColor='green' strokeWidth={15} percent={70} format={(percent) => <div style={{display: 'flex', justifyContent: 'center'}} ><span style={{fontSize: '20px', whiteSpace: 'break-spaces', fontWeight: '600', flex: '0 0 40%'}}>{`${percent}% mới`}</span></div>} size={150} />
+                    <Progress type="circle" strokeColor='yellow' strokeWidth={15} percent={75} format={(percent) => <div style={{ display: 'flex', justifyContent: 'center' }} ><span style={{ fontSize: '20px', whiteSpace: 'break-spaces', fontWeight: '600', flex: '0 0 60%' }}>{`${percent}% trùng lặp`}</span></div>} size={150} />
+                    <Progress type="circle" strokeColor='green' strokeWidth={15} percent={70} format={(percent) => <div style={{ display: 'flex', justifyContent: 'center' }} ><span style={{ fontSize: '20px', whiteSpace: 'break-spaces', fontWeight: '600', flex: '0 0 40%' }}>{`${percent}% mới`}</span></div>} size={150} />
                 </Row>
                 <Row className='gap-1 p-1' style={{ border: '1px solid #ccc', borderRadius: '4px' }} >
                     {
@@ -73,12 +72,12 @@ const DetailResult = () => {
                             return (
                                 <Card className='card-doc' style={{ width: '100%' }}>
                                     <Row className='p-1 flex-column'>
-                                        <h4>{item?.document?.fileName}</h4>
+                                        <h4>{item?.fileName}</h4>
                                         <div>
-                                            <Tag color='#9999FF'>Tác giả: {item?.document?.author}</Tag>
-                                            <Tag color='#9999FF'>Loại: {item?.document?.typeId}</Tag>
-                                            <Tag color='#9999FF'>Chuyên ngành: {item?.document?.majorId}</Tag>
-                                            <Tag color='#9999FF'>Năm xuất bản: {item?.document?.publish_date}</Tag>
+                                            <Tag color='#9999FF'>Tác giả: {item?.author}</Tag>
+                                            <Tag color='#9999FF'>Loại: {item?.typeId}</Tag>
+                                            <Tag color='#9999FF'>Chuyên ngành: {item?.majorId}</Tag>
+                                            <Tag color='#9999FF'>Năm xuất bản: {item?.publish_date}</Tag>
                                         </div>
                                     </Row>
                                     <Row className='p-1' style={{ backgroundColor: '#FBF6EC', marginBottom: '8px' }}>

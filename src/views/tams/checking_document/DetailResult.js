@@ -23,8 +23,10 @@ const DetailResult = () => {
     const [listSentence, setListSentence] = useState([])
     const [highlightIndexs, setHighlightIndex] = useState([])
     const [docFromId, setDocFromId] = useState()
+    const [loadingHTML, setLoadingHTML] = useState(false)
 
     const getData = () => {
+        setLoadingHTML(true)
         getCheckingResultHTML({
             params: {
                 id: location?.state?.id,
@@ -32,18 +34,10 @@ const DetailResult = () => {
             }
         }).then(result => {
             setHTMLResult(result)
-        })
-
-        getListTheSameSentence({
-            params: {
-                id: location?.state?.id,
-                type: 1
-            }
-        }).then(result => {
-            const sentences = result?.data?.map(item => item?.checkingDocumentSentence?.order)
-            const indexs = result?.data?.map(item => item?.checkingDocumentSentence?.id)
-            setListSentence(sentences)
-            setHighlightIndex(indexs)
+        }).catch(error => {
+            console.log(error)
+        }).finally(() => {
+            setLoadingHTML(false)
         })
     }
 
@@ -56,8 +50,24 @@ const DetailResult = () => {
         }
     }
 
+    const getSentence = () => {
+        getListTheSameSentence({
+            params: {
+                id: location?.state?.id,
+                type: 1,
+                // idCheckDoc: 1
+            }
+        }).then(result => {
+            const sentences = result?.data?.map(item => item?.checkingDocumentSentence?.order)
+            const indexs = result?.data?.map(item => item?.checkingDocumentSentence?.id)
+            setListSentence(sentences)
+            setHighlightIndex(indexs)
+        })
+    }
+
     useEffect(() => {
         getData()
+        getSentence()
     }, [])
 
     useEffect(() => {

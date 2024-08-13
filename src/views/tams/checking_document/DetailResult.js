@@ -107,6 +107,7 @@ const DetailResult = () => {
     }, [])
 
     const processContent = (htmlContent, highlightIndexes) => {
+        const colors = ['#FFB90F', '#FF8C00', '#FF6347', '#FF1493', '#8B008B', '#4B0082', '#0000CD']
         const parser = new DOMParser()
         const doc = parser.parseFromString(htmlContent, 'text/html')
         let sentenceCounter = 0
@@ -125,8 +126,10 @@ const DetailResult = () => {
                         const isHighlighted = highlightIndexes.includes(sentenceCounter)
 
                         if (isHighlighted) {
-                            span.style.backgroundColor = 'yellow'
+                            const colorIndex = listSentence.indexOf(sentenceCounter) % 7
+                            span.style.backgroundColor = colors[colorIndex]
                             span.style.cursor = 'pointer'
+                            span.style.color = '#fff'
                             span.dataset.sentenceId = sentenceCounter 
                             span.dataset.indexId = listSentence.indexOf(sentenceCounter)
                             span.dataset.idSentence = highlightIndexs[listSentence.indexOf(sentenceCounter)]

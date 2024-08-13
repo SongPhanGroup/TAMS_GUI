@@ -20,6 +20,7 @@ const DetailResult = () => {
     const [listDocument, setListDocument] = useState([])
     const [sentence, setSentence] = useState('')
     const [listSentence, setListSentence] = useState([])
+    const [highlightIndexs, setHighlightIndex] = useState([])
 
     const getData = () => {
         getCheckingResultHTML({
@@ -43,7 +44,9 @@ const DetailResult = () => {
             }
         }).then(result => {
             const sentences = result?.data?.map(item => item?.checkingDocumentSentence?.order)
+            const indexs = result?.data?.map(item => item?.checkingDocumentSentence?.id)
             setListSentence(sentences)
+            setHighlightIndex(indexs)
         })
     }
 
@@ -69,7 +72,7 @@ const DetailResult = () => {
                     <h4>
                         {location?.state?.fileName}
                     </h4>
-                    <HTMLContent htmlResult={htmlResult} sentences={listSentence}/>
+                    <HTMLContent htmlResult={htmlResult} orders={listSentence} indexs={highlightIndexs} />
                 </Row>
             </Col>
             <Col md={12}>

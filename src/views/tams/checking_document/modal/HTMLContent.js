@@ -1,13 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import mqtt from 'mqtt'
 import { Content } from 'antd/es/layout/layout'
 
-const HTMLContent = ({ htmlResult, sentences }) => {
-    const [clickedId, setClickedId] = useState('') // State to store the clicked ID
-
+const HTMLContent = ({ htmlResult, orders, indexs }) => {
     useEffect(() => {
-        // Initialize the MQTT client
-        const clientID = `clientID - ${parseInt(Math.random() * 1000)}`
+        const clientID = `clientID-${parseInt(Math.random() * 1000)}`
         const client = mqtt.connect('ws://broker.emqx.io:8083/mqtt', { clientId: clientID })
 
         client.on('connect', () => {
@@ -23,12 +20,19 @@ const HTMLContent = ({ htmlResult, sentences }) => {
             console.log('Disconnected from MQTT broker')
         })
 
+        const publishMessage = (topic, message) => {
+            client.publish(topic, message)
+            console.log(`Message sent to topic ${topic}: ${message}`)
+        }
+
         const handleClick = (event) => {
-            if (event.target && event.target.id) {
-                const sentenceId = event.target.id
-                setClickedId(sentenceId) // Update the state with the clicked ID
-                client.publish('clickedSentence', sentenceId) // Publish the ID to 'clickedSentence' topic
-                console.log(`Published ID: ${sentenceId}`)
+            const target = event.target
+            if (target && target.dataset.sentenceId && target.dataset.indexId && target.dataset.idSentence) {
+                const sentenceId = target.dataset.sentenceId
+                const indexId = target.dataset.indexId
+                const idSentence = target.dataset.idSentence
+                publishMessage('clickedSentence', sentenceId)
+                console.log(`Published ID: ${sentenceId}, Index: ${indexId}, Sentence: ${idSentence}`)
             }
         }
 
@@ -60,14 +64,17 @@ const HTMLContent = ({ htmlResult, sentences }) => {
 
                         if (isHighlighted) {
                             span.style.backgroundColor = 'yellow'
+                            span.style.cursor = 'pointer' // Add cursor pointer for highlighted sentences
+                            span.dataset.sentenceId = sentenceCounter // Set data-sentence-id attribute
+                            span.dataset.indexId = orders.indexOf(sentenceCounter)
+                            span.dataset.idSentence = indexs[orders.indexOf(sentenceCounter)]
                         }
 
-                        span.setAttribute('data-sentence-id', sentenceCounter)
                         span.textContent = sentence
                         return span
                     })
 
-                    fragments.forEach(fragment => {
+                    fragments.forEach((fragment) => {
                         child.parentNode.insertBefore(fragment, child)
                     })
 
@@ -82,19 +89,7 @@ const HTMLContent = ({ htmlResult, sentences }) => {
         return doc.body.innerHTML
     }
 
-    return (
-        <>
-            <Content
-                dangerouslySetInnerHTML={{ __html: processContent(htmlResult, sentences) }}
-            ></Content>
-            {clickedId && (
-                <div style={{ marginTop: '20px', fontWeight: 'bold' }}>
-                    Last clicked ID: {clickedId}
-                </div>
-            )}
-        </>
-
-    )
+    return <Content dangerouslySetInnerHTML={{ __html: processContent(htmlResult, orders) }} />
 }
 
 export default HTMLContent

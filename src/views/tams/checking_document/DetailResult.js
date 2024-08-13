@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     DesktopOutlined,
     FileOutlined,
@@ -6,82 +6,206 @@ import {
     TeamOutlined,
     UserOutlined,
 } from '@ant-design/icons'
-import { Breadcrumb, Layout, Menu, theme } from 'antd'
+import mqtt from 'mqtt'
+import { Breadcrumb, Layout, Menu, theme, Row, Col, Card, Badge, Tag, Progress } from 'antd'
+import { useLocation } from 'react-router-dom'
+import { getCheckingResultHTML, getListTheSameSentence } from '../../../api/checking_result'
+import { getListDocFromSetenceId } from '../../../api/checking_sentence'
+// import HTMLContent from './modal/HTMLContent'
 const { Header, Content, Footer, Sider } = Layout
-function getItem(label, key, icon, children) {
-    return {
-        key,
-        icon,
-        children,
-        label,
-    }
-}
-const items = [
-    getItem('Option 1', '1', <PieChartOutlined />),
-    getItem('Option 2', '2', <DesktopOutlined />),
-    getItem('User', 'sub1', <UserOutlined />, [
-        getItem('Tom', '3'),
-        getItem('Bill', '4'),
-        getItem('Alex', '5'),
-    ]),
-    getItem('Team', 'sub2', <TeamOutlined />, [getItem('Team 1', '6'), getItem('Team 2', '8')]),
-    getItem('Files', '9', <FileOutlined />),
-]
+
 const DetailResult = () => {
-    const [collapsed, setCollapsed] = useState(false)
-    const {
-        token: { colorBgContainer, borderRadiusLG },
-    } = theme.useToken()
+    const location = useLocation()
+
+    const [htmlResult, setHTMLResult] = useState()
+    const [listDocument, setListDocument] = useState([])
+    const [sentence, setSentence] = useState('')
+    const [listSentence, setListSentence] = useState([])
+    const [highlightIndexs, setHighlightIndex] = useState([])
+    const [docFromId, setDocFromId] = useState()
+
+    const getData = () => {
+        getCheckingResultHTML({
+            params: {
+                id: location?.state?.id,
+                type: 1
+            }
+        }).then(result => {
+            setHTMLResult(result)
+        })
+
+        getListTheSameSentence({
+            params: {
+                id: location?.state?.id,
+                type: 1
+            }
+        }).then(result => {
+            const sentences = result?.data?.map(item => item?.checkingDocumentSentence?.order)
+            const indexs = result?.data?.map(item => item?.checkingDocumentSentence?.id)
+            setListSentence(sentences)
+            setHighlightIndex(indexs)
+        })
+    }
+
+    const getDetailData = () => {
+        if (docFromId) {
+            getListDocFromSetenceId(docFromId).then(result => {
+                setListDocument(result?.data?.documents)
+                setSentence(result.data[0]?.sentences?.content)
+            })
+        }
+    }
+
+    useEffect(() => {
+        getData()
+    }, [])
+
+    useEffect(() => {
+        getDetailData()
+    }, [docFromId])
+
+    useEffect(() => {
+        const clientID = `clientID-${parseInt(Math.random() * 1000)}`
+        const client = mqtt.connect('ws://broker.emqx.io:8083/mqtt', { clientId: clientID })
+
+        client.on('connect', () => {
+            console.log('Connected to MQTT broker')
+            client.subscribe('tams')
+        })
+
+        client.on('message', (topic, message) => {
+            console.log(`OnMessageArrived: ${message.toString()}`)
+        })
+
+        client.on('disconnect', () => {
+            console.log('Disconnected from MQTT broker')
+        })
+
+        const publishMessage = (topic, message) => {
+            client.publish(topic, message)
+            console.log(`Message sent to topic ${topic}: ${message}`)
+        }
+
+        const handleClick = (event) => {
+            const target = event.target
+            if (target && target.dataset.sentenceId && target.dataset.indexId && target.dataset.idSentence) {
+                const sentenceId = target.dataset.sentenceId
+                const indexId = target.dataset.indexId
+                const idSentence = target.dataset.idSentence
+                setDocFromId(idSentence)
+                publishMessage('clickedSentence', sentenceId)
+                console.log(`Published ID: ${sentenceId}, Index: ${indexId}, Sentence: ${idSentence}`)
+            }
+        }
+
+        document.addEventListener('click', handleClick)
+
+        return () => {
+            document.removeEventListener('click', handleClick)
+            client.end()
+        }
+    }, [])
+
+    const processContent = (htmlContent, highlightIndexes) => {
+        const parser = new DOMParser()
+        const doc = parser.parseFromString(htmlContent, 'text/html')
+        let sentenceCounter = 0
+
+        const walk = (node) => {
+            node.childNodes.forEach((child) => {
+                if (child.nodeType === Node.TEXT_NODE) {
+                    const sentences = child.textContent.split(/(?<=[.!?])\s+/)
+
+                    const fragments = sentences.map((sentence) => {
+                        if (sentence.length < 30) return document.createTextNode(sentence)
+
+                        sentenceCounter += 1
+                        const span = document.createElement('span')
+
+                        const isHighlighted = highlightIndexes.includes(sentenceCounter)
+
+                        if (isHighlighted) {
+                            span.style.backgroundColor = 'yellow'
+                            span.style.cursor = 'pointer'
+                            span.dataset.sentenceId = sentenceCounter 
+                            span.dataset.indexId = listSentence.indexOf(sentenceCounter)
+                            span.dataset.idSentence = highlightIndexs[listSentence.indexOf(sentenceCounter)]
+                        }
+
+                        span.textContent = sentence
+                        return span
+                    })
+
+                    fragments.forEach((fragment) => {
+                        child.parentNode.insertBefore(fragment, child)
+                    })
+
+                    child.remove()
+                } else if (child.nodeType === Node.ELEMENT_NODE) {
+                    walk(child)
+                }
+            })
+        }
+
+        walk(doc.body)
+        return doc.body.innerHTML
+    }
+
     return (
-        <Layout
-            style={{
-                minHeight: '100vh',
-            }}
-        >
-            <Layout>
-                <Header
-                    style={{
-                        padding: 0,
-                        background: colorBgContainer,
-                    }}
-                />
-                <Content
-                    style={{
-                        margin: '0 16px',
-                    }}
-                >
-                    <Breadcrumb
-                        style={{
-                            margin: '16px 0',
-                        }}
-                    >
-                        <Breadcrumb.Item>User</Breadcrumb.Item>
-                        <Breadcrumb.Item>Bill</Breadcrumb.Item>
-                    </Breadcrumb>
-                    <div
-                        style={{
-                            padding: 24,
-                            minHeight: 360,
-                            background: colorBgContainer,
-                            borderRadius: borderRadiusLG,
-                        }}
-                    >
-                        Bill is a cat.
-                    </div>
-                </Content>
-                <Footer
-                    style={{
-                        textAlign: 'center',
-                    }}
-                >
-                    Ant Design ©{new Date().getFullYear()} Created by Ant UED
-                </Footer>
-            </Layout>
-            <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
-                <div className="demo-logo-vertical" />
-                <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} />
-            </Sider>
-        </Layout>
+        <Row gutter={16}>
+            <Col md={12}>
+                <Row gutter={16} style={{ padding: '16px', backgroundColor: '#00A5E9' }}>
+                    <Col md={8} style={{ color: '#fff' }}>
+                        Tổng số câu
+                    </Col>
+                    <Col md={8} style={{ color: '#fff' }}>
+                        Tổng số từ
+                    </Col>
+                    <Col md={8} style={{ color: '#fff' }}>
+                        Tổng số ký tự
+                    </Col>
+                </Row>
+                <Row gutter={16} style={{ padding: '16px', width: '100%', overflow: 'auto' }}>
+                    <h4>
+                        {location?.state?.fileName}
+                    </h4>
+                    {/* <HTMLContent htmlResult={htmlResult} orders={listSentence} indexs={highlightIndexs} /> */}
+                    <Content dangerouslySetInnerHTML={{ __html: processContent(htmlResult, listSentence) }} />
+                </Row>
+            </Col>
+            {
+                docFromId && (
+                    <Col md={12}>
+                        <Row className='p-1 gap-1' style={{ justifyContent: 'center' }}>
+                            <Progress type="circle" strokeColor='yellow' strokeWidth={15} percent={75} format={(percent) => <div style={{ display: 'flex', justifyContent: 'center' }} ><span style={{ fontSize: '20px', whiteSpace: 'break-spaces', fontWeight: '600', flex: '0 0 60%' }}>{`${percent}% trùng lặp`}</span></div>} size={150} />
+                            <Progress type="circle" strokeColor='green' strokeWidth={15} percent={70} format={(percent) => <div style={{ display: 'flex', justifyContent: 'center' }} ><span style={{ fontSize: '20px', whiteSpace: 'break-spaces', fontWeight: '600', flex: '0 0 40%' }}>{`${percent}% mới`}</span></div>} size={150} />
+                        </Row>
+                        <Row className='gap-1 p-1' style={{ border: '1px solid #ccc', borderRadius: '4px' }} >
+                            {
+                                listDocument?.map(item => {
+                                    return (
+                                        <Card className='card-doc' style={{ width: '100%' }}>
+                                            <Row className='p-1 flex-column'>
+                                                <h4>{item?.fileName}</h4>
+                                                <div>
+                                                    <Tag color='#9999FF'>Tác giả: {item?.author}</Tag>
+                                                    <Tag color='#9999FF'>Loại: {item?.typeId}</Tag>
+                                                    <Tag color='#9999FF'>Chuyên ngành: {item?.majorId}</Tag>
+                                                    <Tag color='#9999FF'>Năm xuất bản: {item?.publish_date}</Tag>
+                                                </div>
+                                            </Row>
+                                            <Row className='p-1' style={{ backgroundColor: '#FBF6EC', marginBottom: '8px' }}>
+                                                <p>{sentence}</p>
+                                            </Row>
+                                        </Card>
+                                    )
+                                })
+                            }
+                        </Row>
+                    </Col>
+                )
+            }
+        </Row>
     )
 }
 export default DetailResult

@@ -29,3 +29,9 @@ export const getCheckingResultHTML = async (query) => {
   const res = await API_TAMS.get(uri, query)
   return res
 }
+
+export const getListTheSameSentence = async (query) => {
+  const uri = `/getListSentenceByCheckingResult`
+  const res = await API_TAMS.get(uri, query)
+  return res
+}

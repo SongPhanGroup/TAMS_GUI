@@ -187,9 +187,6 @@ const CheckingResult = () => {
     const CloseBtn = (
         <X className="cursor-pointer" size={15} onClick={handleModal} />
     )
-    const handleDetail = (record) => {
-        navigate(`/tams/detail-comparation/${location?.state?.id}`, {state: record})
-    }
     const handleViewUser = (role) => {
         setRoleSelected(role)
         setIsView(true)
@@ -363,18 +360,7 @@ const CheckingResult = () => {
             align: "center",
             render: (record) => (
                 <div style={{ display: "flex", justifyContent: "center" }}>
-                    {/* {ability.can('update', 'PHAN_QUYEN_VAI_TRO') &&
-                        <>
-                            <UnorderedListOutlined
-                                id={`tooltip_detail_${record._id}`}
-                                style={{ color: "#09A863", cursor: "pointer" }}
-                                onClick={(e) => handleDetail(record)}
-                            />
-                            <UncontrolledTooltip placement="top" target={`tooltip_detail_${record._id}`}
-                            >
-                                Chi tiết
-                            </UncontrolledTooltip>
-                        </>} */}
+                    
                 </div>
             ),
         },

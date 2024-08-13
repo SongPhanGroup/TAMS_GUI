@@ -12,3 +12,9 @@ export const extractingFromFileUpload = async (body) => {
   const res = await API_FormData.post(uri, body)
   return res
 }
+
+export const getListDocFromSetenceId = async (id) => {
+  const uri = `/checking-document-sentence/${id}/get-list-doc-v2`
+  const res = await API_TAMS.get(uri)
+  return res
+}

@@ -107,7 +107,7 @@ const DetailResult = () => {
     }, [])
 
     const processContent = (htmlContent, highlightIndexes) => {
-        const colors = ['#FFB90F', '#FF8C00', '#FF6347', '#FF1493', '#8B008B', '#4B0082', '#0000CD']
+        const colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '8B00FF']
         const parser = new DOMParser()
         const doc = parser.parseFromString(htmlContent, 'text/html')
         let sentenceCounter = 0

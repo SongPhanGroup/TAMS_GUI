@@ -15,7 +15,7 @@ import style from "../../../../assets/scss/index.module.scss"
 import { setSelectedRole } from "../../../../views/apps/ecommerce/store/index.js"
 import { getHomeRouteForLoggedInUser } from "../../../../utility/Utils.js"
 import * as IconReact from "react-feather"
-import * as IconAntd from '@ant-design/icons'
+// import * as IconAntd from '@ant-design/icons'
 import { ssoLink } from "../../../../api/authentication.js"
 
 const NavbarMenu = () => {
@@ -80,7 +80,7 @@ const NavbarMenu = () => {
     <div className="product-small-image-wrapper">
       <Swiper options={thumbnailSwiperParams} style={{ position: "relative" }}>
         <Nav>
-          {listRoles?.map((single, key) => {
+          {/* {listRoles?.map((single, key) => {
             const IconTag = IconAntd[single.icon_] ?? IconReact[single.icon_]
             return (
             <SwiperSlide key={key} style={{ width: "50px" }}>
@@ -102,7 +102,7 @@ const NavbarMenu = () => {
               </div>
             </SwiperSlide>
           )
-              })}
+              })} */}
         </Nav>
       </Swiper>
     </div>

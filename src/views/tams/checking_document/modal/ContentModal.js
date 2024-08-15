@@ -65,9 +65,15 @@ const ContentModal = ({ listSentenceByCheckingResult }) => {
     const [isAdd, setIsAdd] = useState(false)
     const [isEdit, setIsEdit] = useState(false)
     const [checkingDocumentVersionSelected, setCheckingDocumentVersionSelected] = useState()
+
+    console.log(listSentenceByCheckingResult)
     const getData = () => {
         setLoadingData(true)
-        getListSentenceByCheckingResult(listSentenceByCheckingResult?.id, 1)
+        getListSentenceByCheckingResult({
+            idDoc: listSentenceByCheckingResult?.documentId,
+            idCheckDoc: listSentenceByCheckingResult?.checkingResultId,
+            type: 1
+        })
             .then((res) => {
                 setData(res.data)
                 setCount(res?.total)

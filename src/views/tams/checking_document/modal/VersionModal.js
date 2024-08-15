@@ -32,7 +32,8 @@ import {
     EditOutlined,
     LockOutlined,
     AppstoreOutlined,
-    RightCircleOutlined
+    RightCircleOutlined,
+    RightSquareOutlined
 
 } from "@ant-design/icons"
 import { AbilityContext } from "@src/utility/context/Can"
@@ -100,6 +101,10 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
 
     const handleButtonClick = (record) => {
         navigate(`/tams/detail-result/${record?.id}`, { state: record }) 
+    }
+
+    const handleButtonClick2 = (record) => {
+        navigate(`/tams/detail-result2/${record?.id}`, { state: record }) 
     }
 
     useEffect(() => {
@@ -218,6 +223,15 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
                         <UncontrolledTooltip placement="top" target={`tooltip_detail_${record._id}`}
                         >
                             Kết quả chi tiết
+                        </UncontrolledTooltip>
+                        <RightSquareOutlined
+                            id={`tooltip_detail_${record._id}`}
+                            style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
+                            onClick={() => handleButtonClick2(record)}
+                        />
+                        <UncontrolledTooltip placement="top" target={`tooltip_detail_${record._id}`}
+                        >
+                            Kết quả chi tiết phiên bản 2
                         </UncontrolledTooltip>
                         <Popconfirm
                             title="Bạn chắc chắn xóa?"

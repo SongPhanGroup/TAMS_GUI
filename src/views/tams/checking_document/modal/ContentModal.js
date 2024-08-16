@@ -272,18 +272,6 @@ const ContentModal = ({ listSentenceByCheckingResult }) => {
             render: (text, record, index) => (
                 <span>{record?.sentenceOrCheckingDocumentSentence_sententce?.content}</span>
             ),
-        },
-        {
-            title: "Thứ tự trong VB kiểm tra",
-            dataIndex: "version",
-            align: "center",
-            width: 100,
-        },
-        {
-            title: "Thứ tự trong văn bản gốc",
-            dataIndex: "percentage",
-            align: "center",
-            width: 100
         }
     ]
 

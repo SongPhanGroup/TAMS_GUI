@@ -270,7 +270,7 @@ const ContentModal = ({ listSentenceByCheckingResult }) => {
             align: "left",
             width: 500,
             render: (text, record, index) => (
-                <span>{record?.sentence?.content}</span>
+                <span>{record?.sentenceOrCheckingDocumentSentence_sententce?.content}</span>
             ),
         },
         {

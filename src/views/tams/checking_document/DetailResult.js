@@ -7,7 +7,7 @@ import {
     UserOutlined,
 } from '@ant-design/icons'
 import mqtt from 'mqtt'
-import { Breadcrumb, Layout, Menu, theme, Row, Col, Card, Badge, Tag, Progress } from 'antd'
+import { Breadcrumb, Layout, Menu, theme, Row, Col, Card, Badge, Tag, Progress, Spin } from 'antd'
 import { useLocation } from 'react-router-dom'
 import { getCheckingResultHTML, getListTheSameSentence } from '../../../api/checking_result'
 import { getListDocFromSetenceId } from '../../../api/checking_sentence'
@@ -23,8 +23,10 @@ const DetailResult = () => {
     const [listSentence, setListSentence] = useState([])
     const [highlightIndexs, setHighlightIndex] = useState([])
     const [docFromId, setDocFromId] = useState()
+    const [loadingHTML, setLoadingHTML] = useState(false)
 
     const getData = () => {
+        setLoadingHTML(true)
         getCheckingResultHTML({
             params: {
                 id: location?.state?.id,
@@ -32,18 +34,10 @@ const DetailResult = () => {
             }
         }).then(result => {
             setHTMLResult(result)
-        })
-
-        getListTheSameSentence({
-            params: {
-                id: location?.state?.id,
-                type: 1
-            }
-        }).then(result => {
-            const sentences = result?.data?.map(item => item?.checkingDocumentSentence?.order)
-            const indexs = result?.data?.map(item => item?.checkingDocumentSentence?.id)
-            setListSentence(sentences)
-            setHighlightIndex(indexs)
+        }).catch(error => {
+            console.log(error)
+        }).finally(() => {
+            setLoadingHTML(false)
         })
     }
 
@@ -56,8 +50,24 @@ const DetailResult = () => {
         }
     }
 
+    const getSentence = () => {
+        getListTheSameSentence({
+            params: {
+                id: location?.state?.id,
+                type: 1,
+                // idCheckDoc: 1
+            }
+        }).then(result => {
+            const sentences = result?.data?.map(item => item?.checkingDocumentSentence?.order)
+            const indexs = result?.data?.map(item => item?.checkingDocumentSentence?.id)
+            setListSentence(sentences)
+            setHighlightIndex(indexs)
+        })
+    }
+
     useEffect(() => {
         getData()
+        getSentence()
     }, [])
 
     useEffect(() => {
@@ -107,6 +117,7 @@ const DetailResult = () => {
     }, [])
 
     const processContent = (htmlContent, highlightIndexes) => {
+        const colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '8B00FF']
         const parser = new DOMParser()
         const doc = parser.parseFromString(htmlContent, 'text/html')
         let sentenceCounter = 0
@@ -125,9 +136,11 @@ const DetailResult = () => {
                         const isHighlighted = highlightIndexes.includes(sentenceCounter)
 
                         if (isHighlighted) {
-                            span.style.backgroundColor = 'yellow'
+                            const colorIndex = listSentence.indexOf(sentenceCounter) % 7
+                            span.style.backgroundColor = colors[colorIndex]
                             span.style.cursor = 'pointer'
-                            span.dataset.sentenceId = sentenceCounter 
+                            span.style.color = '#fff'
+                            span.dataset.sentenceId = sentenceCounter
                             span.dataset.indexId = listSentence.indexOf(sentenceCounter)
                             span.dataset.idSentence = highlightIndexs[listSentence.indexOf(sentenceCounter)]
                         }
@@ -153,26 +166,32 @@ const DetailResult = () => {
 
     return (
         <Row gutter={16}>
-            <Col md={12}>
-                <Row gutter={16} style={{ padding: '16px', backgroundColor: '#00A5E9' }}>
-                    <Col md={8} style={{ color: '#fff' }}>
-                        Tổng số câu
+            {
+                loadingHTML === true ? <Spin style={{
+                    padding: '16px'
+                }} /> : (
+                    <Col md={12}>
+                        <Row gutter={16} style={{ padding: '16px', backgroundColor: '#00A5E9' }}>
+                            <Col md={8} style={{ color: '#fff' }}>
+                                Tổng số câu
+                            </Col>
+                            <Col md={8} style={{ color: '#fff' }}>
+                                Tổng số từ
+                            </Col>
+                            <Col md={8} style={{ color: '#fff' }}>
+                                Tổng số ký tự
+                            </Col>
+                        </Row>
+                        <Row gutter={16} style={{ padding: '16px', width: '100%', overflow: 'auto' }}>
+                            <h4>
+                                {location?.state?.fileName}
+                            </h4>
+                            {/* <HTMLContent htmlResult={htmlResult} orders={listSentence} indexs={highlightIndexs} /> */}
+                            <Content dangerouslySetInnerHTML={{ __html: processContent(htmlResult, listSentence) }} />
+                        </Row>
                     </Col>
-                    <Col md={8} style={{ color: '#fff' }}>
-                        Tổng số từ
-                    </Col>
-                    <Col md={8} style={{ color: '#fff' }}>
-                        Tổng số ký tự
-                    </Col>
-                </Row>
-                <Row gutter={16} style={{ padding: '16px', width: '100%', overflow: 'auto' }}>
-                    <h4>
-                        {location?.state?.fileName}
-                    </h4>
-                    {/* <HTMLContent htmlResult={htmlResult} orders={listSentence} indexs={highlightIndexs} /> */}
-                    <Content dangerouslySetInnerHTML={{ __html: processContent(htmlResult, listSentence) }} />
-                </Row>
-            </Col>
+                )
+            }
             {
                 docFromId && (
                     <Col md={12}>

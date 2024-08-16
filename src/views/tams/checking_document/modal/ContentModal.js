@@ -65,9 +65,15 @@ const ContentModal = ({ listSentenceByCheckingResult }) => {
     const [isAdd, setIsAdd] = useState(false)
     const [isEdit, setIsEdit] = useState(false)
     const [checkingDocumentVersionSelected, setCheckingDocumentVersionSelected] = useState()
+
+    console.log(listSentenceByCheckingResult)
     const getData = () => {
         setLoadingData(true)
-        getListSentenceByCheckingResult(listSentenceByCheckingResult?.id, 1)
+        getListSentenceByCheckingResult({
+            idDoc: listSentenceByCheckingResult?.documentId,
+            idCheckDoc: listSentenceByCheckingResult?.checkingResultId,
+            type: 1
+        })
             .then((res) => {
                 setData(res.data)
                 setCount(res?.total)
@@ -264,20 +270,8 @@ const ContentModal = ({ listSentenceByCheckingResult }) => {
             align: "left",
             width: 500,
             render: (text, record, index) => (
-                <span>{record?.sentence?.content}</span>
+                <span>{record?.sentenceOrCheckingDocumentSentence_sententce?.content}</span>
             ),
-        },
-        {
-            title: "Thứ tự trong VB kiểm tra",
-            dataIndex: "version",
-            align: "center",
-            width: 100,
-        },
-        {
-            title: "Thứ tự trong văn bản gốc",
-            dataIndex: "percentage",
-            align: "center",
-            width: 100
         }
     ]
 

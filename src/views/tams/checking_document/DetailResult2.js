@@ -230,7 +230,7 @@ const DetailResult2 = () => {
                                                 <Col className='p-0' md={18}>
                                                     <h4 style={{
                                                         color: `${colors[colorIndex]}`
-                                                    }}>{doc?.document?.fileName}</h4>
+                                                    }}>{doc?.document?.title}</h4>
                                                     <p>{doc?.document?.author}</p>
                                                 </Col>
                                                 <Col className='p-0' md={4}>

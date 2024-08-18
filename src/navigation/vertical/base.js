@@ -8,7 +8,7 @@ export default [
     icon: <Home size={12} />,
     navLink: '/dashboard/analytics',
     action: 'read',
-    resource: 'TRANG_CHU_PH1',
+    resource: 'TRANG_CHU',
     role: 0
   },
   {
@@ -105,7 +105,7 @@ export default [
     icon: <Users size={12} />,
     navLink: '/tams/accounts',
     action: 'read',
-    resource: 'TAI_KHOAN',
+    resource: 'QL_TAI_KHOAN',
     role: 0
   },
   {
@@ -123,7 +123,7 @@ export default [
     icon: <UserPlus size={12} />,
     navLink: '/tams/permissions',
     action: 'read',
-    resource: 'CHUC_NANG',
+    resource: 'QL_QUYEN_CO_BAN',
     role: 0
   },
   {
@@ -132,7 +132,7 @@ export default [
     icon: <Settings size={12} />,
     navLink: '/tams/config',
     action: 'read',
-    resource: 'CHUC_NANG',
+    resource: 'CAU_HINH_THAM_SO',
     role: 0
   }
 

@@ -12,10 +12,10 @@ import { Breadcrumb, Layout, Menu, theme, Row, Col, Card, Badge, Tag, Progress, 
 import { useLocation, useParams } from 'react-router-dom'
 import { getCheckingResultHTML, getCheckingResultHTML2, getListTheSameSentence, getSimilarDocument } from '../../../api/checking_result'
 import { getListDocFromSetenceId } from '../../../api/checking_sentence'
+import './hightlight.css'
 import { X } from 'react-feather'
 // import HTMLContent from './modal/HTMLContent'
 const { Header, Content, Footer, Sider } = Layout
-
 const DetailResult2 = () => {
     const location = useLocation()
     const params = useParams()
@@ -209,7 +209,7 @@ const DetailResult2 = () => {
                     }} /> : (
                         <Col md={6}>
                             <Row className='p-1' style={{ justifyContent: 'center', backgroundColor: 'red', color: '#fff', fontWeight: '600' }}>
-                                <Col md={22} style={{textAlign: 'center'}}>Match Overview</Col>
+                                <Col md={22} style={{ textAlign: 'center' }}>Match Overview</Col>
                                 <Col md={2}><X color='#fff' /></Col>
                             </Row>
                             <Row style={{ justifyContent: 'center', fontSize: '24px', color: 'red', fontWeight: '600' }}>
@@ -236,7 +236,7 @@ const DetailResult2 = () => {
                                                 <Col className='p-0' md={4}>
                                                     <h4>{doc?.similarity}%</h4>
                                                 </Col>
-                                                <Col className='p-0' md={1} style={{justifySelf: 'right'}}>
+                                                <Col className='p-0' md={1} style={{ justifySelf: 'right' }}>
                                                     <RightOutlined />
                                                 </Col>
                                             </>

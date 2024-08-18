@@ -14,6 +14,7 @@ import { getCheckingResultHTML, getCheckingResultHTML2, getListTheSameSentence, 
 import { getListDocFromSetenceId } from '../../../api/checking_sentence'
 import './hightlight.css'
 import { X } from 'react-feather'
+import styled from 'styled-components'
 // import HTMLContent from './modal/HTMLContent'
 const { Header, Content, Footer, Sider } = Layout
 const DetailResult2 = () => {
@@ -67,8 +68,6 @@ const DetailResult2 = () => {
             setLoadingDataDoc(false)
         })
     }
-
-    console.log(dataDoc)
 
     // const getSentence = () => {
     //     getListTheSameSentence({
@@ -136,53 +135,38 @@ const DetailResult2 = () => {
     //     }
     // }, [])
 
-    const processContent = (htmlContent, highlightIndexes) => {
-        const colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '8B00FF']
-        const parser = new DOMParser()
-        const doc = parser.parseFromString(htmlContent, 'text/html')
-        let sentenceCounter = 0
+    // const processHTML = (htmlString) => {
+    //     const parser = new DOMParser()
+    //     const doc = parser.parseFromString(htmlString, 'text/html')
 
-        const walk = (node) => {
-            node.childNodes.forEach((child) => {
-                if (child.nodeType === Node.TEXT_NODE) {
-                    const sentences = child.textContent.split(/(?<=[.!?])\s+/)
+    //     const spans = doc.querySelectorAll('span.tooltip.highlight-0')
+    //     spans.forEach(span => {
+    //         // Tách các class thành mảng
+    //         const classes = span.className.split(' ')
 
-                    const fragments = sentences.map((sentence) => {
-                        if (sentence.length < 30) return document.createTextNode(sentence)
+    //         // Loại bỏ class "tooltip"
+    //         const filteredClasses = classes.filter(className => className !== 'tooltip')
 
-                        sentenceCounter += 1
-                        const span = document.createElement('span')
+    //         // Thay thế class "highlight-0" bằng "highlight-1"
+    //         const newClasses = filteredClasses.map(className => {
+    //             return className === 'highlight-0' ? 'highlight-1' : className
+    //         })
 
-                        const isHighlighted = highlightIndexes.includes(sentenceCounter)
+    //         // Gán lại className đã được thay đổi
+    //         span.className = newClasses.join(' ')
+    //     })
 
-                        if (isHighlighted) {
-                            const colorIndex = listSentence.indexOf(sentenceCounter) % 7
-                            span.style.backgroundColor = colors[colorIndex]
-                            span.style.cursor = 'pointer'
-                            span.style.color = '#fff'
-                            span.dataset.sentenceId = sentenceCounter
-                            span.dataset.indexId = listSentence.indexOf(sentenceCounter)
-                            span.dataset.idSentence = highlightIndexs[listSentence.indexOf(sentenceCounter)]
-                        }
+    //     return doc.body.innerHTML
+    // }
 
-                        span.textContent = sentence
-                        return span
-                    })
-
-                    fragments.forEach((fragment) => {
-                        child.parentNode.insertBefore(fragment, child)
-                    })
-
-                    child.remove()
-                } else if (child.nodeType === Node.ELEMENT_NODE) {
-                    walk(child)
-                }
-            })
+    const CustomStyle = styled.div`
+        .tooltip {
+            opacity: 1 !important; /* Bỏ opacity: 0 */
         }
-
-        walk(doc.body)
-        return doc.body.innerHTML
-    }
+        .tooltiptext {
+            color: #000 !important;
+        }
+    `
 
     return (
         <>
@@ -198,7 +182,9 @@ const DetailResult2 = () => {
                                     {location?.state?.fileName}
                                 </h4>
                                 {/* <HTMLContent htmlResult={htmlResult} orders={listSentence} indexs={highlightIndexs} /> */}
-                                <Content dangerouslySetInnerHTML={{ __html: processContent(htmlResult, listSentence) }} />
+                                <CustomStyle>
+                                    <Content dangerouslySetInnerHTML={{ __html: (htmlResult) }} />
+                                </CustomStyle>
                             </Row>
                         </Col>
                     )
@@ -207,7 +193,7 @@ const DetailResult2 = () => {
                     dataDoc && loadingDataDoc === true ? <Spin style={{
                         padding: '16px'
                     }} /> : (
-                        <Col md={6}>
+                        <Col md={6} style={{ position: 'sticky', right: 0, overflow: 'auto', width: '100%' }}>
                             <Row className='p-1' style={{ justifyContent: 'center', backgroundColor: 'red', color: '#fff', fontWeight: '600' }}>
                                 <Col md={22} style={{ textAlign: 'center' }}>Match Overview</Col>
                                 <Col md={2}><X color='#fff' /></Col>

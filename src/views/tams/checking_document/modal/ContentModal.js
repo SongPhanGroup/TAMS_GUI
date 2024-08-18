@@ -24,7 +24,7 @@ import {
     UncontrolledTooltip,
     CardBody,
 } from "reactstrap"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import { Plus, X } from "react-feather"
 import {
     AppstoreAddOutlined,
@@ -50,6 +50,7 @@ import { detailCheckingDocument } from "../../../../api/checking_document"
 import { getListSentenceByCheckingResult } from "../../../../api/checking_result"
 
 const ContentModal = ({ listSentenceByCheckingResult }) => {
+    const params = useParams()
     const [loadingData, setLoadingData] = useState(false)
     const navigate = useNavigate()
     const MySwal = withReactContent(Swal)
@@ -66,13 +67,14 @@ const ContentModal = ({ listSentenceByCheckingResult }) => {
     const [isEdit, setIsEdit] = useState(false)
     const [checkingDocumentVersionSelected, setCheckingDocumentVersionSelected] = useState()
 
-    console.log(listSentenceByCheckingResult)
     const getData = () => {
         setLoadingData(true)
         getListSentenceByCheckingResult({
-            idDoc: listSentenceByCheckingResult?.documentId,
-            idCheckDoc: listSentenceByCheckingResult?.checkingResultId,
-            type: 1
+            params: {
+                idDoc: listSentenceByCheckingResult?.documentId,
+                idCheckDoc: params?.id,
+                type: 1
+            }
         })
             .then((res) => {
                 setData(res.data)

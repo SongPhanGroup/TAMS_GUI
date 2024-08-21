@@ -249,7 +249,7 @@ const DetailResult2 = () => {
                                                 <Col className='p-0' md={2} style={{
                                                     color: `${colors[colorIndex]}`
                                                 }}>
-                                                    <h4 style={{ textAlign: "center", marginRight: "0.3rem" }}>{index + 1}</h4>
+                                                    <h2 style={{ textAlign: "center", marginRight: "0.3rem", color: `${colors[colorIndex]}` }}>{index + 1}</h2>
                                                 </Col>
                                                 <Col className='p-0' md={17}>
                                                     <h4 style={{

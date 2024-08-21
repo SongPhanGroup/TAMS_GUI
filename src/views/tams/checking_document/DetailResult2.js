@@ -167,7 +167,44 @@ const DetailResult2 = () => {
             color: #000 !important;
         }
     `
-
+    const dataTest = [
+        {
+            document: {
+                author: "Nguyễn Văn A",
+                title: "Test 1"
+            }
+        },
+        {
+            document: {
+                author: "Nguyễn Văn A",
+                title: "Test 1"
+            }
+        },
+        {
+            document: {
+                author: "Nguyễn Văn A",
+                title: "Test 1"
+            }
+        },
+        {
+            document: {
+                author: "Nguyễn Văn A",
+                title: "Test 1"
+            }
+        },
+        {
+            document: {
+                author: "Nguyễn Văn A",
+                title: "Test 1"
+            }
+        },
+        {
+            document: {
+                author: "Nguyễn Văn A",
+                title: "Test 1"
+            }
+        }
+    ]
     return (
         <>
             <Row></Row>
@@ -195,7 +232,7 @@ const DetailResult2 = () => {
                     }} /> : (
                         <Col md={6} style={{ position: 'sticky', right: 0, overflow: 'auto', width: '100%' }}>
                             <Row className='p-1' style={{ justifyContent: 'center', backgroundColor: 'red', color: '#fff', fontWeight: '600' }}>
-                                <Col md={22} style={{ textAlign: 'center' }}>Match Overview</Col>
+                                <Col md={22} style={{ textAlign: 'center' }}>Kết quả trùng lặp</Col>
                                 <Col md={2}><X color='#fff' /></Col>
                             </Row>
                             <Row style={{ justifyContent: 'center', fontSize: '24px', color: 'red', fontWeight: '600' }}>
@@ -204,7 +241,8 @@ const DetailResult2 = () => {
                             <Row className='p-1' style={{ border: '1px solid #ccc' }} >
                                 {
                                     dataDoc?.map((doc, index) => {
-                                        const colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '8B00FF']
+                                        // const colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '8B00FF']
+                                        const colors = ['rgba(255, 51, 51, 0.4)', 'rgba(255, 153, 0, 0.4)', '#FF99FF', '#66CC99', 'rgba(102, 153, 255, 0.4)', 'rgba(102, 0, 204, 0.4)', 'rgba(0, 136, 0, 0.4)']
                                         const colorIndex = index % 7
                                         return (
                                             <>

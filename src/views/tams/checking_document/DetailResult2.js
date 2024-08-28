@@ -15,6 +15,7 @@ import { getListDocFromSetenceId } from '../../../api/checking_sentence'
 import './hightlight.css'
 import { X } from 'react-feather'
 import styled from 'styled-components'
+import ContentModalFromHTML from './modal/ContentModal2'
 // import HTMLContent from './modal/HTMLContent'
 const { Header, Content, Footer, Sider } = Layout
 const DetailResult2 = () => {
@@ -31,6 +32,8 @@ const DetailResult2 = () => {
     const [docFromId, setDocFromId] = useState()
     const [loadingHTML, setLoadingHTML] = useState(false)
     const [loadingDataDoc, setLoadingDataDoc] = useState(false)
+    const [modalContent, setModalContent] = useState(false)
+    const [selectedDocId, setSelectedDocId] = useState()
 
     const getData = () => {
         setLoadingHTML(true)
@@ -205,6 +208,16 @@ const DetailResult2 = () => {
             }
         }
     ]
+
+    const handleGetSentences = (docId) => {
+        setModalContent(true)
+        setSelectedDocId(docId)
+    }
+
+    const handleModal = () => {
+        setModalContent(false)
+    }
+
     return (
         <>
             <Row></Row>
@@ -262,7 +275,7 @@ const DetailResult2 = () => {
                                                     <span style={{ fontWeight: "bold" }}>{doc?.similarity}%</span>
                                                 </Col>
                                                 <Col className='p-0' md={1} style={{ justifySelf: 'right' }}>
-                                                    <RightOutlined />
+                                                    <RightOutlined style={{ cursor: 'pointer' }} onClick={() => handleGetSentences(doc?.documentId)} />
                                                 </Col>
                                             </Row>
                                         )
@@ -273,6 +286,7 @@ const DetailResult2 = () => {
                     )
                 }
             </Row>
+            <ContentModalFromHTML open={modalContent} docId={selectedDocId} handleModal={handleModal} />
         </>
     )
 }

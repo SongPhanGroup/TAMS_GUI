@@ -216,20 +216,20 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
                             Kết quả kiểm tra
                         </UncontrolledTooltip>
                         <RightCircleOutlined
-                            id={`tooltip_detail_${record._id}`}
+                            id={`tooltip_detail1_${record._id}`}
                             style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
                             onClick={() => handleButtonClick(record)}
                         />
-                        <UncontrolledTooltip placement="top" target={`tooltip_detail_${record._id}`}
+                        <UncontrolledTooltip placement="top" target={`tooltip_detail1_${record._id}`}
                         >
-                            Kết quả chi tiết
+                            Kết quả chi tiết phiên bản 1
                         </UncontrolledTooltip>
                         <RightSquareOutlined
-                            id={`tooltip_detail_${record._id}`}
+                            id={`tooltip_detail2_${record._id}`}
                             style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
                             onClick={() => handleButtonClick2(record)}
                         />
-                        <UncontrolledTooltip placement="top" target={`tooltip_detail_${record._id}`}
+                        <UncontrolledTooltip placement="top" target={`tooltip_detail2_${record._id}`}
                         >
                             Kết quả chi tiết phiên bản 2
                         </UncontrolledTooltip>

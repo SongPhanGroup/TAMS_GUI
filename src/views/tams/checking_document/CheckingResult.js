@@ -32,6 +32,7 @@ import {
     EditOutlined,
     LockOutlined,
     RightCircleOutlined,
+    RightSquareOutlined,
     UnorderedListOutlined,
 } from "@ant-design/icons"
 import { AbilityContext } from '@src/utility/context/Can'
@@ -228,6 +229,14 @@ const CheckingResult = () => {
         return ''
     }
 
+    const handleButtonClick = (record) => {
+        navigate(`/tams/detail-result/${record?.id}`, { state: record })
+    }
+
+    const handleButtonClick2 = (record) => {
+        navigate(`/tams/detail-result2/${record?.id}`, { state: record })
+    }
+
     const columns = [
         {
             title: "STT",
@@ -360,7 +369,24 @@ const CheckingResult = () => {
             align: "center",
             render: (record) => (
                 <div style={{ display: "flex", justifyContent: "center" }}>
-                    
+                    {/* <RightCircleOutlined
+                        id={`tooltip_detail1_${record._id}`}
+                        style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
+                        onClick={() => handleButtonClick(record)}
+                    />
+                    <UncontrolledTooltip placement="top" target={`tooltip_detail1_${record._id}`}
+                    >
+                        Kết quả chi tiết phiên bản 1
+                    </UncontrolledTooltip>
+                    <RightSquareOutlined
+                        id={`tooltip_detail2_${record._id}`}
+                        style={{ color: "#09A863", cursor: "pointer" }}
+                        onClick={() => handleButtonClick2(record)}
+                    />
+                    <UncontrolledTooltip placement="top" target={`tooltip_detail2_${record._id}`}
+                    >
+                        Kết quả chi tiết phiên bản 2
+                    </UncontrolledTooltip> */}
                 </div>
             ),
         },

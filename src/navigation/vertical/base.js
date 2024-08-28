@@ -66,6 +66,15 @@ export default [
   },
   {
     id: 'organization',
+    title: 'Loại đơn vị',
+    icon: <MenuOutlined size={12} />,
+    navLink: '/tams/organization-type',
+    action: 'read',
+    resource: 'LOAI_DON_VI',
+    role: 0
+  },
+  {
+    id: 'organization',
     title: 'Đơn vị',
     icon: <ApartmentOutlined size={12} />,
     navLink: '/tams/organization',

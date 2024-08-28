@@ -8,6 +8,8 @@ const Major = lazy(() => import('../../views/tams/major'))
 const DocumentType = lazy(() => import('../../views/tams/document_type'))
 const DocumentSource = lazy(() => import('../../views/tams/document_source'))
 const Organization = lazy(() => import('../../views/nentangloi/quanlydanhmuc/organizations'))
+const OrganizationType = lazy(() => import('../../views/nentangloi/quanlydanhmuc/organizationTypes'))
+
 const Config = lazy(() => import('../../views/nentangloi/quanlyhethong/config'))
 
 const TamsRoutes = [
@@ -39,9 +41,13 @@ const TamsRoutes = [
         path: '/tams/document-source',
         element: <DocumentSource />
     },
-      {
+    {
         path: '/tams/organization',
         element: <Organization />
+    },
+    {
+        path: '/tams/organization-type',
+        element: <OrganizationType />
     },
     {
         path: '/tams/config',

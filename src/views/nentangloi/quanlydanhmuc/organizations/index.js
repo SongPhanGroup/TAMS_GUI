@@ -37,7 +37,7 @@ const ListOrganizations = () => {
   const [data, setData] = useState([])
   const [count, setCount] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
-  const [rowsPerPage, setRowsPerpage] = useState(1000)
+  const [rowsPerPage, setRowsPerpage] = useState(100)
   const [search, setSearch] = useState("")
   const [isAdd, setIsAdd] = useState(false)
   const [isEdit, setIsEdit] = useState(false)
@@ -384,7 +384,7 @@ const ListOrganizations = () => {
           </Col>}
       </Row>
       {
-        loading && <div className="flex" style={{width: "100%", position: 'relative', left: '50%'}}>
+        loading && <div className="flex" style={{ width: "100%", position: 'relative', left: '50%' }}>
           <Spin />
         </div>
       }

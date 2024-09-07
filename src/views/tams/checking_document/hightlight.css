@@ -5,6 +5,7 @@ p {
             position: relative;
             display: inline-block;
             cursor: pointer;
+            line-height: 1.5;
         }
 
         .custom-tooltip .tooltiptext {

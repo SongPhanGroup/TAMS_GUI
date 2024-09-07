@@ -263,7 +263,7 @@ const DetailResult2 = () => {
                     loadingHTML === true ? <Spin style={{
                         padding: '16px'
                     }} /> : (
-                        <Col md={18}>
+                        <Col md={18} style={{height: '100vh', overflow: 'auto'}}>
                             <Row gutter={16} style={{ padding: '16px', width: '100%', overflow: 'auto' }}>
                                 <h4>
                                     {location?.state?.fileName}
@@ -280,7 +280,7 @@ const DetailResult2 = () => {
                     dataDoc && loadingDataDoc === true ? <Spin style={{
                         padding: '16px'
                     }} /> : (
-                        <Col md={6} style={{ position: 'fixed', right: 0, overflow: 'auto', width: '100%' }}>
+                        <Col md={6} style={{ position: 'fixed', right: 0, width: '100%', height: '100%' }}>
                             <Row className='p-1' style={{ justifyContent: 'center', backgroundColor: '#09A863', color: '#fff', fontWeight: '600' }}>
                                 <Col md={22} style={{ textAlign: 'center' }}>Kết quả trùng lặp</Col>
                                 <Col md={2}><X color='#fff' /></Col>
@@ -288,7 +288,7 @@ const DetailResult2 = () => {
                             <Row style={{ justifyContent: 'center', fontSize: '24px', color: 'red', fontWeight: '600' }}>
                                 {location?.state?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}%
                             </Row>
-                            <Row className='p-1' style={{ border: '1px solid #ccc' }} >
+                            <Row className='p-1' style={{ border: '1px solid #ccc', height: '90vh', overflow: 'auto' }} >
                                 {
                                     dataDoc?.map((doc, index) => {
                                         // const colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '8B00FF']

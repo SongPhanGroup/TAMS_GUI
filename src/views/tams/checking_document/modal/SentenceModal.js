@@ -32,7 +32,9 @@ const SentenceModal = ({ open, sentence, handleModal }) => {
 
     const getData = () => {
         setLoadingData(true)
-        checkSentence(sentence).then(res => {
+        checkSentence({
+            sentence
+        }).then(res => {
             setData(res?.finalResult)
             setCount(res?.finalResult.count)
         }).catch(error => {

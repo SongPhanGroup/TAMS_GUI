@@ -61,7 +61,7 @@ const SentenceModal = ({ open, sentence, handleModal }) => {
             ),
         },
         {
-            title: "Câu",
+            title: "Câu trong các tài liệu mẫu",
             dataIndex: "text",
             width: 500,
             render: (text, record, index) => (
@@ -69,7 +69,16 @@ const SentenceModal = ({ open, sentence, handleModal }) => {
             ),
         },
         {
-            title: "Văn bản",
+            title: "Độ tương đồng",
+            dataIndex: "similarity",
+            align: "center",
+            width: 100,
+            render: (text, record, index) => (
+                <span>{record?.similarity}</span>
+            ),
+        },
+        {
+            title: "Tên tài liệu mẫu",
             dataIndex: "title",
             width: 200,
             render: (text, record, index) => (
@@ -77,12 +86,27 @@ const SentenceModal = ({ open, sentence, handleModal }) => {
             ),
         },
         {
-            title: "Độ tương đồng",
-            dataIndex: "similarity",
-            align: "center",
-            width: 50,
+            title: "Loại tài liệu",
+            dataIndex: "title",
+            width: 200,
             render: (text, record, index) => (
-                <span>{record?.similarity}</span>
+                <span style={{ whiteSpace: 'break-spaces' }}>{record?.listDocumentId}</span>
+            ),
+        },
+        {
+            title: "Tác giả",
+            dataIndex: "title",
+            width: 200,
+            render: (text, record, index) => (
+                <span style={{ whiteSpace: 'break-spaces' }}>{record?.author}</span>
+            ),
+        },
+        {
+            title: "Năm công bố",
+            dataIndex: "title",
+            width: 100,
+            render: (text, record, index) => (
+                <span style={{ whiteSpace: 'break-spaces' }}>{record?.publishYear}</span>
             ),
         }
     ]

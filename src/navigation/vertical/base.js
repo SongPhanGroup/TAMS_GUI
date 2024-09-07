@@ -97,11 +97,20 @@ export default [
   },
   {
     id: 'checking-document',
-    title: 'Kiểm tra tài liệu',
+    title: 'Kiểm tra nhanh tài liệu',
     icon: <CheckOutlined size={12} />,
     navLink: '/tams/checking-document',
     action: 'read',
     resource: 'KIEM_TRA_TAI_LIEU',
+    role: 0
+  },
+  {
+    id: 'checking-specialized',
+    title: 'Kiểm tra chuyên sâu',
+    icon: <CheckOutlined size={12} />,
+    navLink: '/tams/checking-specialized',
+    action: 'read',
+    resource: 'KIEM_TRA_CHUYEN_SAU',
     role: 0
   },
   {

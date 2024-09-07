@@ -22,6 +22,10 @@ const TamsRoutes = [
         element: <CheckingDocument />
     },
     {
+        path: '/tams/checking-specialized',
+        element: <CheckingDocument />
+    },
+    {
         path: '/tams/checking-result/:id',
         element: <CheckingDocumentResult />
     },

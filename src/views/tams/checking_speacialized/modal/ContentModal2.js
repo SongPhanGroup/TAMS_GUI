@@ -51,10 +51,8 @@ const ContentModalFromHTML = ({ open, docId, handleModal }) => {
     }
 
     useEffect(() => {
-        if (open) {
-            getData()
-        }
-    }, [docId, params?.id, open])
+        getData()
+    }, [docId, params?.id])
 
     const columns = [
         {

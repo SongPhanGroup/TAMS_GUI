@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     DesktopOutlined,
     FileOutlined,
@@ -162,42 +162,12 @@ const DetailResult2 = () => {
     //     return doc.body.innerHTML
     // }
 
-    const containerRef = useRef(null)
-
-    useEffect(() => {
-        const container = containerRef.current
-        // Tạo một đối tượng DOM từ chuỗi HTML
-        if (container) {
-            const parser = new DOMParser()
-            const doc = parser.parseFromString(htmlResult, 'text/html')
-
-            // Tìm tất cả các thẻ <span> có class 'custom-tooltip'
-            const tooltips = doc.querySelectorAll('span.custom-tooltip')
-
-            // Thêm sự kiện click cho từng thẻ <span>
-            tooltips.forEach((tooltip, index) => {
-                const handleClick = () => {
-                    console.log('aloooo')
-                    console.log(`Tooltip ${index + 1}: ${tooltip.textContent}`)
-                }
-
-                // Thêm sự kiện click
-                tooltip.addEventListener('click', handleClick)
-
-                // Cleanup sự kiện khi component bị unmount
-                return () => {
-                    tooltip.removeEventListener('click', handleClick)
-                }
-            })
-        }
-    }, [htmlResult])
-
     const CustomStyle = styled.div`
         .tooltip {
-            opacity: 1 !important /* Bỏ opacity: 0 */
+            opacity: 1 !important; /* Bỏ opacity: 0 */
         }
         .tooltiptext {
-            color: #000 !important
+            color: #000 !important;
         }
     `
     const dataTest = [
@@ -263,7 +233,7 @@ const DetailResult2 = () => {
                                 </h4>
                                 {/* <HTMLContent htmlResult={htmlResult} orders={listSentence} indexs={highlightIndexs} /> */}
                                 <CustomStyle>
-                                    <Content ref={containerRef} dangerouslySetInnerHTML={{ __html: (htmlResult) }} />
+                                    <Content dangerouslySetInnerHTML={{ __html: (htmlResult) }} />
                                 </CustomStyle>
                             </Row>
                         </Col>
@@ -273,8 +243,8 @@ const DetailResult2 = () => {
                     dataDoc && loadingDataDoc === true ? <Spin style={{
                         padding: '16px'
                     }} /> : (
-                        <Col md={6} style={{ position: 'fixed', right: 0, overflow: 'auto', width: '100%' }}>
-                            <Row className='p-1' style={{ justifyContent: 'center', backgroundColor: '#09A863', color: '#fff', fontWeight: '600' }}>
+                        <Col md={6} style={{ position: 'sticky', right: 0, overflow: 'auto', width: '100%' }}>
+                            <Row className='p-1' style={{ justifyContent: 'center', backgroundColor: 'red', color: '#fff', fontWeight: '600' }}>
                                 <Col md={22} style={{ textAlign: 'center' }}>Kết quả trùng lặp</Col>
                                 <Col md={2}><X color='#fff' /></Col>
                             </Row>

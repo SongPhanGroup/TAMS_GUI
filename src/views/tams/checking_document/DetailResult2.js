@@ -16,6 +16,7 @@ import './hightlight.css'
 import { X } from 'react-feather'
 import styled from 'styled-components'
 import ContentModalFromHTML from './modal/ContentModal2'
+import SentenceModal from './modal/SentenceModal'
 // import HTMLContent from './modal/HTMLContent'
 const { Header, Content, Footer, Sider } = Layout
 const DetailResult2 = () => {
@@ -33,7 +34,9 @@ const DetailResult2 = () => {
     const [loadingHTML, setLoadingHTML] = useState(false)
     const [loadingDataDoc, setLoadingDataDoc] = useState(false)
     const [modalContent, setModalContent] = useState(false)
+    const [modalSentence, setModalSentence] = useState(false)
     const [selectedDocId, setSelectedDocId] = useState()
+    const [selectedSentence, setSelectedSentence] = useState()
 
     const getData = () => {
         setLoadingHTML(true)
@@ -171,26 +174,29 @@ const DetailResult2 = () => {
             const parser = new DOMParser()
             const doc = parser.parseFromString(htmlResult, 'text/html')
 
-            // Tìm tất cả các thẻ <span> có class 'custom-tooltip'
-            const tooltips = doc.querySelectorAll('span.custom-tooltip')
+            // Chèn nội dung đã được phân tích cú pháp vào container
+            container.innerHTML = doc.body.innerHTML
+
+            // Tìm tất cả các thẻ <span> có class 'custom-tooltip' trong DOM thực tế
+            const tooltips = container.querySelectorAll('span.custom-tooltip')
+            console.log(tooltips)
 
             // Thêm sự kiện click cho từng thẻ <span>
             tooltips.forEach((tooltip, index) => {
-                const handleClick = () => {
-                    console.log('aloooo')
-                    console.log(`Tooltip ${index + 1}: ${tooltip.textContent}`)
-                }
+                console.log(tooltip)
+                tooltip.addEventListener('click', function () {
+                    const text = tooltip.textContent
 
-                // Thêm sự kiện click
-                tooltip.addEventListener('click', handleClick)
+                    // Tách câu và giữ dấu câu kết thúc câu
+                    const sentenceMatch = text.match(/.*?[.!?]/)
+                    const sentence = sentenceMatch ? sentenceMatch[0] : text // Lấy câu đầu tiên hoặc toàn bộ văn bản nếu không tìm thấy dấu câu
 
-                // Cleanup sự kiện khi component bị unmount
-                return () => {
-                    tooltip.removeEventListener('click', handleClick)
-                }
+                    setSelectedSentence(sentence)
+                    setModalSentence(true)
+                })
             })
         }
-    }, [htmlResult])
+    })
 
     const CustomStyle = styled.div`
         .tooltip {
@@ -246,6 +252,7 @@ const DetailResult2 = () => {
 
     const handleModal = () => {
         setModalContent(false)
+        setModalSentence(false)
     }
 
     return (
@@ -317,6 +324,7 @@ const DetailResult2 = () => {
                 }
             </Row>
             <ContentModalFromHTML open={modalContent} docId={selectedDocId} handleModal={handleModal} />
+            <SentenceModal open={modalSentence} sentence={selectedSentence} handleModal={handleModal} />
         </>
     )
 }

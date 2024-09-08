@@ -1,4 +1,4 @@
-import { Table, Input, Card, CardTitle, Tag, Popconfirm, Switch, Select, Spin } from "antd"
+import { Table, Input, Card, CardTitle, Tag, Popconfirm, Switch, Select, Spin, Tooltip } from "antd"
 import React, { useState, Fragment, useEffect, useRef, useContext } from "react"
 import {
     Label,
@@ -298,14 +298,16 @@ const Document = () => {
                 <div style={{ display: "flex", justifyContent: "center" }}>
                     {ability.can('update', 'LOAI_DON_VI') &&
                         <>
-                            <EditOutlined
-                                id={`tooltip_edit${record.ID}`}
-                                style={{ color: "#09A863", cursor: 'pointer', marginRight: '1rem' }}
-                                onClick={() => handleEdit(record)}
-                            />
-                            <UncontrolledTooltip placement="top" target={`tooltip_edit${record.ID}`}>
-                                Chỉnh sửa
-                            </UncontrolledTooltip>
+                            <Tooltip placement="top" title="Chỉnh sửa">
+                                <EditOutlined
+                                    // id={`tooltip_edit${record.ID}`}
+                                    style={{ color: "#09A863", cursor: 'pointer', marginRight: '1rem' }}
+                                    onClick={() => handleEdit(record)}
+                                />
+                                {/* <UncontrolledTooltip placement="top" target={`tooltip_edit${record.ID}`}>
+                                    Chỉnh sửa
+                                </UncontrolledTooltip> */}
+                            </Tooltip>
                         </>}
                     {ability.can('delete', 'LOAI_DON_VI') &&
                         <Popconfirm
@@ -314,10 +316,13 @@ const Document = () => {
                             cancelText="Hủy"
                             okText="Đồng ý"
                         >
-                            <DeleteOutlined style={{ color: "red", cursor: 'pointer' }} id={`tooltip_delete${record.ID}`} />
-                            <UncontrolledTooltip placement="top" target={`tooltip_delete${record.ID}`}>
+                            <Tooltip placement="top" title="Xóa">
+
+                                <DeleteOutlined style={{ color: "red", cursor: 'pointer' }} id={`tooltip_delete${record.ID}`} />
+                                {/* <UncontrolledTooltip placement="top" target={`tooltip_delete${record.ID}`}>
                                 Xóa
-                            </UncontrolledTooltip>
+                            </UncontrolledTooltip> */}
+                            </Tooltip>
                         </Popconfirm>}
                 </div>
             ),

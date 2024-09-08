@@ -295,7 +295,7 @@ const DetailResult2 = () => {
                                         const colors = ['rgba(255, 51, 51, 0.4)', 'rgba(255, 153, 0, 0.4)', '#FF99FF', '#66CC99', 'rgba(102, 153, 255, 0.4)', 'rgba(102, 0, 204, 0.4)', 'rgba(0, 136, 0, 0.4)']
                                         const colorIndex = index % 7
                                         return (
-                                            <Row style={{ width: "100%", border: "0.5px solid #ccc", display: "flex", alignItems: "center", padding: "0.4rem" }}>
+                                            <Row style={{ width: "100%", border: "0.5px solid #ccc", display: "flex", padding: "0.4rem" }}>
                                                 <Col className='p-0' md={2} style={{
                                                     color: `${colors[colorIndex]}`
                                                 }}>

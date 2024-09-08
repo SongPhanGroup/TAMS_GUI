@@ -25,7 +25,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 // ** Styles
 import '@styles/react/libs/react-select/_react-select.scss'
 import Swal from 'sweetalert2'
-import { postCheckingDocumentVersion } from "../../../../api/checking_document_version"
+import { postCheckingDocumentVersion } from "../../../../api/checking_document_version_by_word"
 
 const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDocumentSelected }) => {
     const AddNewCheckingDocumentVersionSchema = yup.object().shape({

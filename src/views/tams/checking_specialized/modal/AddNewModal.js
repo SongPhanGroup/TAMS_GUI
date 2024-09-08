@@ -29,7 +29,7 @@ import Swal from 'sweetalert2'
 import { postCheckingDocument } from "../../../../api/checking_document"
 import { getCourse } from "../../../../api/course"
 import classNames from "classnames"
-import { postCheckingDocumentVersion } from "../../../../api/checking_document_version"
+import { postCheckingDocumentVersion } from "../../../../api/checking_document_version_by_word"
 
 const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
     const AddNewCheckingDocumentSchema = yup.object().shape({

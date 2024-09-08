@@ -17,7 +17,7 @@ import {
     Table,
     Spin
 } from "antd"
-import { getListSentenceByCheckingResult } from "../../../../api/checking_result"
+import { getListSentenceByCheckingResult } from "../../../../api/checking_result_by_word"
 import { useEffect, useState } from "react"
 
 const ContentModalFromHTML = ({ open, docId, handleModal }) => {
@@ -67,12 +67,30 @@ const ContentModalFromHTML = ({ open, docId, handleModal }) => {
             ),
         },
         {
-            title: "Nội dung",
-            dataIndex: "content",
+            title: "Các câu trong tài liệu kiểm tra",
+            dataIndex: "checkingDocumentSentence",
+            align: "left",
+            width: 500,
+            render: (text, record, index) => (
+                <span>{record?.checkingDocumentSentence?.content}</span>
+            ),
+        },
+        {
+            title: "Các câu trong tài liệu mẫu",
+            dataIndex: "sentenceOrCheckingDocumentSentence_sententce",
             align: "left",
             width: 500,
             render: (text, record, index) => (
                 <span>{record?.sentenceOrCheckingDocumentSentence_sententce?.content}</span>
+            ),
+        },
+        {
+            title: "Độ tương đồng",
+            dataIndex: "content",
+            align: "center",
+            width: 100,
+            render: (text, record, index) => (
+                <span>{(record?.similarity * 100).toFixed(2)}%</span>
             ),
         }
     ]

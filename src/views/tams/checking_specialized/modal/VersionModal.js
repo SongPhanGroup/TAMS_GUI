@@ -209,13 +209,16 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
                         <AppstoreOutlined
                             id={`tooltip_result_${record._id}`}
                             style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
-                            onClick={(e) => handleResult(record)}
+                            onClick={() => {
+                                const recordStandard = {...record, from: 'checking-specialized'}
+                                return handleResult(recordStandard)
+                            }}
                         />
                         <UncontrolledTooltip placement="top" target={`tooltip_result_${record._id}`}
                         >
                             Kết quả kiểm tra
                         </UncontrolledTooltip>
-                        <RightCircleOutlined
+                        {/* <RightCircleOutlined
                             id={`tooltip_detail1_${record._id}`}
                             style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
                             onClick={() => handleButtonClick(record)}
@@ -223,15 +226,18 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
                         <UncontrolledTooltip placement="top" target={`tooltip_detail1_${record._id}`}
                         >
                             Kết quả chi tiết phiên bản 1
-                        </UncontrolledTooltip>
+                        </UncontrolledTooltip> */}
                         <RightSquareOutlined
                             id={`tooltip_detail2_${record._id}`}
                             style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
-                            onClick={() => handleButtonClick2(record)}
+                            onClick={() => {
+                                const recordStandard = {...record, from: 'checking-specialized'}
+                                return handleButtonClick2(recordStandard)
+                            }}
                         />
                         <UncontrolledTooltip placement="top" target={`tooltip_detail2_${record._id}`}
                         >
-                            Kết quả chi tiết phiên bản 2
+                            Kết quả chi tiết
                         </UncontrolledTooltip>
                         <Popconfirm
                             title="Bạn chắc chắn xóa?"

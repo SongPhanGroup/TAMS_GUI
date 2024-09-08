@@ -1,7 +1,7 @@
 import React from 'react'
 import { Pie } from 'react-chartjs-2'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
-import { Card, CardHeader, CardTitle, CardBody, CardSubtitle, Badge } from 'reactstrap'
+import { Row, Card, CardHeader, CardTitle, CardBody, CardSubtitle, Badge } from 'reactstrap'
 
 // Đăng ký các thành phần cho biểu đồ
 ChartJS.register(ArcElement, Tooltip, Legend)

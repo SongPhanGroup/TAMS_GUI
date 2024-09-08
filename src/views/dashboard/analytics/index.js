@@ -131,31 +131,17 @@ const AnalyticsDashboard = () => {
   return (
     <div id='dashboard-analytics'>
       <Row className='match-height'>
-        <Col lg='6' sm='12'>
-          <CardCongratulations />
+        <Col lg='6' xs='12'>
+          <DocumentByCategories />
         </Col>
-        {/* <Col lg='3' sm='6'>
-          <SubscribersGained kFormatter={kFormatter} />
-        </Col>
-        <Col lg='3' sm='6'>
-          <OrdersReceived kFormatter={kFormatter} warning={colors.warning.main} />
-        </Col> */}
-        <Col lg='6' sm='12'>
+        <Col lg='6' xs='12'>
           <DocumentByAspects />
-
         </Col>
       </Row>
       <Row className='match-height'>
-        <Col lg='6' xs='12'>
-          <DocumentByCategories />
-          {/* <AvgSessions primary={colors.primary.main} /> */}
-        </Col>
-        <Col lg='6' xs='12'>
-          {/* <SupportTracker primary={colors.primary.main} danger={colors.danger.main} /> */}
-          {/* <DocumentByAspects /> */}
-          <CountNumChecking />
-        </Col>
+        <CountNumChecking />
       </Row>
+
       <Row className='match-height'>
         <DocumentByTime />
       </Row>

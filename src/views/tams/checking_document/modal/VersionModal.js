@@ -9,6 +9,7 @@ import {
     Collapse,
     Checkbox,
     Spin,
+    Tooltip
 } from "antd"
 import React, { useState, Fragment, useEffect, useRef, useContext } from "react"
 import {
@@ -100,11 +101,11 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
     }
 
     const handleButtonClick = (record) => {
-        navigate(`/tams/detail-result/${record?.id}`, { state: record }) 
+        navigate(`/tams/detail-result/${record?.id}`, { state: record })
     }
 
     const handleButtonClick2 = (record) => {
-        navigate(`/tams/detail-result2/${record?.id}`, { state: record }) 
+        navigate(`/tams/detail-result2/${record?.id}`, { state: record })
     }
 
     useEffect(() => {
@@ -196,28 +197,21 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
             render: (record) => {
                 return (
                     <div style={{ display: "flex", justifyContent: "center" }}>
-
-                        <EditOutlined
-                            id={`tooltip_edit_${record._id}`}
-                            style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
-                            onClick={(e) => handleEdit(record)}
-                        />
-                        <UncontrolledTooltip placement="top" target={`tooltip_edit_${record._id}`}
-                        >
-                            Chỉnh sửa
-                        </UncontrolledTooltip>
-                        <AppstoreOutlined
-                            id={`tooltip_result_${record._id}`}
-                            style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
-                            onClick={() => {
-                                const recordStandard = {...record, from: 'checking-document'}
-                                return handleResult(recordStandard)
-                            }}
-                        />
-                        <UncontrolledTooltip placement="top" target={`tooltip_result_${record._id}`}
-                        >
-                            Kết quả kiểm tra
-                        </UncontrolledTooltip>
+                        <Tooltip placement="top" title="Chỉnh sửa">
+                            <EditOutlined
+                                style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
+                                onClick={(e) => handleEdit(record)}
+                            />
+                        </Tooltip>
+                        <Tooltip placement="top" title="Kết quả kiểm tra">
+                            <AppstoreOutlined
+                                style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
+                                onClick={() => {
+                                    const recordStandard = { ...record, from: 'checking-document' }
+                                    return handleResult(recordStandard)
+                                }}
+                            />
+                        </Tooltip>
                         {/* <RightCircleOutlined
                             id={`tooltip_detail1_${record._id}`}
                             style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
@@ -227,27 +221,28 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
                         >
                             Kết quả chi tiết phiên bản 1
                         </UncontrolledTooltip> */}
-                        <RightSquareOutlined
-                            id={`tooltip_detail2_${record._id}`}
-                            style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
-                            onClick={() => {
-                                const recordStandard = {...record, from: 'checking-document'}
-                                return handleButtonClick2(recordStandard)
-                            }}
-                        />
-                        <UncontrolledTooltip placement="top" target={`tooltip_detail2_${record._id}`}
-                        >
-                            Kết quả chi tiết
-                        </UncontrolledTooltip>
+                        <Tooltip placement="top" title="Kết quả chi tiết">
+
+                            <RightSquareOutlined
+                                id={`tooltip_detail2_${record._id}`}
+                                style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
+                                onClick={() => {
+                                    const recordStandard = { ...record, from: 'checking-document' }
+                                    return handleButtonClick2(recordStandard)
+                                }}
+                            />
+                        </Tooltip>
                         <Popconfirm
                             title="Bạn chắc chắn xóa?"
                             onConfirm={() => handleDelete(record)}
                             cancelText="Hủy"
                             okText="Đồng ý"
                         >
-                            <DeleteOutlined
-                                style={{ color: "red", cursor: "pointer", marginRight: '1rem' }}
-                            />
+                            <Tooltip placement="top" title="Xóa">
+                                <DeleteOutlined
+                                    style={{ color: "red", cursor: "pointer", marginRight: '1rem' }}
+                                />
+                            </Tooltip>
                         </Popconfirm>
 
                     </div>
@@ -327,7 +322,7 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
                     }
                 }}
             />}
-            
+
             <AddNewCheckingDocumentVersion open={isAdd} handleModal={handleModal} getData={getData} rowsPerPage={rowsPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} checkingDocumentSelected={checkingDocumentSelected} listSubmit={listSubmit} />
             {checkingDocumentVersionSelected && <EditCheckingDocumentVersion open={isEdit} handleModal={handleModal} getData={getData} rowsPerPage={rowsPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} infoEditVersion={checkingDocumentVersionSelected} listSubmit={listSubmit} dataCheckingDocument={checkingDocumentSelected} />}
         </Card>

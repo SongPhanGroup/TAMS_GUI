@@ -23,7 +23,9 @@ import {
     DropdownMenu,
     DropdownItem,
     DropdownToggle,
-    UncontrolledDropdown
+    UncontrolledDropdown,
+    CardTitle,
+    CardHeader
 } from 'reactstrap'
 
 ChartJS.register(
@@ -139,8 +141,14 @@ export default function CountNumChecking() {
 
     return (
         <Card style={{ position: "relative", width: "100%" }}>
+            <CardHeader className='d-flex flex-sm-row flex-column justify-content-md-between align-items-start justify-content-start'>
+                <div>
+                    <CardTitle className='mb-75' tag='h4'>
+                        {title}
+                    </CardTitle>
+                </div>
+            </CardHeader>
             <CardBody>
-                <CardText className='fw-bold mb-2'>{title}</CardText>
                 <Chart type='bar' data={dataChart} options={options} />
             </CardBody>
         </Card>

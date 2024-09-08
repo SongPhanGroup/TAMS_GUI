@@ -60,60 +60,60 @@ export const TYPEOFDAY = [
 export const LIST_ROLE = [
     {
         id: 'base',
-        title: 'Quản lý hệ thống',
-        icon: "Users",
+        title: 'Kiểm tra trùng lặp tuyệt đối',
+        icon: "Globe",
         role: 0,
-        description: 'qlht.HVCT.info'
+        description: '/tams/checking-document'
     },
     {
         id: 'training',
-        title: 'Quản lý đào tạo',
+        title: 'Kiểm tra trùng lặp xấp xỉ',
         icon: "BookOpen",
         role: 1,
-        description: 'qldt.HVCT.info'
+        description: '/tams/checking-specialized'
     },
     {
         id: 'facilities',
-        title: 'Quản lý KH huấn luyện',
+        title: 'Quản lý kho dữ liệu mẫu',
         icon: "Trello",
         role: 2,
-        description: 'qlkhhl.HVCT.info'
+        description: '/tams/document'
     },
     {
         id: 'science',
-        title: 'Quản lý CSVC',
-        icon: "Chrome",
+        title: 'Quản lý tài khoản người dùng',
+        icon: "Users",
         role: 3,
-        description: 'qlcsvc.HVCT.info'
+        description: '/tams/accounts'
     },
     {
         id: 'map',
-        title: 'Quản lý khoa học',
+        title: 'Quản lý người dùng và phân quyền',
         icon: "Hexagon",
         role: 4,
-        description: 'qlkh.HVCT.info'
+        description: '/tams/roles'
     },
     {
         id: 'plan',
-        title: 'Quản lý bản đồ',
+        title: 'Quản lý đơn vị',
         icon: "Map",
         role: 5,
-        description: 'qlbd.HVCT.info'
+        description: '/tams/organization'
     },
-    {
-        id: 'information',
-        title: 'Quản lý TT học trực tuyến',
-        icon: "Info",
-        role: 6,
-        description: 'qltthtt.HVCT.info'
-    },
-    {
-        id: 'manage',
-        title: 'Quản lý TT điều hành',
-        icon: "Globe",
-        role: 7,
-        description: 'qlttdh.HVCT.info'
-    }
+    // {
+    //     id: 'information',
+    //     title: 'Quản lý TT học trực tuyến',
+    //     icon: "Info",
+    //     role: 6,
+    //     description: 'qltthtt.HVCT.info'
+    // },
+    // {
+    //     id: 'manage',
+    //     title: 'Quản lý TT điều hành',
+    //     icon: "Globe",
+    //     role: 7,
+    //     description: 'qlttdh.HVCT.info'
+    // }
 ]
 
 export const LIST_PROVINCES = [

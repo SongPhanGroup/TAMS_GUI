@@ -6,7 +6,6 @@ import { getHomeRouteForLoggedInUser } from "../../../../utility/Utils"
 // ** Third Party Components
 import InputNumber from "rc-input-number"
 import PerfectScrollbar from "react-perfect-scrollbar"
-import { ShoppingCart, X, Plus, Minus, Grid, Star, Heart } from "react-feather"
 
 // ** Reactstrap Imports
 import {
@@ -26,6 +25,7 @@ import {
 } from "reactstrap"
 import classnames from "classnames"
 import * as IconReact from "react-feather"
+const { ShoppingCart, X, Plus, Minus, Grid, Star, Heart } = IconReact
 // ** Store & Actions
 import { useDispatch, useSelector } from "react-redux"
 import {
@@ -132,7 +132,7 @@ const CartDropdown = () => {
           Danh sách chức năng
         </UncontrolledTooltip>
       </DropdownToggle>
-      {/* <DropdownMenu
+      <DropdownMenu
         end
         tag="ul"
         className="dropdown-menu-media dropdown-cart mt-0 shadow-box customMenu"
@@ -154,7 +154,7 @@ const CartDropdown = () => {
           </DropdownItem>
         </li>
         <div className="ecommerce-application">{renderMenuItems()}</div>
-      </DropdownMenu> */}
+      </DropdownMenu>
     </Dropdown>
   )
 }

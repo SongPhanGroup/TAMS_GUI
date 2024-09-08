@@ -19,6 +19,7 @@ import {
 } from "antd"
 import { useEffect, useState } from "react"
 import { checkSentence } from "../../../../api/checking_sentence"
+import { toDateTimeString } from "../../../../utility/Utils"
 
 const SentenceModal = ({ open, sentence, handleModal }) => {
     const params = useParams()
@@ -74,7 +75,7 @@ const SentenceModal = ({ open, sentence, handleModal }) => {
             align: "center",
             width: 100,
             render: (text, record, index) => (
-                <span>{record?.similarity}</span>
+                <span>{(record?.similarity * 100).toFixed(2)}</span>
             ),
         },
         {
@@ -90,7 +91,7 @@ const SentenceModal = ({ open, sentence, handleModal }) => {
             dataIndex: "title",
             width: 200,
             render: (text, record, index) => (
-                <span style={{ whiteSpace: 'break-spaces' }}>{record?.listDocumentId}</span>
+                <span style={{ whiteSpace: 'break-spaces' }}>{record?.document_type}</span>
             ),
         },
         {
@@ -106,7 +107,7 @@ const SentenceModal = ({ open, sentence, handleModal }) => {
             dataIndex: "title",
             width: 100,
             render: (text, record, index) => (
-                <span style={{ whiteSpace: 'break-spaces' }}>{record?.publishYear}</span>
+                <span style={{ whiteSpace: 'break-spaces' }}>{toDateTimeString(record?.publishYear)}</span>
             ),
         }
     ]
@@ -117,6 +118,7 @@ const SentenceModal = ({ open, sentence, handleModal }) => {
                 <div className='text-center mb-1'>
                     <h2 className='mb-1'>Danh sách các câu tương đồng</h2>
                 </div>
+                <h6>Câu kiểm tra: <span style={{color: 'red'}}>{sentence}</span></h6>
                 <Row tag='table' className='gy-1 pt-75'>
                     {loadingData === true ? <Spin /> : <Table
                         columns={columns}

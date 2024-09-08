@@ -23,7 +23,7 @@ const Error = lazy(() => import('../views/pages/misc/Error'))
 const Login = lazy(() => import('../views/pages/authentication/Login'))
 const NotAuthorized = lazy(() => import('../views/pages/misc/NotAuthorized'))
 const DetailCheckingDocumentResult = lazy(() => import('../views/tams/checking_document/DetailResult'))
-const DetailCheckingDocumentResult2 = lazy(() => import('../views/tams/checking_document/DetailResult2'))
+const DetailCheckingDocumentResult2 = lazy(() => import('../views/tams/checking_specialized/DetailResult2'))
 
 const _handlePermission = (memberInfo) => {
   const permissionArr = memberInfo.permission ? JSON.parse(memberInfo.permission) : []

@@ -50,24 +50,24 @@ const DetailResult = () => {
         }
     }
 
-    const getSentence = () => {
-        getListTheSameSentence({
-            params: {
-                id: location?.state?.id,
-                type: 1,
-                // idCheckDoc: 1
-            }
-        }).then(result => {
-            const sentences = result?.data?.map(item => item?.checkingDocumentSentence?.order)
-            const indexs = result?.data?.map(item => item?.checkingDocumentSentence?.id)
-            setListSentence(sentences)
-            setHighlightIndex(indexs)
-        })
-    }
+    // const getSentence = () => {
+    //     getListTheSameSentence({
+    //         params: {
+    //             id: location?.state?.id,
+    //             type: 1,
+    //             // idCheckDoc: 1
+    //         }
+    //     }).then(result => {
+    //         const sentences = result?.data?.map(item => item?.checkingDocumentSentence?.order)
+    //         const indexs = result?.data?.map(item => item?.checkingDocumentSentence?.id)
+    //         setListSentence(sentences)
+    //         setHighlightIndex(indexs)
+    //     })
+    // }
 
     useEffect(() => {
         getData()
-        getSentence()
+        // getSentence()
     }, [])
 
     useEffect(() => {

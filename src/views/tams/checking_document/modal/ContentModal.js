@@ -47,7 +47,7 @@ import { yupResolver } from "@hookform/resolvers/yup"
 import classnames from "classnames"
 import { deleteCheckingDocumentVersion, getCheckingDocumentVersion } from "../../../../api/checking_document_version"
 import { detailCheckingDocument } from "../../../../api/checking_document"
-import { getListSentenceByCheckingResult } from "../../../../api/checking_result"
+import { getListSentenceByCheckingResult } from "../../../../api/checking_result_by_word"
 
 const ContentModal = ({ listSentenceByCheckingResult }) => {
     const params = useParams()
@@ -101,133 +101,10 @@ const ContentModal = ({ listSentenceByCheckingResult }) => {
         navigate(`/tams/checking-result/${record?.id}`)
     }
 
-    // const getInfo = () => {
-    //     getGroupPermission({
-    //         params: {
-    //             page: 1,
-    //             limit: 500,
-    //         },
-    //     })
-    //         .then((res) => {
-    //             const { count, data } = res[0]
-    //             const listData = data.map((item, index) => ({ ...item, key: index }))
-    //             setListPerGroup(listData ?? [])
-    //         })
-    //         .catch((err) => {
-    //             console.log(err)
-    //         })
-    //     getPermission({
-    //         params: {
-    //             page: 1,
-    //             limit: 5000,
-    //         },
-    //     })
-    //         .then((res) => {
-    //             const { count, data } = res[0]
-    //             setListAllPer(data ?? [])
-    //         })
-    //         .catch((err) => {
-    //             console.log(err)
-    //         })
-    // }
     useEffect(() => {
-        // getInfo()
         getData()
     }, [listSentenceByCheckingResult])
 
-    // const _handleCheckRoleAction = (e, act, permission, role) => {
-    //     setListSubmit((pre) => {
-    //         const isChecked = listSubmit.find(
-    //             (per) => per.permissionID === permission._id && per.roleID === role?._id && per.actionContent === act)
-    //         if (isChecked) {
-    //             if (act === "read") {
-    //                 return listSubmit.filter(
-    //                     (per) => !(per.permissionID === permission._id && per.roleID === role?._id)
-    //                 )
-    //             }
-    //             return listSubmit.filter(
-    //                 (per) => !(
-    //                     per.permissionID === permission._id &&
-    //                     per.roleID === role?._id &&
-    //                     per.actionContent === act
-    //                 )
-    //             )
-    //         } else {
-    //             if (act !== "read") {
-    //                 const isChecked_ = listSubmit.find(
-    //                     (per) => per.permissionID === permission._id &&
-    //                         per.roleID === role?._id &&
-    //                         per.actionContent === act
-    //                 )
-    //                 if (isChecked_) {
-    //                     return listSubmit.filter(
-    //                         (per) => !(per.permissionID === permission._id && per.roleID === role?._id && per.actionContent === act))
-    //                 } else {
-    //                     const isRead = listSubmit.find(
-    //                         (per) => per.permissionID === permission._id &&
-    //                             per.roleID === role?._id &&
-    //                             per.actionContent === 'read'
-    //                     )
-    //                     if (isRead) {
-    //                         return [
-    //                             ...pre,
-    //                             {
-    //                                 permissionID: permission._id,
-    //                                 roleID: role._id,
-    //                                 actionContent: act,
-    //                                 isActive: 1,
-    //                             },
-    //                         ]
-    //                     } else {
-    //                         return [
-    //                             ...pre,
-    //                             {
-    //                                 permissionID: permission._id,
-    //                                 roleID: role._id,
-    //                                 actionContent: "read",
-    //                                 isActive: 1,
-    //                             },
-    //                             {
-    //                                 permissionID: permission._id,
-    //                                 roleID: role._id,
-    //                                 actionContent: act,
-    //                                 isActive: 1,
-    //                             },
-    //                         ]
-    //                     }
-    //                 }
-    //             }
-    //             return [
-    //                 ...pre,
-    //                 {
-    //                     permissionID: permission._id,
-    //                     roleID: role._id,
-    //                     actionContent: act,
-    //                     isActive: 1,
-    //                 },
-    //             ]
-    //         }
-    //     })
-    // }
-    // const _renderRoleItem = (act, permission, role) => {
-    //     // const permissionData = listPermissionSelected?.find(
-    //     //   (lstPer) => lstPer.permissionID === permission._id &&
-    //     //     lstPer.actionContent === act &&
-    //     //     lstPer.roleID === role?._id
-    //     // )
-    //     // const isCheck = permission.actionContents?.find(x => x === act)
-    //     const isCheck = listSubmit.find(x => x.permissionID === permission._id && x.actionContent === act)
-    //     return (
-    //         <Checkbox
-    //             type="checkbox"
-    //             style={{ cursor: "pointer" }}
-    //             className="action-cb"
-    //             id={`${permission._id}_${act}`}
-    //             checked={isCheck || false}
-    //             onChange={(e) => _handleCheckRoleAction(e, act, permission, role)}
-    //         />
-    //     )
-    // }
     const handleDelete = (record) => {
         deleteCheckingDocumentVersion(record?.id)
             .then((res) => {
@@ -267,12 +144,30 @@ const ContentModal = ({ listSentenceByCheckingResult }) => {
             ),
         },
         {
-            title: "Nội dung",
-            dataIndex: "content",
+            title: "Các câu trong tài liệu kiểm tra",
+            dataIndex: "checkingDocumentSentence",
+            align: "left",
+            width: 500,
+            render: (text, record, index) => (
+                <span>{record?.checkingDocumentSentence?.content}</span>
+            ),
+        },
+        {
+            title: "Các câu trong tài liệu mẫu",
+            dataIndex: "sentenceOrCheckingDocumentSentence_sententce",
             align: "left",
             width: 500,
             render: (text, record, index) => (
                 <span>{record?.sentenceOrCheckingDocumentSentence_sententce?.content}</span>
+            ),
+        },
+        {
+            title: "Độ tương đồng",
+            dataIndex: "content",
+            align: "center",
+            width: 100,
+            render: (text, record, index) => (
+                <span>{(record?.similarity * 100).toFixed(2)}%</span>
             ),
         }
     ]

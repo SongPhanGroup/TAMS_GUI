@@ -329,7 +329,7 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
               Nguồn tài liệu <span style={{ color: 'red' }}>(*)</span>
             </Label>
             <Controller
-              defaultValue={{ value: infoEdit?.source?.id, label: infoEdit?.source?.name }}
+              defaultValue={ infoEdit?.source && { value: infoEdit?.source?.id, label: infoEdit?.source?.name }}
               id="react-select"
               name='source'
               control={control}
@@ -353,7 +353,7 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
             </Label>
             <Controller
               id='react-select'
-              defaultValue={{ value: infoEdit?.documentType?.id, label: infoEdit?.documentType?.name }}
+              defaultValue={ infoEdit?.documentType && { value: infoEdit?.documentType?.id, label: infoEdit?.documentType?.name }}
               name='documentType'
               control={control}
               render={({ field }) => (
@@ -375,7 +375,7 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
             </Label>
             <Controller
               id='react-select'
-              defaultValue={{ value: infoEdit?.major?.id, label: infoEdit?.major?.name }}
+              defaultValue={ infoEdit?.major && { value: infoEdit?.major?.id, label: infoEdit?.major?.name }}
               name='major'
               control={control}
               render={({ field }) => (

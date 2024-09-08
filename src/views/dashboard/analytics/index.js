@@ -142,25 +142,27 @@ const AnalyticsDashboard = () => {
         </Col> */}
         <Col lg='6' sm='12'>
           <DocumentByAspects />
-
         </Col>
       </Row>
       <Row className='match-height'>
-        <Col lg='6' xs='12'>
+        <Col lg='6' md='12'>
           <DocumentByCategories />
-          {/* <AvgSessions primary={colors.primary.main} /> */}
         </Col>
-        <Col lg='6' xs='12'>
+        <Col lg='6' md='12'>
           {/* <SupportTracker primary={colors.primary.main} danger={colors.danger.main} /> */}
           {/* <DocumentByAspects /> */}
           <CountNumChecking />
         </Col>
       </Row>
       <Row className='match-height'>
-        <DocumentByTime />
+        <Col lg='12' md='12'>
+          <DocumentByTime />
+        </Col>
       </Row>
       <Row className='match-height'>
-        <NumCheckingBySimilarity />
+        <Col lg='12' md='12'>
+          <NumCheckingBySimilarity />
+        </Col>
       </Row>
       {/* <Row className='match-height'>
         <Col lg='4' xs='12'>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import {
     DesktopOutlined,
     FileOutlined,
@@ -10,12 +10,13 @@ import {
 import mqtt from 'mqtt'
 import { Breadcrumb, Layout, Menu, theme, Row, Col, Card, Badge, Tag, Progress, Spin } from 'antd'
 import { useLocation, useParams } from 'react-router-dom'
-import { getCheckingResultHTML, getCheckingResultHTML2, getListTheSameSentence, getSimilarDocument } from '../../../api/checking_result'
+import { getCheckingResultHTML, getCheckingResultHTML2, getSimilarDocument } from '../../../api/checking_result'
 import { getListDocFromSetenceId } from '../../../api/checking_sentence'
 import './hightlight.css'
 import { X } from 'react-feather'
 import styled from 'styled-components'
 import ContentModalFromHTML from './modal/ContentModal2'
+import SentenceModal from './modal/SentenceModal'
 // import HTMLContent from './modal/HTMLContent'
 const { Header, Content, Footer, Sider } = Layout
 const DetailResult2 = () => {
@@ -33,7 +34,9 @@ const DetailResult2 = () => {
     const [loadingHTML, setLoadingHTML] = useState(false)
     const [loadingDataDoc, setLoadingDataDoc] = useState(false)
     const [modalContent, setModalContent] = useState(false)
+    const [modalSentence, setModalSentence] = useState(false)
     const [selectedDocId, setSelectedDocId] = useState()
+    const [selectedSentence, setSelectedSentence] = useState()
 
     const getData = () => {
         setLoadingHTML(true)
@@ -71,21 +74,6 @@ const DetailResult2 = () => {
             setLoadingDataDoc(false)
         })
     }
-
-    // const getSentence = () => {
-    //     getListTheSameSentence({
-    //         params: {
-    //             id: location?.state?.id,
-    //             type: 1,
-    //             // idCheckDoc: 1
-    //         }
-    //     }).then(result => {
-    //         const sentences = result?.data?.map(item => item?.checkingDocumentSentence?.order)
-    //         const indexs = result?.data?.map(item => item?.checkingDocumentSentence?.id)
-    //         setListSentence(sentences)
-    //         setHighlightIndex(indexs)
-    //     })
-    // }
 
     useEffect(() => {
         getData()
@@ -162,6 +150,38 @@ const DetailResult2 = () => {
     //     return doc.body.innerHTML
     // }
 
+    console.log(location.state.from)
+    const containerRef = useRef(null)
+
+    useEffect(() => {
+        const container = containerRef.current
+        // Tạo một đối tượng DOM từ chuỗi HTML
+        if (container && location.state.from === 'checking-specialized') {
+            const parser = new DOMParser()
+            const doc = parser.parseFromString(htmlResult, 'text/html')
+
+            // Chèn nội dung đã được phân tích cú pháp vào container
+            container.innerHTML = doc.body.innerHTML
+
+            // Tìm tất cả các thẻ <span> có class 'custom-tooltip' trong DOM thực tế
+            const tooltips = container.querySelectorAll('span.custom-tooltip')
+
+            // Thêm sự kiện click cho từng thẻ <span>
+            tooltips.forEach((tooltip, index) => {
+                tooltip.addEventListener('click', function () {
+                    const text = tooltip.textContent
+
+                    // Tách câu và giữ dấu câu kết thúc câu
+                    const sentenceMatch = text.match(/.*?[.!?]/)
+                    const sentence = sentenceMatch ? sentenceMatch[0] : text // Lấy câu đầu tiên hoặc toàn bộ văn bản nếu không tìm thấy dấu câu
+
+                    setSelectedSentence(sentence)
+                    setModalSentence(true)
+                })
+            })
+        }
+    })
+
     const CustomStyle = styled.div`
         .tooltip {
             opacity: 1 !important; /* Bỏ opacity: 0 */
@@ -216,6 +236,7 @@ const DetailResult2 = () => {
 
     const handleModal = () => {
         setModalContent(false)
+        setModalSentence(false)
     }
 
     return (
@@ -226,14 +247,14 @@ const DetailResult2 = () => {
                     loadingHTML === true ? <Spin style={{
                         padding: '16px'
                     }} /> : (
-                        <Col md={18}>
+                        <Col md={18} style={{height: '100vh', overflow: 'auto'}}>
                             <Row gutter={16} style={{ padding: '16px', width: '100%', overflow: 'auto' }}>
                                 <h4>
                                     {location?.state?.fileName}
                                 </h4>
                                 {/* <HTMLContent htmlResult={htmlResult} orders={listSentence} indexs={highlightIndexs} /> */}
                                 <CustomStyle>
-                                    <Content dangerouslySetInnerHTML={{ __html: (htmlResult) }} />
+                                    <Content ref={containerRef} dangerouslySetInnerHTML={{ __html: (htmlResult) }} />
                                 </CustomStyle>
                             </Row>
                         </Col>
@@ -243,22 +264,22 @@ const DetailResult2 = () => {
                     dataDoc && loadingDataDoc === true ? <Spin style={{
                         padding: '16px'
                     }} /> : (
-                        <Col md={6} style={{ position: 'sticky', right: 0, overflow: 'auto', width: '100%' }}>
-                            <Row className='p-1' style={{ justifyContent: 'center', backgroundColor: 'red', color: '#fff', fontWeight: '600' }}>
+                        <Col md={6} style={{ position: 'fixed', right: 0, width: '100%', height: '100%' }}>
+                            <Row className='p-1' style={{ justifyContent: 'center', backgroundColor: '#09A863', color: '#fff', fontWeight: '600' }}>
                                 <Col md={22} style={{ textAlign: 'center' }}>Kết quả trùng lặp</Col>
                                 <Col md={2}><X color='#fff' /></Col>
                             </Row>
                             <Row style={{ justifyContent: 'center', fontSize: '24px', color: 'red', fontWeight: '600' }}>
                                 {location?.state?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}%
                             </Row>
-                            <Row className='p-1' style={{ border: '1px solid #ccc' }} >
+                            <Row className='p-1' style={{ border: '1px solid #ccc', height: '90vh', overflow: 'auto' }} >
                                 {
                                     dataDoc?.map((doc, index) => {
                                         // const colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '8B00FF']
                                         const colors = ['rgba(255, 51, 51, 0.4)', 'rgba(255, 153, 0, 0.4)', '#FF99FF', '#66CC99', 'rgba(102, 153, 255, 0.4)', 'rgba(102, 0, 204, 0.4)', 'rgba(0, 136, 0, 0.4)']
                                         const colorIndex = index % 7
                                         return (
-                                            <Row style={{ width: "100%", border: "0.5px solid #ccc", display: "flex", alignItems: "center", padding: "0.4rem" }}>
+                                            <Row style={{ width: "100%", border: "0.5px solid #ccc", display: "flex", padding: "0.4rem" }}>
                                                 <Col className='p-0' md={2} style={{
                                                     color: `${colors[colorIndex]}`
                                                 }}>
@@ -287,6 +308,7 @@ const DetailResult2 = () => {
                 }
             </Row>
             <ContentModalFromHTML open={modalContent} docId={selectedDocId} handleModal={handleModal} />
+            <SentenceModal open={modalSentence} sentence={selectedSentence} handleModal={handleModal} />
         </>
     )
 }

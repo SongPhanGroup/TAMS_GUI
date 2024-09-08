@@ -17,10 +17,11 @@ import {
     Table,
     Spin
 } from "antd"
-import { getListSentenceByCheckingResult } from "../../../../api/checking_result"
 import { useEffect, useState } from "react"
+import { checkSentence } from "../../../../api/checking_sentence"
+import { toDateTimeString } from "../../../../utility/Utils"
 
-const ContentModalFromHTML = ({ open, docId, handleModal }) => {
+const SentenceModal = ({ open, sentence, handleModal }) => {
     const params = useParams()
     const navigate = useNavigate()
     const [loadingData, setLoadingData] = useState(false)
@@ -32,27 +33,23 @@ const ContentModalFromHTML = ({ open, docId, handleModal }) => {
 
     const getData = () => {
         setLoadingData(true)
-        getListSentenceByCheckingResult({
-            params: {
-                idDoc: docId,
-                idCheckDoc: params?.id,
-                type: 1
-            }
+        checkSentence({
+            sentence
+        }).then(res => {
+            setData(res?.finalResult)
+            setCount(res?.finalResult.count)
+        }).catch(error => {
+            console.log(error)
+        }).finally(() => {
+            setLoadingData(false)
         })
-            .then((res) => {
-                setData(res.data)
-                setCount(res?.total)
-            })
-            .catch((err) => {
-                console.log(err)
-            }).finally(() => {
-                setLoadingData(false)
-            })
     }
 
     useEffect(() => {
-        getData()
-    }, [docId, params?.id])
+        if (open) {
+            getData()
+        }
+    }, [open])
 
     const columns = [
         {
@@ -65,12 +62,52 @@ const ContentModalFromHTML = ({ open, docId, handleModal }) => {
             ),
         },
         {
-            title: "Nội dung",
-            dataIndex: "content",
-            align: "left",
+            title: "Câu trong các tài liệu mẫu",
+            dataIndex: "text",
             width: 500,
             render: (text, record, index) => (
-                <span>{record?.sentenceOrCheckingDocumentSentence_sententce?.content}</span>
+                <span style={{ whiteSpace: 'break-spaces' }}>{record?.text}</span>
+            ),
+        },
+        {
+            title: "Độ tương đồng",
+            dataIndex: "similarity",
+            align: "center",
+            width: 100,
+            render: (text, record, index) => (
+                <span>{(record?.similarity * 100).toFixed(2)}%</span>
+            ),
+        },
+        {
+            title: "Tên tài liệu mẫu",
+            dataIndex: "title",
+            width: 200,
+            render: (text, record, index) => (
+                <span style={{ whiteSpace: 'break-spaces' }}>{record?.title}</span>
+            ),
+        },
+        {
+            title: "Loại tài liệu",
+            dataIndex: "title",
+            width: 200,
+            render: (text, record, index) => (
+                <span style={{ whiteSpace: 'break-spaces' }}>{record?.document_type}</span>
+            ),
+        },
+        {
+            title: "Tác giả",
+            dataIndex: "title",
+            width: 200,
+            render: (text, record, index) => (
+                <span style={{ whiteSpace: 'break-spaces' }}>{record?.author}</span>
+            ),
+        },
+        {
+            title: "Năm công bố",
+            dataIndex: "title",
+            width: 100,
+            render: (text, record, index) => (
+                <span style={{ whiteSpace: 'break-spaces' }}>{toDateTimeString(record?.publishYear)}</span>
             ),
         }
     ]
@@ -79,8 +116,9 @@ const ContentModalFromHTML = ({ open, docId, handleModal }) => {
             <ModalHeader className='bg-transparent' toggle={handleModal}></ModalHeader>
             <ModalBody className='px-sm-3 mx-50 pb-2' style={{ paddingTop: 0 }}>
                 <div className='text-center mb-1'>
-                    <h2 className='mb-1'>Danh sách các câu trùng với tài liệu</h2>
+                    <h2 className='mb-1'>Danh sách các câu tương đồng</h2>
                 </div>
+                <h6>Câu kiểm tra: <span style={{color: 'red'}}>{sentence}</span></h6>
                 <Row tag='table' className='gy-1 pt-75'>
                     {loadingData === true ? <Spin /> : <Table
                         columns={columns}
@@ -110,4 +148,4 @@ const ContentModalFromHTML = ({ open, docId, handleModal }) => {
     )
 }
 
-export default ContentModalFromHTML
+export default SentenceModal

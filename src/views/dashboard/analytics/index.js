@@ -146,7 +146,9 @@ const AnalyticsDashboard = () => {
         <DocumentByTime />
       </Row>
       <Row className='match-height'>
-        <NumCheckingBySimilarity />
+        <Col lg='12' md='12'>
+          <NumCheckingBySimilarity />
+        </Col>
       </Row>
       {/* <Row className='match-height'>
         <Col lg='4' xs='12'>

@@ -52,7 +52,7 @@ const DocumentByAspects = () => {
                     </CardTitle>
                 </div>
             </CardHeader>
-            <CardBody style={{ width: '400px', height: '400px' }}>
+            <CardBody style={{ width: '400px', height: '400px', margin: 'auto' }}>
                 <Pie data={data} options={options} />
             </CardBody>
         </Card>

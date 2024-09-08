@@ -177,7 +177,7 @@ const EditCheckingDocument = ({ open, handleModal, infoEdit, getData }) => {
                         </Label>
                         <Controller
                             id='react-select'
-                            defaultValue={{ value: infoEdit?.course?.id, label: infoEdit?.course?.name }}
+                            defaultValue={ infoEdit?.course && { value: infoEdit?.course?.id, label: infoEdit?.course?.name }}
                             name='course'
                             control={control}
                             render={({ field }) => (

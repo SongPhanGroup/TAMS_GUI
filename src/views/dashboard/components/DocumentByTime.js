@@ -27,6 +27,9 @@ import {
     CardTitle,
     CardHeader
 } from 'reactstrap'
+import ChartDataLabels from 'chartjs-plugin-datalabels'
+import { DatePicker } from "antd"
+import dayjs from "dayjs"
 
 ChartJS.register(
     LinearScale,
@@ -37,64 +40,76 @@ ChartJS.register(
     Legend,
     Tooltip,
     LineController,
-    BarController
+    BarController,
+    ChartDataLabels
 )
 
 // const labels = ["Đơn vị 1", "Đơn vị 2", "Đơn vị 3", "Đơn vị 4", "Đơn vị 5", "Đơn vị 6", "Đơn vị 7", "Đơn vị 8", "Đơn vị 9", "Đơn vị 10", "Đơn vị 11", "Đơn vị 12"]
 const labels = ["2018", "2019", "2020", "2021", "2022", "2023"]
 const fakeData = [
     {
-        count: 10,
+        count1: 10,
+        count2: 8,
         month: "Tháng 1",
         backgroundColor: "rgba(245,34,45,0.8)"
     },
     {
-        count: 12,
+        count1: 12,
+        count2: 10,
         month: "Tháng 2",
         backgroundColor: "rgba(245,34,45,0.8)"
     },
     {
-        count: 8,
+        count1: 8,
+        count2: 10,
         month: "Tháng 3",
         backgroundColor: "rgba(245,34,45,0.8)"
     },
     {
-        count: 4,
+        count1: 4,
+        count2: 10,
         month: "Tháng 4",
         backgroundColor: "rgba(245,34,45,0.8)"
     },
     {
-        count: 7,
+        count1: 7,
+        count2: 9,
         month: "Tháng 5",
         backgroundColor: "rgba(245,34,45,0.8)"
     },
     {
-        count: 8,
+        count1: 8,
+        count2: 6,
         month: "Tháng 6",
         backgroundColor: "rgba(245,34,45,0.8)"
     },
     {
-        count: 10,
+        count1: 10,
+        count2: 6,
         month: "Tháng 7",
         backgroundColor: "rgba(245,34,45,0.8)"
     },
     {
-        count: 9,
+        count1: 9,
+        count2: 12,
         month: "Tháng 8",
         backgroundColor: "rgba(245,34,45,0.8)"
     },
     {
-        count: 5,
+        count1: 5,
+        count2: 7,
         month: "Tháng 9",
         backgroundColor: "rgba(245,34,45,0.8)"
     },
     {
-        count: 5,
+        count1: 5,
+        count2: 12,
         month: "Tháng 10",
         backgroundColor: "rgba(245,34,45,0.8)"
     },
     {
-        count: 4,
+        count1: 4,
+        count2: 6,
         month: "Tháng 11",
         backgroundColor: "rgba(245,34,45,0.8)"
     },
@@ -113,17 +128,16 @@ export default function DocumentByTime() {
         datasets: [
             {
                 label: "Luận văn",
-                data: fakeData?.map(item => item.count),
+                data: fakeData?.map(item => item.count1),
                 backgroundColor: "rgba(245,34,45,0.8)"
             },
             {
                 label: "Luận án",
-                data: fakeData?.map(item => item.count),
+                data: fakeData?.map(item => item.count2),
                 backgroundColor: "rgba(34,150,245,1)"
             }
         ]
     }
-    console.log(dataChart)
     const options = {
         responsive: true,
         maintainAspectRatio: true,
@@ -142,7 +156,21 @@ export default function DocumentByTime() {
             display: true,
             position: 'bottom',
         },
+        plugins: {
+            legend: {
+                display: true,
+                position: 'bottom',
+            },
+            // Thêm datalabels plugin để hiển thị nhãn dữ liệu
+            datalabels: {
+                anchor: 'end',  // Đặt vị trí nhãn dữ liệu ở cuối cột
+                align: 'end',   // Căn chỉnh nhãn dữ liệu
+                formatter: (value) => value, // Định dạng hiển thị của nhãn (ở đây là giá trị trực tiếp)
+                color: '#000',  // Màu của nhãn dữ liệu
+            }
+        }
     }
+    const currentYear = new Date().getFullYear()
 
     return (
         <Card style={{ position: "relative", width: "100%" }}>
@@ -154,6 +182,18 @@ export default function DocumentByTime() {
                 </div>
             </CardHeader>
             <CardBody>
+                <div className="d-flex col col-4" style={{ justifyContent: "flex-start", marginRight: "1rem", alignItems: "center" }}>
+                    <span style={{ marginRight: "1rem" }}>Thời gian</span>
+                    <DatePicker.RangePicker
+                        style={{
+                            width: "70%",
+                        }}
+                        defaultValue={[dayjs(`${currentYear}-01-01`), dayjs(`${currentYear}-12-31`)]}
+                        format={"DD/MM/YYYY"}
+                        allowClear={false}
+                    // onChange={handleChangeYear}
+                    />
+                </div>
                 <Chart type='bar' data={dataChart} options={options} />
             </CardBody>
         </Card>

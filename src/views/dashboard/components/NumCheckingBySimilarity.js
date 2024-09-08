@@ -1,9 +1,11 @@
 // ** Third Party Components
 import Chart from 'react-apexcharts'
 import { ArrowDown } from 'react-feather'
-
+import { DatePicker } from "antd"
+import dayjs from "dayjs"
 // ** Reactstrap Imports
 import { Card, CardHeader, CardTitle, CardBody, CardSubtitle, Badge } from 'reactstrap'
+import ChartDataLabels from 'chartjs-plugin-datalabels'
 
 const NumCheckingBySimilarity = () => {
     const direction = 'ltr'
@@ -27,7 +29,15 @@ const NumCheckingBySimilarity = () => {
             colors: [warning, "#00FF00", "#0000FF", "#FF0000"]
         },
         dataLabels: {
-            enabled: false
+            enabled: true, // Hiển thị số liệu
+            formatter(val) {
+                return val // Định dạng số liệu với ký hiệu phần trăm
+            },
+            offsetY: -5, // Vị trí của số liệu so với cột
+            style: {
+                fontSize: '12px',
+                colors: ["#ccc"]
+            }
         },
         stroke: {
             curve: 'straight'
@@ -42,9 +52,8 @@ const NumCheckingBySimilarity = () => {
         },
         tooltip: {
             custom(data) {
-                console.log(data)
                 return `<div class='px-1 py-50'>
-              <span>đây${data.series[data.seriesIndex][data.dataPointIndex]}%</span>
+              <span>${data.series[data.seriesIndex][data.dataPointIndex]}</span>
             </div>`
             }
         },
@@ -88,6 +97,7 @@ const NumCheckingBySimilarity = () => {
             data: [10, 9, 3, 10, 15, 14, 5, 17, 25, 17, 16, 22]
         }
     ]
+    const currentYear = new Date().getFullYear()
 
     return (
         <Card>
@@ -107,6 +117,18 @@ const NumCheckingBySimilarity = () => {
                 </div> */}
             </CardHeader>
             <CardBody>
+                <div className="d-flex col col-4" style={{ justifyContent: "flex-start", marginRight: "1rem", alignItems: "center" }}>
+                    <span style={{ marginRight: "1rem" }}>Thời gian</span>
+                    <DatePicker.RangePicker
+                        style={{
+                            width: "70%",
+                        }}
+                        defaultValue={[dayjs(`${currentYear}-01-01`), dayjs(`${currentYear}-12-31`)]}
+                        format={"DD/MM/YYYY"}
+                        allowClear={false}
+                    // onChange={handleChangeYear}
+                    />
+                </div>
                 <Chart options={options} series={series} type='line' height={400} />
             </CardBody>
         </Card>

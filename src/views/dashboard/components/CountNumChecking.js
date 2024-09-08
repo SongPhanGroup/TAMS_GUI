@@ -27,6 +27,9 @@ import {
     CardTitle,
     CardHeader
 } from 'reactstrap'
+import ChartDataLabels from 'chartjs-plugin-datalabels'
+import { DatePicker } from "antd"
+import dayjs from "dayjs"
 
 ChartJS.register(
     LinearScale,
@@ -37,7 +40,8 @@ ChartJS.register(
     Legend,
     Tooltip,
     LineController,
-    BarController
+    BarController,
+    ChartDataLabels
 )
 
 // const labels = ["Đơn vị 1", "Đơn vị 2", "Đơn vị 3", "Đơn vị 4", "Đơn vị 5", "Đơn vị 6", "Đơn vị 7", "Đơn vị 8", "Đơn vị 9", "Đơn vị 10", "Đơn vị 11", "Đơn vị 12"]
@@ -118,12 +122,10 @@ export default function CountNumChecking() {
             }
         ]
     }
-    console.log(dataChart)
     const options = {
         responsive: true,
         maintainAspectRatio: true,
-        // maintainAspectRatio: true,
-        aspectRatio: 2, // Tỷ
+        aspectRatio: 2, // Tỷ lệ khung hình
         scales: {
             y: {
                 min: 0, // Giá trị tối thiểu của trục y
@@ -133,11 +135,28 @@ export default function CountNumChecking() {
                 },
             },
         },
-        legend: {
-            display: true,
-            position: 'bottom',
+        plugins: {
+            legend: {
+                display: true,
+                position: 'bottom',
+            },
+            tooltip: {
+                enabled: true,
+            },
+            datalabels: {
+                anchor: 'end',
+                align: 'end',
+                color: 'black', // Màu chữ của số liệu
+                font: {
+                    weight: 'bold',
+                    size: 14,
+                },
+                formatter: (value) => value, // Hiển thị giá trị thực
+            },
         },
     }
+
+    const currentYear = new Date().getFullYear()
 
     return (
         <Card style={{ position: "relative", width: "100%" }}>
@@ -149,6 +168,18 @@ export default function CountNumChecking() {
                 </div>
             </CardHeader>
             <CardBody>
+                <div className="d-flex col col-4" style={{ justifyContent: "flex-start", marginRight: "1rem", alignItems: "center" }}>
+                    <span style={{ marginRight: "1rem" }}>Thời gian</span>
+                    <DatePicker.RangePicker
+                        style={{
+                            width: "70%",
+                        }}
+                        defaultValue={[dayjs(`${currentYear}-01-01`), dayjs(`${currentYear}-12-31`)]}
+                        format={"DD/MM/YYYY"}
+                        allowClear={false}
+                    // onChange={handleChangeYear}
+                    />
+                </div>
                 <Chart type='bar' data={dataChart} options={options} />
             </CardBody>
         </Card>

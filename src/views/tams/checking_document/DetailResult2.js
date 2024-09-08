@@ -211,7 +211,7 @@ const DetailResult2 = () => {
                     loadingHTML === true ? <Spin style={{
                         padding: '16px'
                     }} /> : (
-                        <Col md={18} style={{height: '100vh', overflow: 'auto'}}>
+                        <Col md={18} style={{ height: '100vh', overflow: 'auto' }}>
                             <Row gutter={16} style={{ padding: '16px', width: '100%', overflow: 'auto' }}>
                                 <h4>
                                     {location?.state?.fileName}
@@ -230,8 +230,8 @@ const DetailResult2 = () => {
                     }} /> : (
                         <Col md={6} style={{ position: 'fixed', right: 0, width: '100%', height: '100%' }}>
                             <Row className='p-1' style={{ justifyContent: 'center', backgroundColor: '#09A863', color: '#fff', fontWeight: '600' }}>
-                                <Col md={22} style={{ textAlign: 'center' }}>Kết quả trùng lặp</Col>
-                                <Col md={2}><X color='#fff' /></Col>
+                                <Col md={24} style={{ textAlign: 'center' }}><h6 style={{ textTransform: 'uppercase', color: '#fff', marginBottom: 0 }}>Kết quả trùng lặp</h6></Col>
+                                {/* <Col md={2}><X color='#fff' /></Col> */}
                             </Row>
                             <Row style={{ justifyContent: 'center', fontSize: '24px', color: 'red', fontWeight: '600' }}>
                                 {location?.state?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}%

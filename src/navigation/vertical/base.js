@@ -1,5 +1,5 @@
 import { FileOutlined, MenuOutlined, UnorderedListOutlined, MoneyCollectOutlined, BookOutlined, ScheduleOutlined, ApartmentOutlined, CheckOutlined, DiffOutlined, GlobalOutlined } from '@ant-design/icons'
-import { Mail, MessageSquare, CheckSquare, Calendar, FileText, Circle, ShoppingCart, User, Shield, Users, Airplay, Columns, Settings, Bold, Bell, Aperture, Home, Book, Grid, Menu, UserPlus, Sliders } from 'react-feather'
+import { Mail, MessageSquare, CheckSquare, Calendar, FileText, Circle, ShoppingCart, User, Shield, Users, Airplay, Columns, Settings, Bold, Bell, Aperture, Home, Book, Grid, Menu, UserPlus, Sliders, BarChart } from 'react-feather'
 
 export default [
   {
@@ -21,7 +21,38 @@ export default [
     // role: 0
   },
   {
-    header: "Tài liệu",
+    header: "Kiểm tra tài liệu",
+    role: 0
+  },
+  {
+    id: 'course',
+    title: 'QL đợt kiểm tra',
+    icon: <DiffOutlined size={12} />,
+    navLink: '/tams/course',
+    action: 'read',
+    resource: 'DOT_KIEM_TRA',
+    role: 0
+  },
+  {
+    id: 'checking-document',
+    title: 'KT trùng lặp tuyệt đối',
+    icon: <CheckOutlined size={12} />,
+    navLink: '/tams/checking-document',
+    action: 'read',
+    resource: 'KIEM_TRA_TAI_LIEU',
+    role: 0
+  },
+  {
+    id: 'checking-specialized',
+    title: 'KT trùng lặp xấp xỉ',
+    icon: <CheckOutlined size={12} />,
+    navLink: '/tams/checking-specialized',
+    action: 'read',
+    resource: 'KIEM_TRA_CHUYEN_SAU',
+    role: 0
+  },
+  {
+    header: "Tài liệu mẫu",
     role: 0
   },
   {
@@ -29,6 +60,15 @@ export default [
     title: 'QL kho tài liệu mẫu',
     icon: <FileText size={12} />,
     navLink: '/tams/document',
+    action: 'read',
+    resource: 'QL_KHO_TAI_LIEU_MAU',
+    role: 0
+  },
+  {
+    id: 'statistic-document',
+    title: 'Thống kê tài liệu mẫu',
+    icon: <BarChart size={12} />,
+    navLink: '/tams/statistic-document',
     action: 'read',
     resource: 'QL_KHO_TAI_LIEU_MAU',
     role: 0
@@ -57,7 +97,7 @@ export default [
   },
   {
     id: 'major',
-    title: 'Lĩnh vực',
+    title: 'Lĩnh vực tài liệu',
     icon: <Sliders size={12} />,
     navLink: '/tams/major',
     action: 'read',
@@ -74,8 +114,12 @@ export default [
     role: 0
   },
   {
+    header: "Quản lý hệ thống",
+    role: 0
+  },
+  {
     id: 'organization',
-    title: 'Đơn vị',
+    title: 'QL đơn vị',
     icon: <ApartmentOutlined size={12} />,
     navLink: '/tams/organization',
     action: 'read',
@@ -83,43 +127,8 @@ export default [
     role: 0
   },
   {
-    header: "Kiểm tra tài liệu",
-    role: 0
-  },
-  {
-    id: 'course',
-    title: 'Đợt kiểm tra',
-    icon: <DiffOutlined size={12} />,
-    navLink: '/tams/course',
-    action: 'read',
-    resource: 'DOT_KIEM_TRA',
-    role: 0
-  },
-  {
-    id: 'checking-document',
-    title: 'Kiểm tra nhanh tài liệu',
-    icon: <CheckOutlined size={12} />,
-    navLink: '/tams/checking-document',
-    action: 'read',
-    resource: 'KIEM_TRA_TAI_LIEU',
-    role: 0
-  },
-  {
-    id: 'checking-specialized',
-    title: 'Kiểm tra chuyên sâu',
-    icon: <CheckOutlined size={12} />,
-    navLink: '/tams/checking-specialized',
-    action: 'read',
-    resource: 'KIEM_TRA_CHUYEN_SAU',
-    role: 0
-  },
-  {
-    header: "Quản lý hệ thống",
-    role: 0
-  },
-  {
     id: 'permissions',
-    title: 'QL Tài khoản',
+    title: 'QL tài khoản',
     icon: <Users size={12} />,
     navLink: '/tams/accounts',
     action: 'read',
@@ -128,7 +137,7 @@ export default [
   },
   {
     id: 'role',
-    title: 'Vai trò, phân quyền',
+    title: 'QL vai trò và phân quyền',
     icon: <Users size={12} />,
     navLink: '/tams/roles',
     action: 'read',

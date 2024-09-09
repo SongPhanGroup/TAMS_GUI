@@ -97,6 +97,7 @@ const CheckingResult = () => {
     const [listPermissionSelected, setListPermissionSelected] = useState([])
     const [checkingDocumentSelected, setCheckingDocumentSelected] = useState()
     const [listAllRole, setListAllRole] = useState([])
+    const [selectedCourse, setSelectedCourse] = useState()
 
     const [listCourse, setListCourse] = useState([])
 
@@ -162,6 +163,7 @@ const CheckingResult = () => {
                     return { ...item, _id: item.id, key: index }
                 }))
                 setData2(result)
+                setSelectedCourse(result[0].document.course.id)
                 setCount2(res?.total)
             })
             .catch((err) => {
@@ -390,6 +392,12 @@ const CheckingResult = () => {
         }
     }
 
+    const [expandedRowKeys, setExpandedRowKeys] = useState([])
+
+    const onExpand = (expanded, record) => {
+        setExpandedRowKeys(expanded ? [record.key] : [])
+    }
+
     return (
         <Fragment>
             <Card
@@ -478,31 +486,35 @@ const CheckingResult = () => {
                         // rowClassName={rowClassName}
                         />}
                     </Col>
-                    <Col md="12">
-                        <h6 style={{ textTransform: 'uppercase' }}>2. Kết quả trùng lặp với các tài liệu cùng đợt kiểm tra</h6>
-                        {/* <Select options={listCourse} placeholder="Chọn đợt kiểm tra" className="mb-1" style={{ float: 'right', width: '200px' }} allowClear onChange={(value) => handleChangeCourse(value)} /> */}
-                        {loadingData === true ? <Spin style={{ position: 'relative', left: '50%' }} /> : <Table
-                            columns={columns}
-                            dataSource={data}
-                            bordered
-                            expandable={{
-                                expandedRowRender: (record) => <ContentModal
-                                    listSentenceByCheckingResult={record} />,
-                                rowExpandable: (record) => record.name !== 'Not Expandable',
-                                // expandRowByClick: true
-                            }}
-                            pagination={{
-                                defaultPageSize: 10,
-                                showSizeChanger: true,
-                                pageSizeOptions: ["10", "20", "30"],
-                                total: { count },
-                                locale: { items_per_page: "/ trang" },
-                                showSizeChanger: true,
-                                showTotal: (total, range) => <span>Tổng số: {total}</span>,
-                            }}
-                        // rowClassName={rowClassName}
-                        />}
-                    </Col>
+                    {
+                        data && selectedCourse !== 1 ? <Col md="12">
+                            <h6 style={{ textTransform: 'uppercase' }}>2. Kết quả trùng lặp với các tài liệu cùng đợt kiểm tra</h6>
+                            {/* <Select options={listCourse} placeholder="Chọn đợt kiểm tra" className="mb-1" style={{ float: 'right', width: '200px' }} allowClear onChange={(value) => handleChangeCourse(value)} /> */}
+                            {loadingData === true ? <Spin style={{ position: 'relative', left: '50%' }} /> : <Table
+                                columns={columns}
+                                dataSource={data}
+                                bordered
+                                expandable={{
+                                    expandedRowRender: (record) => <ContentModal
+                                        listSentenceByCheckingResult={record} />,
+                                    rowExpandable: (record) => record.name !== 'Not Expandable',
+                                    // expandRowByClick: true
+                                }}
+                                expandedRowKeys={expandedRowKeys}
+                                onExpand={onExpand}
+                                pagination={{
+                                    defaultPageSize: 10,
+                                    showSizeChanger: true,
+                                    pageSizeOptions: ["10", "20", "30"],
+                                    total: { count },
+                                    locale: { items_per_page: "/ trang" },
+                                    showSizeChanger: true,
+                                    showTotal: (total, range) => <span>Tổng số: {total}</span>,
+                                }}
+                            // rowClassName={rowClassName}
+                            />}
+                        </Col> : <></>
+                    }
                 </Row>
             </Card>
         </Fragment>

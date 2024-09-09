@@ -205,17 +205,30 @@ const DetailResult2 = () => {
 
     return (
         <>
-            <Row></Row>
-            <Row gutter={16}>
+            <Row gutter={16} style={{ padding: '16px 16px 0 16px' }}>
+                <Col md={18} style={{ display: 'flex', alignItems: 'center', padding: 0, borderBottom: '4px solid #357BBD' }}>
+                    <Row style={{ flex: 1 }}>
+                        <Col md={12}>
+                            <h4 style={{ textTransform: 'uppercase', marginBottom: 0, color: '#1C5385' }}>Kiểm tra chi tiết</h4>
+                        </Col>
+                        <Col md={12}>
+                            <h4 style={{ marginBottom: 0, color: 'red' }}>{location.state.fileName}</h4>
+                        </Col>
+                    </Row>
+                </Col>
+                <Col md={6}>
+
+                </Col>
+            </Row>            <Row gutter={16}>
                 {
                     loadingHTML === true ? <Spin style={{
                         padding: '16px'
                     }} /> : (
                         <Col md={18} style={{ height: '100vh', overflow: 'auto' }}>
                             <Row gutter={16} style={{ padding: '16px', width: '100%', overflow: 'auto' }}>
-                                <h4>
+                                {/* <h4>
                                     {location?.state?.fileName}
-                                </h4>
+                                </h4> */}
                                 {/* <HTMLContent htmlResult={htmlResult} orders={listSentence} indexs={highlightIndexs} /> */}
                                 <CustomStyle>
                                     <Content dangerouslySetInnerHTML={{ __html: (htmlResult) }} />

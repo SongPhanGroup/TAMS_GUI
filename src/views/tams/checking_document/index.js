@@ -352,6 +352,12 @@ const CheckingDocument = () => {
         },
     ]
 
+    const [expandedRowKeys, setExpandedRowKeys] = useState([])
+
+    const onExpand = (expanded, record) => {
+        setExpandedRowKeys(expanded ? [record.key] : [])
+    }
+
     return (
         <Fragment>
             <Card
@@ -483,6 +489,8 @@ const CheckingDocument = () => {
                                 rowExpandable: (record) => record.name !== 'Not Expandable',
                                 // expandRowByClick: true
                             }}
+                            expandedRowKeys={expandedRowKeys}
+                            onExpand={onExpand}
                             pagination={{
                                 defaultPageSize: 10,
                                 showSizeChanger: true,

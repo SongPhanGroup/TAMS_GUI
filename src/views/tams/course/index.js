@@ -238,7 +238,7 @@ const Course = () => {
                             }
                         </Popconfirm>
                     }
-                    {ability.can('update', 'LOAI_DON_VI') &&
+                    {ability.can('update', 'DOT_KIEM_TRA') &&
                         <>
 
                             <Tooltip placement="top" title="Kiểm tra trong khóa" >
@@ -248,9 +248,8 @@ const Course = () => {
                                 />
                             </Tooltip>
                         </>}
-                    {ability.can('update', 'LOAI_DON_VI') &&
+                    {ability.can('update', 'DOT_KIEM_TRA') &&
                         <>
-
                             <Tooltip placement="top" title="Chỉnh sửa" >
                                 <EditOutlined
                                     style={{ color: "#09A863", cursor: 'pointer', marginRight: '1rem' }}
@@ -258,7 +257,7 @@ const Course = () => {
                                 />
                             </Tooltip>
                         </>}
-                    {ability.can('delete', 'LOAI_DON_VI') &&
+                    {ability.can('delete', 'DOT_KIEM_TRA') &&
                         <Popconfirm
                             title="Bạn chắc chắn xóa?"
                             onConfirm={() => handleDelete(record.id)}
@@ -333,18 +332,20 @@ const Course = () => {
                         />
                     </Col>
                 </Col>
-                <Col sm="4" style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <Button
-                        onClick={(e) => setIsAdd(true)}
-                        color="primary"
-                        className="addBtn"
-                        style={{
-                            width: '100px',
-                        }}
-                    >
-                        Thêm mới
-                    </Button>
-                </Col>
+                {ability.can('create', 'DOT_KIEM_TRA') &&
+                    <Col sm="4" style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <Button
+                            onClick={(e) => setIsAdd(true)}
+                            color="primary"
+                            className="addBtn"
+                            style={{
+                                width: '100px',
+                            }}
+                        >
+                            Thêm mới
+                        </Button>
+                    </Col>
+                }
             </Row>
             {loadingData === true ? <Spin style={{ position: 'relative', left: '50%' }} /> : <Table
                 columns={columns}

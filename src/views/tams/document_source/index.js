@@ -147,7 +147,7 @@ const DocumentSource = () => {
             align: "center",
             render: (record) => (
                 <div style={{ display: "flex", justifyContent: "center" }}>
-                    {ability.can('update', 'LOAI_DON_VI') &&
+                    {ability.can('update', 'NGUON_TAI_LIEU') &&
                         <>
                             <Tooltip placement="top" title="Chỉnh sửa">
                                 <EditOutlined
@@ -156,7 +156,7 @@ const DocumentSource = () => {
                                 />
                             </Tooltip>
                         </>}
-                    {ability.can('delete', 'LOAI_DON_VI') &&
+                    {ability.can('delete', 'NGUON_TAI_LIEU') &&
                         <Popconfirm
                             title="Bạn chắc chắn xóa?"
                             onConfirm={() => handleDelete(record.id)}
@@ -209,18 +209,20 @@ const DocumentSource = () => {
                         }}
                     />
                 </Col>
-                <Col sm="7" style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <Button
-                        onClick={(e) => setIsAdd(true)}
-                        color="primary"
-                        className="addBtn"
-                        style={{
-                            width: '100px',
-                        }}
-                    >
-                        Thêm mới
-                    </Button>
-                </Col>
+                {ability.can('create', 'NGUON_TAI_LIEU') &&
+                    <Col sm="7" style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <Button
+                            onClick={(e) => setIsAdd(true)}
+                            color="primary"
+                            className="addBtn"
+                            style={{
+                                width: '100px',
+                            }}
+                        >
+                            Thêm mới
+                        </Button>
+                    </Col>
+                }
             </Row>
             {loadingData === true ? <Spin style={{ position: 'relative', left: '50%' }} /> : <Table
                 columns={columns}

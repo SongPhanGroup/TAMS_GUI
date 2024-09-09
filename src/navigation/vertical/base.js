@@ -39,7 +39,7 @@ export default [
     icon: <CheckOutlined size={12} />,
     navLink: '/tams/checking-document',
     action: 'read',
-    resource: 'KIEM_TRA_TAI_LIEU',
+    resource: 'KIEM_TRA_TRUNG_LAP_TUYET_DOI',
     role: 0
   },
   {
@@ -48,7 +48,7 @@ export default [
     icon: <CheckOutlined size={12} />,
     navLink: '/tams/checking-specialized',
     action: 'read',
-    resource: 'KIEM_TRA_CHUYEN_SAU',
+    resource: 'KIEM_TRA_TRUNG_LAP_XAP_XI',
     role: 0
   },
   {
@@ -70,7 +70,7 @@ export default [
     icon: <BarChart size={12} />,
     navLink: '/tams/statistic-document',
     action: 'read',
-    resource: 'QL_KHO_TAI_LIEU_MAU',
+    resource: 'THONG_KE_TAI_LIEU_MAU',
     role: 0
   },
   {
@@ -101,7 +101,7 @@ export default [
     icon: <Sliders size={12} />,
     navLink: '/tams/major',
     action: 'read',
-    resource: 'LINH_VUC',
+    resource: 'LINH_VUC_TAI_LIEU',
     role: 0
   },
   {

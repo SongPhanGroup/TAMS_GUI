@@ -8,7 +8,8 @@ import {
     Switch,
     Collapse,
     Select,
-    Spin
+    Spin,
+    Tooltip
 } from "antd"
 import React, { useState, Fragment, useEffect, useRef, useContext } from "react"
 import {
@@ -315,19 +316,16 @@ const CheckingDocument = () => {
             align: "center",
             render: (record) => (
                 <div style={{ display: "flex", justifyContent: "center" }}>
-                    {ability.can('update', 'PHAN_QUYEN_VAI_TRO') &&
+                    {ability.can('update', 'KIEM_TRA_TRUNG_LAP_XAP_XI') &&
                         <>
-                            <EditOutlined
-                                id={`tooltip_edit_${record._id}`}
-                                style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
-                                onClick={(e) => handleEdit(record)}
-                            />
-                            <UncontrolledTooltip placement="top" target={`tooltip_edit_${record._id}`}
-                            >
-                                Chỉnh sửa
-                            </UncontrolledTooltip>
+                            <Tooltip placement="top" title="Chỉnh sửa" >
+                                <EditOutlined
+                                    style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
+                                    onClick={(e) => handleEdit(record)}
+                                />
+                            </Tooltip>
                         </>}
-                    {/* { ability.can('update', 'PHAN_QUYEN_VAI_TRO') && 
+                    {/* { ability.can('update', 'KIEM_TRA_TRUNG_LAP_XAP_XI') && 
                               <>
               <AppstoreAddOutlined
                 id={`tooltip_per_${record._id}`}
@@ -337,20 +335,19 @@ const CheckingDocument = () => {
               <UncontrolledTooltip placement="top" target={`tooltip_per_${record._id}`}>
                 Phân quyền
               </UncontrolledTooltip></>} */}
-                    {ability.can('delete', 'PHAN_QUYEN_VAI_TRO') &&
+                    {ability.can('delete', 'KIEM_TRA_TRUNG_LAP_XAP_XI') &&
                         <Popconfirm
                             title="Bạn chắc chắn xóa?"
                             onConfirm={() => handleDelete(record._id)}
                             cancelText="Hủy"
                             okText="Đồng ý"
                         >
-                            <DeleteOutlined
-                                style={{ color: "red", cursor: "pointer" }}
-                                id={`tooltip_delete_${record._id}`}
-                            />
-                            <UncontrolledTooltip placement="top" target={`tooltip_delete_${record._id}`}>
-                                Xóa
-                            </UncontrolledTooltip>
+                            <Tooltip placement="top" title="Xóa" >
+                                <DeleteOutlined
+                                    style={{ color: "red", cursor: "pointer" }}
+                                    id={`tooltip_delete_${record._id}`}
+                                />
+                            </Tooltip>
                         </Popconfirm>}
                 </div>
             ),
@@ -464,7 +461,7 @@ const CheckingDocument = () => {
                                 </Col>
                             </Col>
                             <Col md="2" style={{ display: "flex", justifyContent: "flex-end" }}>
-                                {ability.can('create', 'PHAN_QUYEN_VAI_TRO') &&
+                                {ability.can('create', 'KIEM_TRA_TRUNG_LAP_XAP_XI') &&
                                     <Button
                                         onClick={(e) => setIsAdd(true)}
                                         color="primary"

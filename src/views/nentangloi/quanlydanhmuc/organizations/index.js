@@ -300,7 +300,7 @@ const ListOrganizations = () => {
       align: "center",
       render: (record) => (
         <div style={{ display: "flex", justifyContent: "center" }}>
-          {ability.can('update', 'LOAI_DON_VI') &&
+          {ability.can('update', 'DON_VI') &&
             <>
               <Tooltip placement="top" title="Chỉnh sửa">
                 <EditOutlined
@@ -313,7 +313,7 @@ const ListOrganizations = () => {
                 />
               </Tooltip>
             </>}
-          {ability.can('delete', 'LOAI_DON_VI') &&
+          {ability.can('delete', 'DON_VI') &&
             <Popconfirm
               title="Bạn chắc chắn xóa?"
               onConfirm={() => handleDelete(record)}
@@ -369,7 +369,7 @@ const ListOrganizations = () => {
             }}
           />
         </Col>
-        {ability.can('create', 'LOAI_DON_VI') &&
+        {ability.can('create', 'DON_VI') &&
           <Col sm="7" style={{ display: "flex", justifyContent: "flex-end" }}>
             <Button
               onClick={(e) => setIsAdd(true)}

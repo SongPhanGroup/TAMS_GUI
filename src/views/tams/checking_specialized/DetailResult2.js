@@ -240,7 +240,7 @@ const DetailResult2 = () => {
     }
 
     return (
-        <>
+        <div style={{height: '100vh', overflow: 'hidden'}}>
             <Row gutter={16} style={{ padding: '16px 16px 0 16px' }}>
                 <Col md={18} style={{ display: 'flex', alignItems: 'center', padding: 0, borderBottom: '4px solid #357BBD' }}>
                     <Row style={{ flex: 1 }}>
@@ -286,7 +286,7 @@ const DetailResult2 = () => {
                             <Row style={{ justifyContent: 'center', fontSize: '24px', color: 'red', fontWeight: '600' }}>
                                 {location?.state?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}%
                             </Row>
-                            <Row className='p-1' style={{ border: '1px solid #ccc', height: '90vh', overflow: 'auto' }} >
+                            <Row className='p-1' style={{ border: '1px solid #ccc', height: '85vh', overflow: 'auto' }} >
                                 {
                                     dataDoc?.map((doc, index) => {
                                         // const colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '8B00FF']
@@ -325,7 +325,7 @@ const DetailResult2 = () => {
             </Row>
             <ContentModalFromHTML open={modalContent} docId={selectedDocId} handleModal={handleModal} />
             <SentenceModal open={modalSentence} sentence={selectedSentence} handleModal={handleModal} />
-        </>
+        </div>
     )
 }
 export default DetailResult2

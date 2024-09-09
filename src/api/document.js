@@ -25,9 +25,14 @@ export const detailDocument = async (id) => {
   return res
 }
 
-
 export const deleteDocument = async (id) => {
   const uri = `/document/${id}`
   const res = await API_TAMS.delete(uri)
+  return res
+}
+
+export const statisticByTime = async (params) => {
+  const uri = `/document/statistical-by-time`
+  const res = await API_TAMS.get(uri, params)
   return res
 }

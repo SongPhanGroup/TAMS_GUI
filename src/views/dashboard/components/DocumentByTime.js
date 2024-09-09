@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     Chart as ChartJS,
     LinearScale,
@@ -44,6 +44,7 @@ ChartJS.register(
     ChartDataLabels
 )
 
+import { statisticByTime } from '../../../api/document'
 // const labels = ["Đơn vị 1", "Đơn vị 2", "Đơn vị 3", "Đơn vị 4", "Đơn vị 5", "Đơn vị 6", "Đơn vị 7", "Đơn vị 8", "Đơn vị 9", "Đơn vị 10", "Đơn vị 11", "Đơn vị 12"]
 const labels = ["2018", "2019", "2020", "2021", "2022", "2023"]
 const fakeData = [
@@ -120,6 +121,12 @@ const fakeData = [
     }
 ]
 export default function DocumentByTime() {
+    const currentYear = new Date().getFullYear()
+    const [filter, setFilter] = useState({
+        startDate: dayjs(`${currentYear}-01-01`),
+        endDate: dayjs(`${currentYear}-12-31`)
+    })
+    // const [dataChart, setDataChart] = useState()
     const title = "Tổng số tài liệu mẫu bổ sung vào hệ thống theo thời gian"
     const labelData = fakeData?.map(item => item.month)
     const data = fakeData?.map(item => item.count)
@@ -170,8 +177,29 @@ export default function DocumentByTime() {
             }
         }
     }
-    const currentYear = new Date().getFullYear()
+    useEffect(() => {
+        statisticByTime({
+            params: {
+                startDate: filter?.startDate,
+                endDate: filter?.endDate
+            }
+        }).then((res) => {
+            const data = res?.data ?? []
+            // setDataChart({
+            //     labels: data?.map(item => `Tháng ${item.month}`),
+            //     datasets: [
+            //         {
 
+            //         }
+            //     ]
+            // })
+        }).catch(() => {
+            console.log("Error fetching data")
+        })
+    }, [filter])
+    const handleChangeDates = (dates) => {
+        console.log(dates, "dates")
+    }
     return (
         <Card style={{ position: "relative", width: "100%" }}>
             <CardHeader className='d-flex flex-sm-row flex-column justify-content-md-between align-items-start justify-content-start'>
@@ -188,10 +216,10 @@ export default function DocumentByTime() {
                         style={{
                             width: "70%",
                         }}
-                        defaultValue={[dayjs(`${currentYear}-01-01`), dayjs(`${currentYear}-12-31`)]}
+                        defaultValue={[filter?.startDate, filter?.endDate]}
                         format={"DD/MM/YYYY"}
                         allowClear={false}
-                    // onChange={handleChangeYear}
+                        onChange={handleChangeDates}
                     />
                 </div>
                 <Chart type='bar' data={dataChart} options={options} />

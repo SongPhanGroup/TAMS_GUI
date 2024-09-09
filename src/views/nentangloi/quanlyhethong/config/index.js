@@ -313,6 +313,7 @@ const App = () => {
     const [data, setData] = useState(originData)
     const [count, setCount] = useState()
     const [editingKey, setEditingKey] = useState('')
+    const [isHidden, setIsHidden] = useState(false)
     const isEditing = (record) => record.key === editingKey
     const edit = (record) => {
         form.setFieldsValue({
@@ -323,9 +324,11 @@ const App = () => {
             ...record,
         })
         setEditingKey(record.key)
+        setIsHidden(true)
     }
     const cancel = () => {
         setEditingKey('')
+        setIsHidden(false)
     }
     const save = async (key) => {
         try {
@@ -340,10 +343,12 @@ const App = () => {
                 })
                 setData(newData)
                 setEditingKey('')
+                setIsHidden(false)
             } else {
                 newData.push(row)
                 setData(newData)
                 setEditingKey('')
+                setIsHidden(false)
             }
         } catch (errInfo) {
             console.log('Validate Failed:', errInfo)
@@ -421,7 +426,7 @@ const App = () => {
                             )
                         }
                         {
-                            data.length >= 1 ? (
+                            !editable && data.length >= 1 ? (
                                 <Popconfirm title="Bạn có chắc chắn muốn xóa không?" onConfirm={() => handleDelete(record.key)}>
                                     <a><DeleteOutlined style={{ color: "red", cursor: 'pointer' }} /></a>
                                 </Popconfirm>

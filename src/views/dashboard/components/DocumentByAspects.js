@@ -65,7 +65,7 @@ const DocumentByAspects = () => {
             <CardHeader className='d-flex flex-sm-row flex-column justify-content-md-between align-items-start justify-content-start'>
                 <div>
                     <CardTitle className='mb-75' tag='h4'>
-                        Tổng số tài liệu mẫu:190. Theo lĩnh vực:
+                        Tổng số tài liệu mẫu: 190. Theo lĩnh vực:
                     </CardTitle>
                 </div>
             </CardHeader>

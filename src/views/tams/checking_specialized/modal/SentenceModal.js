@@ -19,7 +19,7 @@ import {
 } from "antd"
 import { useEffect, useState } from "react"
 import { checkSentence } from "../../../../api/checking_sentence"
-import { toDateTimeString } from "../../../../utility/Utils"
+import { toDateString, toDateTimeString } from "../../../../utility/Utils"
 
 const SentenceModal = ({ open, sentence, handleModal }) => {
     const params = useParams()
@@ -103,11 +103,11 @@ const SentenceModal = ({ open, sentence, handleModal }) => {
             ),
         },
         {
-            title: "Năm công bố",
+            title: "Thời gian công bố",
             dataIndex: "title",
             width: 100,
             render: (text, record, index) => (
-                <span style={{ whiteSpace: 'break-spaces' }}>{toDateTimeString(record?.publishYear)}</span>
+                <span style={{ whiteSpace: 'break-spaces' }}>{toDateString(record?.publishYear)}</span>
             ),
         }
     ]

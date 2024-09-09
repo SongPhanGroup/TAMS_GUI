@@ -97,7 +97,7 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
     }
 
     const handleResult = (record) => {
-        navigate(`/tams/checking-result/${record?.id}`, { state: record })
+        navigate(`/tams/checking-specialized-result/${record?.id}`, { state: record })
     }
 
     const handleButtonClick = (record) => {

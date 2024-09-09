@@ -89,7 +89,7 @@ const Course = () => {
     }
 
     const handleSupervisor = (record) => {
-        navigate(`/tams/checking-document`, {state: record})
+        navigate(`/tams/checking-document`, { state: record })
     }
 
     const handleDelete = (key) => {
@@ -226,11 +226,15 @@ const Course = () => {
                             okText="Đồng ý"
                         >
                             {
-                                record.isActive === 1 ? <LockOutlined
-                                    style={{ color: "red", cursor: 'pointer', marginRight: '1rem' }}
-                                /> : <UnlockOutlined
-                                    style={{ color: "#09A863", cursor: 'pointer', marginRight: '1rem' }}
-                                />
+                                record.isActive === 1 ? <Tooltip placement="top" title="Khóa đợt kiểm tra">
+                                    <LockOutlined
+                                        style={{ color: "red", cursor: 'pointer', marginRight: '1rem' }}
+                                    />
+                                </Tooltip> : <Tooltip placement="top" title="Mở khóa đợt kiểm tra">
+                                    <UnlockOutlined
+                                        style={{ color: "#09A863", cursor: 'pointer', marginRight: '1rem' }}
+                                    />
+                                </Tooltip>
                             }
                         </Popconfirm>
                     }

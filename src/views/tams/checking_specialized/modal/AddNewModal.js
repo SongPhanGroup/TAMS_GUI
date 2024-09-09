@@ -87,7 +87,8 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
                 label: `${res.name}`
             }
         })
-        setListCourse(courses)
+        const courses2 = [{ value: 1, label: 'Đợt kiểm tra độc lập' }, ...courses]
+        setListCourse(courses2)
     }
 
     useEffect(() => {

@@ -69,35 +69,35 @@ export const LIST_ROLE = [
         id: 'training',
         title: 'Kiểm tra trùng lặp xấp xỉ',
         icon: "BookOpen",
-        role: 1,
+        role: 0,
         description: '/tams/checking-specialized'
     },
     {
         id: 'facilities',
         title: 'Quản lý kho dữ liệu mẫu',
         icon: "Trello",
-        role: 2,
+        role: 0,
         description: '/tams/document'
     },
     {
         id: 'science',
         title: 'Quản lý tài khoản người dùng',
         icon: "Users",
-        role: 3,
+        role: 0,
         description: '/tams/accounts'
     },
     {
         id: 'map',
         title: 'Quản lý người dùng và phân quyền',
         icon: "Hexagon",
-        role: 4,
+        role: 0,
         description: '/tams/roles'
     },
     {
         id: 'plan',
         title: 'Quản lý đơn vị',
         icon: "Map",
-        role: 5,
+        role: 0,
         description: '/tams/organization'
     },
     // {

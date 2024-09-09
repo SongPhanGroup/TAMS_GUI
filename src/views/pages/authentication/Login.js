@@ -206,29 +206,31 @@ const Login = () => {
                 localStorage.setItem('userData', JSON.stringify(memberInfo))
                 ability.update(permissionArrFormat)
                 const routeItem = navigation.find(x => x.role === memberInfo?.listRoles[0]?.role)
-                if (userRoles_[0]?.description === 'BANGIAMDOC') {
-                  navigate('/default/homepage', { state: memberInfo })
-                  // return
-                } else {
-                  if (routeItem && routeItem.children) {
-                    const children = routeItem.children
-                    if (children && children[0]?.children) {
-                      if (ability.can('read', children[0]?.children[0]?.resource)) {
-                        navigate(children[0]?.children[0]?.navLink)
-                      } else {
-                        navigate(getHomeRouteForLoggedInUser("admin"))
-                      }
-                    } else {
-                      if (ability.can('read', routeItem.children[0]?.resource)) {
-                        navigate(routeItem.children[0]?.navLink)
-                      } else {
-                        navigate(getHomeRouteForLoggedInUser("admin"))
-                      }
-                    }
-                  } else {
-                    navigate(routeItem.navLink ?? getHomeRouteForLoggedInUser("admin"))
-                  }
-                }
+                navigate(getHomeRouteForLoggedInUser("admin"))
+
+                // if (userRoles_[0]?.description === 'BANGIAMDOC') {
+                //   navigate('/default/homepage', { state: memberInfo })
+                //   // return
+                // } else {
+                //   if (routeItem && routeItem.children) {
+                //     const children = routeItem.children
+                //     if (children && children[0]?.children) {
+                //       if (ability.can('read', children[0]?.children[0]?.resource)) {
+                //         navigate(children[0]?.children[0]?.navLink)
+                //       } else {
+                //         navigate(getHomeRouteForLoggedInUser("admin"))
+                //       }
+                //     } else {
+                //       if (ability.can('read', routeItem.children[0]?.resource)) {
+                //         navigate(routeItem.children[0]?.navLink)
+                //       } else {
+                //         navigate(getHomeRouteForLoggedInUser("admin"))
+                //       }
+                //     }
+                //   } else {
+                //     navigate(routeItem.navLink ?? getHomeRouteForLoggedInUser("admin"))
+                //   }
+                // }
                 // }
                 // })
 

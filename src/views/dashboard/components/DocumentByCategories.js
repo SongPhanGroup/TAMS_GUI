@@ -1,13 +1,43 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Pie } from 'react-chartjs-2'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 import { Card, CardHeader, CardTitle, CardBody, CardSubtitle, Badge } from 'reactstrap'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
+import { statisticByType } from '../../../api/document'
 
 // Đăng ký các thành phần cho biểu đồ
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels)
+const getRandomColor = () => {
+    const r = Math.floor(Math.random() * 255)
+    const g = Math.floor(Math.random() * 255)
+    const b = Math.floor(Math.random() * 255)
+    return `rgb(${r}, ${g}, ${b})`
+}
+const convertDataForChart = (apiData) => {
+    return {
+        labels: apiData.map(item => item.name),  // Lấy tên các phần (labels)
+        datasets: [
+            {
+                label: '# tài liệu',
+                data: apiData.map(item => parseInt(item.count)),  // Chuyển đổi count thành số nguyên
+                backgroundColor: apiData.map(() => getRandomColor()),  // Tạo màu ngẫu nhiên cho mỗi phần
+                borderColor: apiData.map(() => 'rgba(255, 255, 255, 1)'),  // Màu viền luôn là màu trắng
+                borderWidth: 1,
+            },
+        ],
+    }
+}
+const getTotalDocuments = (data) => {
+    return data.reduce((total, item) => total + parseInt(item.count), 0)
+}
 
+// Sử dụng hàm tính tổng
 const DocumentByCategories = () => {
+    const [total, setTotal] = useState()
+    const [dataChart, setDataChart] = useState({
+        labels: [],
+        datasets: [],
+    })
     const data = {
         labels: ['Luận văn', 'Luận án'],
         datasets: [
@@ -26,7 +56,17 @@ const DocumentByCategories = () => {
             },
         ],
     }
-
+    useEffect(() => {
+        statisticByType().then((res) => {
+            const apiData = res?.data ?? []
+            const data_ = convertDataForChart(apiData)
+            setDataChart(data_)
+            const totalDocuments = getTotalDocuments(apiData)
+            setTotal(totalDocuments)
+        }).catch((err) => {
+            console.log("Error fetching data", err)
+        })
+    }, [])
     const options = {
         responsive: true,
         maintainAspectRatio: false,
@@ -60,12 +100,12 @@ const DocumentByCategories = () => {
             <CardHeader className='d-flex flex-sm-row flex-column justify-content-md-between align-items-start justify-content-start'>
                 <div>
                     <CardTitle className='mb-75' tag='h4'>
-                        Tổng số tài liệu mẫu: 190. Theo loại tài liệu:
+                        Tổng số tài liệu mẫu: {total ?? 0}. Theo loại tài liệu:
                     </CardTitle>
                 </div>
             </CardHeader>
             <CardBody style={{ width: '400px', height: '400px', margin: 'auto' }}>
-                <Pie data={data} options={options} />
+                <Pie data={dataChart} options={options} />
             </CardBody>
         </Card>
     )

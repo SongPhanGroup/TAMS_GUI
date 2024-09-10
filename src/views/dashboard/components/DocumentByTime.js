@@ -29,8 +29,11 @@ import {
 } from 'reactstrap'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 import { DatePicker } from "antd"
-import dayjs from "dayjs"
-
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
+dayjs.extend(utc)
+dayjs.extend(timezone)
 ChartJS.register(
     LinearScale,
     CategoryScale,
@@ -45,8 +48,6 @@ ChartJS.register(
 )
 
 import { statisticByTime } from '../../../api/document'
-// const labels = ["Đơn vị 1", "Đơn vị 2", "Đơn vị 3", "Đơn vị 4", "Đơn vị 5", "Đơn vị 6", "Đơn vị 7", "Đơn vị 8", "Đơn vị 9", "Đơn vị 10", "Đơn vị 11", "Đơn vị 12"]
-const labels = ["2018", "2019", "2020", "2021", "2022", "2023"]
 const fakeData = [
     {
         count1: 10,
@@ -120,17 +121,27 @@ const fakeData = [
         backgroundColor: "rgba(245,34,45,0.8)"
     }
 ]
+const getRandomColor = () => {
+    const r = Math.floor(Math.random() * 255)
+    const g = Math.floor(Math.random() * 255)
+    const b = Math.floor(Math.random() * 255)
+    return `rgba(${r},${g},${b},0.8)`
+}
 export default function DocumentByTime() {
     const currentYear = new Date().getFullYear()
     const [filter, setFilter] = useState({
         startDate: dayjs(`${currentYear}-01-01`),
         endDate: dayjs(`${currentYear}-12-31`)
     })
-    // const [dataChart, setDataChart] = useState()
+    const [dataChart, setDataChart] = useState({
+        labels: [],
+        datasets: []
+    })
     const title = "Tổng số tài liệu mẫu bổ sung vào hệ thống theo thời gian"
     const labelData = fakeData?.map(item => item.month)
     const data = fakeData?.map(item => item.count)
-    const dataChart = {
+    // data format
+    const dataChart_ = {
         labels: labelData,
         datasets: [
             {
@@ -153,7 +164,7 @@ export default function DocumentByTime() {
         scales: {
             y: {
                 min: 0, // Giá trị tối thiểu của trục y
-                max: 20, // Giá trị tối đa của trục y
+                // max: 20, // Giá trị tối đa của trục y
                 ticks: {
                     beginAtZero: true, // Bắt đầu từ 0
                 },
@@ -180,25 +191,49 @@ export default function DocumentByTime() {
     useEffect(() => {
         statisticByTime({
             params: {
-                startDate: filter?.startDate,
-                endDate: filter?.endDate
+                startDate: dayjs(filter?.startDate).format('YYYY-MM-DD'),
+                endDate: dayjs(filter?.endDate).format('YYYY-MM-DD')
             }
         }).then((res) => {
-            const data = res?.data ?? []
-            // setDataChart({
-            //     labels: data?.map(item => `Tháng ${item.month}`),
-            //     datasets: [
-            //         {
+            const apiData = res?.data ?? []
+            // Lấy tất cả các loại tài liệu (không trùng lặp)
+            const allMajors = new Set()
+            apiData?.forEach(item => {
+                item?.major?.forEach(majorItem => {
+                    allMajors.add(majorItem.name)
+                })
+            })
+            // Chuyển `Set` thành mảng để dễ làm việc
+            const majorLabels = Array.from(allMajors)
 
-            //         }
-            //     ]
-            // })
-        }).catch(() => {
-            console.log("Error fetching data")
+            // Tạo mảng `datasets` động
+            const datasets_ = majorLabels?.map(majorName => ({
+                label: majorName,
+                data: apiData?.map(item => {
+                    const major = item?.major?.find(majorItem => majorItem.name === majorName)
+                    return major ? parseInt(major.count, 10) : 0 // Nếu không tìm thấy, trả về 0
+                }),
+                backgroundColor: getRandomColor() // Gán màu ngẫu nhiên
+            }))
+
+            // Tạo mảng `labels` cho các tháng
+            const labelData = apiData?.map(item => `Tháng ${item.month}/${item.year}`)
+
+            // Tạo cấu trúc biểu đồ cuối cùng
+            const dataChart_ = {
+                labels: labelData,
+                datasets: datasets_
+            }
+            setDataChart(dataChart_)
+        }).catch((err) => {
+            console.log("Error fetching data", err)
         })
     }, [filter])
     const handleChangeDates = (dates) => {
-        console.log(dates, "dates")
+        setFilter({
+            startDate: dayjs(dates[0], 'YYYY-MM-DD'),
+            endDate: dayjs(dates[1], 'YYYY-MM-DD')
+        })
     }
     return (
         <Card style={{ position: "relative", width: "100%" }}>
@@ -216,8 +251,8 @@ export default function DocumentByTime() {
                         style={{
                             width: "70%",
                         }}
-                        defaultValue={[filter?.startDate, filter?.endDate]}
-                        format={"DD/MM/YYYY"}
+                        value={[dayjs(filter?.startDate), dayjs(filter?.endDate)]}
+                        format={"DD-MM-YYYY"}
                         allowClear={false}
                         onChange={handleChangeDates}
                     />

@@ -111,32 +111,13 @@ const Login = () => {
               localStorage.setItem('userId', res?.User?._id)
               localStorage.setItem('userRoles', JSON.stringify(res?.userRoles))
               const userRoles_ = res?.userRoles ?? []
-              let checkRolesForlecture = false
-              const stringRolesForlecture = "LECTURER, CH_PHONG/KHOA, CNBM"
-              for (const item of res?.userRoles) {
-                if (stringRolesForlecture.includes(item.description)) {
-                  checkRolesForlecture = true
-                }
-              }
-
-              for (const item of res?.userRoles) {
-                if (item.description === "ADMIN") {
-                  checkRolesForlecture = false
-                }
-              }
-
-              if (checkRolesForlecture) {
-                //lay thong tin cua lecture giao vien, chi huy khoa, chu nhiem bo mom
-                localStorage.setItem("infoLecture", JSON.stringify(res?.User ? res?.User : {}))
-              }
-
               for (const u of res.userRoles) {
                 if (u !== null && u.isActive === 1) {
                   const promise = getPermissionByRole({
                     params: {
                       roleID: u._id,
                       page: 1,
-                      limit: 500
+                      limit: 100
                     }
                   }).then((res) => {
                     const { count, data } = res[0]
@@ -149,11 +130,6 @@ const Login = () => {
                             resource: item?.permissionCode,
                             permissionGroup: item?.permissionGroupName
                           })
-                          // return {
-                          //   action: per,
-                          //   resource: item?.permissionCode,
-                          //   permissionGroup: item?.permissionGroupName
-                          // }
                         })
                       }
 
@@ -163,7 +139,6 @@ const Login = () => {
                     console.log(err)
                     return [] // Trả về một mảng rỗng nếu có lỗi
                   })
-
                   promises.push(promise)
                 }
               }
@@ -187,7 +162,8 @@ const Login = () => {
                 const uniqueSet = new Set(listGroup)
                 // Chuyển Set thành mảng và trả về
                 const uniqueArray = [...listGroup]
-                const list_roles = LIST_ROLE.filter(x => (uniqueArray.find(y => y === x.title)))
+                // const list_roles = LIST_ROLE.filter(x => (uniqueArray.find(y => y === x.title)))
+                const list_roles = LIST_ROLE
                 permissionArrFormat = permissionArrFormat.concat(initialAbility)
 
                 if (res.User?.userName === 'admin') {
@@ -226,13 +202,12 @@ const Login = () => {
                       }
                     }
                   } else {
+                    console.log(routeItem.navLink)
                     navigate(routeItem.navLink ?? getHomeRouteForLoggedInUser("admin"))
                   }
                 }
                 // }
                 // })
-
-
               }).catch(err => {
                 console.log(err)
               })

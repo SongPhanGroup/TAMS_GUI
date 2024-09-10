@@ -13,7 +13,7 @@ import {
 } from '@layouts/utils'
 
 const VerticalMenuNavItems = props => {
-  const { roleId } = useSelector(state => state.ecommerce)
+  // const { roleId } = useSelector(state => state.ecommerce)
   // ** Components Object
   const Components = {
     VerticalNavMenuLink,

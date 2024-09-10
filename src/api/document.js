@@ -36,3 +36,9 @@ export const statisticByTime = async (params) => {
   const res = await API_TAMS.get(uri, params)
   return res
 }
+
+export const statisticByType = async (params) => {
+  const uri = `/document/statistical-by-type`
+  const res = await API_TAMS.get(uri, params)
+  return res
+}

@@ -71,6 +71,7 @@ import ContentModal from "./modal/ContentModal"
 import { getCheckingResult, getSimilarDocument, getTop3SimilarDocument } from "../../../api/checking_result"
 import { getCourse } from "../../../api/course"
 import { PAGE_DEFAULT, PER_PAGE_DEFAULT } from "../../../utility/constant"
+import { downloadFileCheckingDocumentVersion } from "../../../api/checking_document_version"
 
 const CheckingResult = () => {
     const [loadingData, setLoadingData] = useState(false)
@@ -97,6 +98,8 @@ const CheckingResult = () => {
     const [listPermissionSelected, setListPermissionSelected] = useState([])
     const [checkingDocumentSelected, setCheckingDocumentSelected] = useState()
     const [selectedCourse, setSelectedCourse] = useState()
+    const [isLoadingDownload, setIsLoadingDownload] = useState(false)
+    const [loadingId, setLoadingId] = useState(null)
 
     const [listCourse, setListCourse] = useState([])
 
@@ -240,6 +243,26 @@ const CheckingResult = () => {
         navigate(`/tams/detail-result2/${record?.id}`, { state: record })
     }
 
+    const handleDownloadFile = (id) => {
+        setIsLoadingDownload(true)
+        setLoadingId(id)
+        downloadFileCheckingDocumentVersion(id)
+            .then(res => {
+                const originalURL = window.URL.createObjectURL(new Blob([res]))
+                const link = document.createElement('a')
+                link.href = originalURL
+                link.setAttribute('download', `Tài liệu kiểm tra.docx`)
+                document.body.appendChild(link)
+                link.click()
+            })
+            .catch(error => {
+                console.log(error)
+            }).finally(() => {
+                setIsLoadingDownload(false)
+                setLoadingId(null)
+            })
+    }
+
     const columns = [
         {
             title: "STT",
@@ -372,12 +395,17 @@ const CheckingResult = () => {
             align: "center",
             render: (record) => (
                 // <div style={{ display: "flex", justifyContent: "center" }}>
-                <Tooltip placement="top" title="Download file">
-                    <DownloadOutlined
-                        id={`tooltip_download_${record._id}`}
-                        style={{ color: "#09A863", cursor: "pointer" }}
-                    />
-                </Tooltip>
+                <>
+                    {
+                        isLoadingDownload === true && loadingId === record.id ? <Spin /> : <Tooltip placement="top" title="Download file">
+                            <DownloadOutlined
+                                id={`tooltip_download_${record._id}`}
+                                style={{ color: "#09A863", cursor: "pointer" }}
+                                onClick={() => handleDownloadFile(record.id)}
+                            />
+                        </Tooltip>
+                    }
+                </>
                 // </div>
             ),
         },

@@ -30,3 +30,9 @@ export const deleteCheckingDocumentVersion = async (id) => {
   const res = await API_TAMS.delete(uri)
   return res
 }
+
+export const downloadFileCheckingDocumentVersion = async (id) => {
+  const uri = `/checking-document-version/${id}/download`
+  const res = await API_TAMS.get(uri, {responseType: 'blob'})
+  return res
+}

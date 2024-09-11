@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     Chart as ChartJS,
     LinearScale,
@@ -29,8 +29,12 @@ import {
 } from 'reactstrap'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 import { DatePicker } from "antd"
-import dayjs from "dayjs"
 
+import dayjs from "dayjs"
+import { getCheckingDocumentStatisticByTime } from '../../../api/checking_document_statistic'
+import { toDateString, toDateStringv2 } from '../../../utility/Utils'
+
+const { RangePicker } = DatePicker
 ChartJS.register(
     LinearScale,
     CategoryScale,
@@ -45,79 +49,34 @@ ChartJS.register(
 )
 
 // const labels = ["Đơn vị 1", "Đơn vị 2", "Đơn vị 3", "Đơn vị 4", "Đơn vị 5", "Đơn vị 6", "Đơn vị 7", "Đơn vị 8", "Đơn vị 9", "Đơn vị 10", "Đơn vị 11", "Đơn vị 12"]
-const labels = ["2018", "2019", "2020", "2021", "2022", "2023"]
-const fakeData = [
-    {
-        count: 10,
-        month: "Tháng 1",
-        backgroundColor: "rgba(245,34,45,0.8)"
-    },
-    {
-        count: 12,
-        month: "Tháng 2",
-        backgroundColor: "rgba(245,34,45,0.8)"
-    },
-    {
-        count: 8,
-        month: "Tháng 3",
-        backgroundColor: "rgba(245,34,45,0.8)"
-    },
-    {
-        count: 4,
-        month: "Tháng 4",
-        backgroundColor: "rgba(245,34,45,0.8)"
-    },
-    {
-        count: 7,
-        month: "Tháng 5",
-        backgroundColor: "rgba(245,34,45,0.8)"
-    },
-    {
-        count: 8,
-        month: "Tháng 6",
-        backgroundColor: "rgba(245,34,45,0.8)"
-    },
-    {
-        count: 10,
-        month: "Tháng 7",
-        backgroundColor: "rgba(245,34,45,0.8)"
-    },
-    {
-        count: 9,
-        month: "Tháng 8",
-        backgroundColor: "rgba(245,34,45,0.8)"
-    },
-    {
-        count: 5,
-        month: "Tháng 9",
-        backgroundColor: "rgba(245,34,45,0.8)"
-    },
-    {
-        count: 5,
-        month: "Tháng 10",
-        backgroundColor: "rgba(245,34,45,0.8)"
-    },
-    {
-        count: 4,
-        month: "Tháng 11",
-        backgroundColor: "rgba(245,34,45,0.8)"
-    },
-    {
-        count: 2,
-        month: "Tháng 12",
-        backgroundColor: "rgba(245,34,45,0.8)"
-    }
-]
+// const labels = ["2018", "2019", "2020", "2021", "2022", "2023"]
+
 export default function CountNumChecking() {
+    const [data, setData] = useState([])
+    const [start_date, setStartDate] = useState(toDateStringv2(new Date(new Date().getFullYear(), 0, 1)))
+    const [end_date, setEndDate] = useState(toDateStringv2(new Date(new Date().getFullYear(), 11, 31)))
+
+    useEffect(() => {
+        if (start_date && end_date) {
+            getCheckingDocumentStatisticByTime({
+                params: {
+                    startDate: start_date,
+                    endDate: end_date
+                }
+            }).then(res => {
+                setData(res.data)
+            })
+        }
+    }, [start_date, end_date])
+
     const title = "Số lượt kiểm tra tài liệu theo thời gian"
-    const labelData = fakeData?.map(item => item.month)
-    const data = fakeData?.map(item => item.count)
+    const labelData = data?.map(item => `Tháng ${item.month}`)
     const dataChart = {
         labels: labelData,
         datasets: [
             {
                 label: "Số lượt kiểm tra tài liệu",
-                data: fakeData?.map(item => item.count),
+                data: data?.map(item => item.count),
                 backgroundColor: "rgba(245,34,45,0.8)"
             }
         ]
@@ -158,6 +117,16 @@ export default function CountNumChecking() {
 
     const currentYear = new Date().getFullYear()
 
+    const handleChangeTime = (date, dateString) => {
+        if (!dateString[0] && !dateString[1]) {
+            setStartDate(toDateStringv2(new Date(new Date().getFullYear(), 0, 1)))
+            setEndDate(toDateStringv2(new Date(new Date().getFullYear(), 11, 31)))
+        } else {
+            setStartDate(toDateStringv2(dateString[0]))
+            setEndDate(toDateStringv2(dateString[1]))
+        }
+    }
+
     return (
         <Card style={{ position: "relative", width: "100%" }}>
             <CardHeader className='d-flex flex-sm-row flex-column justify-content-md-between align-items-start justify-content-start'>
@@ -170,14 +139,14 @@ export default function CountNumChecking() {
             <CardBody>
                 <div className="d-flex col col-4" style={{ justifyContent: "flex-start", marginRight: "1rem", alignItems: "center" }}>
                     <span style={{ marginRight: "1rem" }}>Thời gian</span>
-                    <DatePicker.RangePicker
+                    <RangePicker
                         style={{
                             width: "70%",
                         }}
-                        defaultValue={[dayjs(`${currentYear}-01-01`), dayjs(`${currentYear}-12-31`)]}
+                        // defaultValue={[dayjs(`${currentYear}-01-01`), dayjs(`${currentYear}-12-31`)]}
                         format={"DD/MM/YYYY"}
-                        allowClear={false}
-                    // onChange={handleChangeYear}
+                        allowClear={true}
+                        onChange={handleChangeTime} 
                     />
                 </div>
                 <Chart type='bar' data={dataChart} options={options} />

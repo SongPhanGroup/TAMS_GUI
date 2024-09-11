@@ -71,6 +71,7 @@ import ContentModal from "./modal/ContentModal"
 import { getCheckingResult, getSimilarDocument, getTop3SimilarDocument } from "../../../api/checking_result"
 import { getCourse } from "../../../api/course"
 import { PAGE_DEFAULT, PER_PAGE_DEFAULT } from "../../../utility/constant"
+import { downloadFileCheckingDocumentVersion } from "../../../api/checking_document_version"
 
 const CheckingResult = () => {
     const [loadingData, setLoadingData] = useState(false)
@@ -98,6 +99,8 @@ const CheckingResult = () => {
     const [checkingDocumentSelected, setCheckingDocumentSelected] = useState()
     const [listAllRole, setListAllRole] = useState([])
     const [selectedCourse, setSelectedCourse] = useState()
+    const [isLoadingDownload, setIsLoadingDownload] = useState(false)
+    const [loadingId, setLoadingId] = useState(null)
 
     const [listCourse, setListCourse] = useState([])
 
@@ -241,6 +244,26 @@ const CheckingResult = () => {
         navigate(`/tams/detail-result2/${record?.id}`, { state: record })
     }
 
+    const handleDownloadFile = (id) => {
+        setIsLoadingDownload(true)
+        setLoadingId(id)
+        downloadFileCheckingDocumentVersion(id)
+            .then(res => {
+                const originalURL = window.URL.createObjectURL(new Blob([res]))
+                const link = document.createElement('a')
+                link.href = originalURL
+                link.setAttribute('download', `Tài liệu kiểm tra.docx`)
+                document.body.appendChild(link)
+                link.click()
+            })
+            .catch(error => {
+                console.log(error)
+            }).finally(() => {
+                setIsLoadingDownload(false)
+                setLoadingId(null)
+            })
+    }
+
     const columns = [
         {
             title: "STT",
@@ -373,12 +396,17 @@ const CheckingResult = () => {
             align: "center",
             render: (record) => (
                 // <div style={{ display: "flex", justifyContent: "center" }}>
-                <Tooltip placement="top" title="Download file">
-                    <DownloadOutlined
-                        id={`tooltip_download_${record._id}`}
-                        style={{ color: "#09A863", cursor: "pointer" }}
-                    />
-                </Tooltip>
+                <>
+                    {
+                        isLoadingDownload === true && loadingId === record.id ? <Spin /> : <Tooltip placement="top" title="Download file">
+                            <DownloadOutlined
+                                id={`tooltip_download_${record._id}`}
+                                style={{ color: "#09A863", cursor: "pointer" }}
+                                onClick={() => handleDownloadFile(record.id)}
+                            />
+                        </Tooltip>
+                    }
+                </>
                 // </div>
             ),
         },
@@ -404,9 +432,9 @@ const CheckingResult = () => {
                 title="Kết quả kiểm tra tài liệu"
                 style={{ backgroundColor: "white", width: "100%", height: "100%" }}
                 extra={
-                    <Col md="12" style={{ display: "flex", justifyContent: "flex-end" }}>
-                        {ability.can('create', 'PHAN_QUYEN_VAI_TRO') &&
-                            <Link to="/tams/checking-document">
+                    <>
+                        <Col md="12" style={{ display: "flex", justifyContent: "flex-end", gap: 16 }}>
+                            {ability.can('create', 'PHAN_QUYEN_VAI_TRO') &&
                                 <Button
                                     // onClick={(e) => setIsAdd(true)}
                                     color="primary"
@@ -418,11 +446,28 @@ const CheckingResult = () => {
                                     }}
                                     outline
                                 >
-                                    Quay lại
+                                    Báo cáo
                                 </Button>
-                            </Link>
-                        }
-                    </Col>
+                            }
+                            {ability.can('create', 'PHAN_QUYEN_VAI_TRO') &&
+                                <Link to="/tams/checking-document">
+                                    <Button
+                                        // onClick={(e) => setIsAdd(true)}
+                                        color="primary"
+                                        className=""
+                                        style={{
+                                            width: '100px',
+                                            marginBottom: 0,
+                                            padding: '8px 15px'
+                                        }}
+                                        outline
+                                    >
+                                        Quay lại
+                                    </Button>
+                                </Link>
+                            }
+                        </Col>
+                    </>
                 }
             >
 

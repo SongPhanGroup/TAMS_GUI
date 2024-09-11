@@ -6,8 +6,32 @@ import dayjs from "dayjs"
 // ** Reactstrap Imports
 import { Card, CardHeader, CardTitle, CardBody, CardSubtitle, Badge } from 'reactstrap'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
+import { toDateStringv2 } from '../../../utility/Utils'
+import { useEffect, useState } from 'react'
+import { getCheckingDocumentStatisticByDuplicate } from '../../../api/checking_document_statistic'
+
+const { RangePicker } = DatePicker
 
 const NumCheckingBySimilarity = () => {
+    const [data, setData] = useState([])
+    const [start_date, setStartDate] = useState(toDateStringv2(new Date(new Date().getFullYear(), 0, 1)))
+    const [end_date, setEndDate] = useState(toDateStringv2(new Date(new Date().getFullYear(), 11, 31)))
+
+    useEffect(() => {
+        if (start_date && end_date) {
+            getCheckingDocumentStatisticByDuplicate({
+                params: {
+                    startDate: start_date,
+                    endDate: end_date
+                }
+            }).then(res => {
+                setData(res.data)
+            })
+        }
+    }, [start_date, end_date])
+
+    console.log(data)
+
     const direction = 'ltr'
     const warning = '#ff9f43'
     // ** Chart Options
@@ -99,6 +123,16 @@ const NumCheckingBySimilarity = () => {
     ]
     const currentYear = new Date().getFullYear()
 
+    const handleChangeTime = (date, dateString) => {
+        if (!dateString[0] && !dateString[1]) {
+            setStartDate(toDateStringv2(new Date(new Date().getFullYear(), 0, 1)))
+            setEndDate(toDateStringv2(new Date(new Date().getFullYear(), 11, 31)))
+        } else {
+            setStartDate(toDateStringv2(dateString[0]))
+            setEndDate(toDateStringv2(dateString[1]))
+        }
+    }
+
     return (
         <Card>
             <CardHeader className='d-flex flex-sm-row flex-column justify-content-md-between align-items-start justify-content-start'>
@@ -119,14 +153,14 @@ const NumCheckingBySimilarity = () => {
             <CardBody>
                 <div className="d-flex col col-4" style={{ justifyContent: "flex-start", marginRight: "1rem", alignItems: "center" }}>
                     <span style={{ marginRight: "1rem" }}>Thời gian</span>
-                    <DatePicker.RangePicker
+                    <RangePicker
                         style={{
                             width: "70%",
                         }}
-                        defaultValue={[dayjs(`${currentYear}-01-01`), dayjs(`${currentYear}-12-31`)]}
+                        // defaultValue={[dayjs(`${currentYear}-01-01`), dayjs(`${currentYear}-12-31`)]}
                         format={"DD/MM/YYYY"}
-                        allowClear={false}
-                    // onChange={handleChangeYear}
+                        allowClear={true}
+                        onChange={handleChangeTime}
                     />
                 </div>
                 <Chart options={options} series={series} type='line' height={400} />

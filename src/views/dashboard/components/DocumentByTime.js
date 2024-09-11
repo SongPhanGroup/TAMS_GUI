@@ -116,7 +116,7 @@ const fakeData = [
         backgroundColor: "rgba(245,34,45,0.8)"
     },
     {
-        count: 2,
+        count1: 2,
         month: "Tháng 12",
         backgroundColor: "rgba(245,34,45,0.8)"
     }
@@ -143,18 +143,21 @@ export default function DocumentByTime() {
     // data format
     const dataChart_ = {
         labels: labelData,
-        datasets: [
-            {
-                label: "Luận văn",
-                data: fakeData?.map(item => item.count1),
-                backgroundColor: "rgba(245,34,45,0.8)"
-            },
-            {
-                label: "Luận án",
-                data: fakeData?.map(item => item.count2),
-                backgroundColor: "rgba(34,150,245,1)"
-            }
-        ]
+        // datasets: [
+        //     {
+        //         label: "Luận văn",
+        //         data: data?.map(item => item.count1),
+        //         backgroundColor: "rgba(245,34,45,0.8)"
+        //     },
+        //     {
+        //         label: "Luận án",
+        //         data: data?.map(item => item.count2),
+        //         backgroundColor: "rgba(34,150,245,1)"
+        //     }
+        // ]
+        datasets: dataSample.map(item => {
+            return item
+        })
     }
     const options = {
         responsive: true,
@@ -247,7 +250,7 @@ export default function DocumentByTime() {
             <CardBody>
                 <div className="d-flex col col-4" style={{ justifyContent: "flex-start", marginRight: "1rem", alignItems: "center" }}>
                     <span style={{ marginRight: "1rem" }}>Thời gian</span>
-                    <DatePicker.RangePicker
+                    <RangePicker
                         style={{
                             width: "70%",
                         }}

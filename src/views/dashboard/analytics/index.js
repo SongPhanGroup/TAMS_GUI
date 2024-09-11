@@ -27,6 +27,10 @@ import SupportTracker from '@src/views/ui-elements/cards/analytics/SupportTracke
 import OrdersReceived from '@src/views/ui-elements/cards/statistics/OrdersReceived'
 import SubscribersGained from '@src/views/ui-elements/cards/statistics/SubscribersGained'
 import CardCongratulations from '@src/views/ui-elements/cards/advance/CardCongratulations'
+import CountNumChecking from '../components/CountNumChecking'
+import DocumentByTime from '../components/DocumentByTime'
+import NumCheckingBySimilarity from '../components/NumCheckingBySimilarity'
+import DocumentByCategories from '../components/DocumentByCategories'
 
 // ** Images
 import jsonImg from '@src/assets/images/icons/json.png'
@@ -34,6 +38,7 @@ import ceo from '@src/assets/images/portrait/small/avatar-s-9.jpg'
 
 // ** Styles
 import '@styles/react/libs/charts/apex-charts.scss'
+import DocumentByAspects from '../components/DocumentByAspects'
 
 const AnalyticsDashboard = () => {
   // ** Context
@@ -126,25 +131,26 @@ const AnalyticsDashboard = () => {
   return (
     <div id='dashboard-analytics'>
       <Row className='match-height'>
-        <Col lg='6' sm='12'>
-          <CardCongratulations />
+        <Col lg='6' xs='12'>
+          <DocumentByCategories />
         </Col>
-        <Col lg='3' sm='6'>
-          <SubscribersGained kFormatter={kFormatter} />
-        </Col>
-        <Col lg='3' sm='6'>
-          <OrdersReceived kFormatter={kFormatter} warning={colors.warning.main} />
+        <Col lg='6' xs='12'>
+          <DocumentByAspects />
         </Col>
       </Row>
       <Row className='match-height'>
-        <Col lg='6' xs='12'>
-          <AvgSessions primary={colors.primary.main} />
-        </Col>
-        <Col lg='6' xs='12'>
-          <SupportTracker primary={colors.primary.main} danger={colors.danger.main} />
-        </Col>
+        <CountNumChecking />
+      </Row>
+
+      <Row className='match-height'>
+        <DocumentByTime />
       </Row>
       <Row className='match-height'>
+        <Col lg='12' md='12'>
+          <NumCheckingBySimilarity />
+        </Col>
+      </Row>
+      {/* <Row className='match-height'>
         <Col lg='4' xs='12'>
           <Card className='card-user-timeline'>
             <CardHeader>
@@ -169,7 +175,7 @@ const AnalyticsDashboard = () => {
         <Col xs='12'>
           <InvoiceList />
         </Col>
-      </Row>
+      </Row> */}
     </div>
   )
 }

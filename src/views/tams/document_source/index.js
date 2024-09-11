@@ -1,4 +1,4 @@
-import { Table, Input, Card, CardTitle, Tag, Popconfirm, Switch, Spin } from "antd"
+import { Table, Input, Card, CardTitle, Tag, Popconfirm, Switch, Spin, Tooltip } from "antd"
 import React, { useState, Fragment, useEffect, useRef, useContext } from "react"
 import {
     Label,
@@ -147,28 +147,25 @@ const DocumentSource = () => {
             align: "center",
             render: (record) => (
                 <div style={{ display: "flex", justifyContent: "center" }}>
-                    {ability.can('update', 'LOAI_DON_VI') &&
+                    {ability.can('update', 'NGUON_TAI_LIEU') &&
                         <>
-                            <EditOutlined
-                                id={`tooltip_edit${record.ID}`}
-                                style={{ color: "#09A863", cursor: 'pointer', marginRight: '1rem' }}
-                                onClick={(e) => handleEdit(record)}
-                            />
-                            <UncontrolledTooltip placement="top" target={`tooltip_edit${record.ID}`}>
-                                Chỉnh sửa
-                            </UncontrolledTooltip>
+                            <Tooltip placement="top" title="Chỉnh sửa">
+                                <EditOutlined
+                                    style={{ color: "#09A863", cursor: 'pointer', marginRight: '1rem' }}
+                                    onClick={(e) => handleEdit(record)}
+                                />
+                            </Tooltip>
                         </>}
-                    {ability.can('delete', 'LOAI_DON_VI') &&
+                    {ability.can('delete', 'NGUON_TAI_LIEU') &&
                         <Popconfirm
                             title="Bạn chắc chắn xóa?"
                             onConfirm={() => handleDelete(record.id)}
                             cancelText="Hủy"
                             okText="Đồng ý"
                         >
-                            <DeleteOutlined style={{ color: "red", cursor: 'pointer' }} id={`tooltip_delete${record.ID}`} />
-                            <UncontrolledTooltip placement="top" target={`tooltip_delete${record.ID}`}>
-                                Xóa
-                            </UncontrolledTooltip>
+                            <Tooltip placement="top" title="Xóa">
+                                <DeleteOutlined style={{ color: "red", cursor: 'pointer' }} />
+                            </Tooltip>
                         </Popconfirm>}
                 </div>
             ),
@@ -212,18 +209,20 @@ const DocumentSource = () => {
                         }}
                     />
                 </Col>
-                <Col sm="7" style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <Button
-                        onClick={(e) => setIsAdd(true)}
-                        color="primary"
-                        className="addBtn"
-                        style={{
-                            width: '100px',
-                        }}
-                    >
-                        Thêm mới
-                    </Button>
-                </Col>
+                {ability.can('create', 'NGUON_TAI_LIEU') &&
+                    <Col sm="7" style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <Button
+                            onClick={(e) => setIsAdd(true)}
+                            color="primary"
+                            className="addBtn"
+                            style={{
+                                width: '100px',
+                            }}
+                        >
+                            Thêm mới
+                        </Button>
+                    </Col>
+                }
             </Row>
             {loadingData === true ? <Spin style={{ position: 'relative', left: '50%' }} /> : <Table
                 columns={columns}

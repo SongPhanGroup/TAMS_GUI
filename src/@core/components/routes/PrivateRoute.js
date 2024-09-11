@@ -14,7 +14,6 @@ const PrivateRoute = ({ children, route }) => {
     let action = null
     let resource = null
     let restrictedRoute = false
-
     if (route.meta) {
       action = route.meta.action
       resource = route.meta.resource
@@ -29,7 +28,8 @@ const PrivateRoute = ({ children, route }) => {
     if (user && restrictedRoute && user.role === 'client') {
       return <Navigate to='/access-control' />
     }
-    if (user && (!ability.can(action || 'read', resource) && !(ability.l === 'manage' && ability.p === 'all'))) {
+    if (user && (!ability.can(action || 'read', resource) && !(ability.p === 'manage' && ability.A === 'all'))) {
+      console.log("hdhdh", resource, ability, ability.can(action || 'read', resource), user)
       return <Navigate to='/misc/not-authorized' replace />
     }
   }

@@ -20,13 +20,13 @@ export const editCheckingDocumentVersion = async (id, body) => {
 }
 
 export const detailCheckingDocumentVersion = async (id) => {
-    const uri = `/checking-document-version/${id}`
-    const res = await API_TAMS.get(uri)
-    return res
-  }
+  const uri = `/checking-document-version/${id}`
+  const res = await API_TAMS.get(uri)
+  return res
+}
 
 export const deleteCheckingDocumentVersion = async (id) => {
-    const uri = `/checking-document-version/${id}`
-    const res = await API_TAMS.delete(uri)
-    return res
-  }
+  const uri = `/checking-document-version/${id}`
+  const res = await API_TAMS.delete(uri)
+  return res
+}

@@ -18,3 +18,9 @@ export const getListDocFromSetenceId = async (id) => {
   const res = await API_TAMS.get(uri)
   return res
 }
+
+export const checkSentence = async (body) => {
+  const uri = `/checksentence`
+  const res = await API_TAMS.post(uri, body)
+  return res
+}

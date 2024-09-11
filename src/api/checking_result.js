@@ -12,9 +12,9 @@ export const getTop3SimilarDocument = async (id) => {
   return res
 }
 
-export const getListSentenceByCheckingResult = async (id, type) => {
-  const uri = `/getListSentenceByCheckingResult?id=${id}&type=${type}`
-  const res = await API_TAMS.get(uri)
+export const getListSentenceByCheckingResult = async (query) => {
+  const uri = `/getListSentenceByCheckingResult`
+  const res = await API_TAMS.get(uri, query)
   return res
 }
 
@@ -30,8 +30,8 @@ export const getCheckingResultHTML = async (query) => {
   return res
 }
 
-export const getListTheSameSentence = async (query) => {
-  const uri = `/getListSentenceByCheckingResult`
+export const getCheckingResultHTML2 = async (query) => {
+  const uri = `/getHtmlResult2`
   const res = await API_TAMS.get(uri, query)
   return res
 }

@@ -7,7 +7,8 @@ import {
     Switch,
     Collapse,
     Spin,
-    Select
+    Select,
+    Tooltip
 } from "antd"
 import React, { useState, Fragment, useEffect, useRef, useContext } from "react"
 import {
@@ -29,9 +30,11 @@ import { Plus, X } from "react-feather"
 import {
     AppstoreAddOutlined,
     DeleteOutlined,
+    DownloadOutlined,
     EditOutlined,
     LockOutlined,
     RightCircleOutlined,
+    RightSquareOutlined,
     UnorderedListOutlined,
 } from "@ant-design/icons"
 import { AbilityContext } from '@src/utility/context/Can'
@@ -94,6 +97,7 @@ const CheckingResult = () => {
     const [listPermissionSelected, setListPermissionSelected] = useState([])
     const [checkingDocumentSelected, setCheckingDocumentSelected] = useState()
     const [listAllRole, setListAllRole] = useState([])
+    const [selectedCourse, setSelectedCourse] = useState()
 
     const [listCourse, setListCourse] = useState([])
 
@@ -159,6 +163,7 @@ const CheckingResult = () => {
                     return { ...item, _id: item.id, key: index }
                 }))
                 setData2(result)
+                setSelectedCourse(result[0].document.course.id)
                 setCount2(res?.total)
             })
             .catch((err) => {
@@ -228,6 +233,14 @@ const CheckingResult = () => {
         return ''
     }
 
+    const handleButtonClick = (record) => {
+        navigate(`/tams/detail-result/${record?.id}`, { state: record })
+    }
+
+    const handleButtonClick2 = (record) => {
+        navigate(`/tams/detail-result2/${record?.id}`, { state: record })
+    }
+
     const columns = [
         {
             title: "STT",
@@ -251,7 +264,7 @@ const CheckingResult = () => {
             }
         },
         {
-            title: "Tên tài liệu",
+            title: "Tên tài liệu mẫu",
             dataIndex: "title",
             width: 500,
             align: "left",
@@ -359,9 +372,14 @@ const CheckingResult = () => {
             width: 100,
             align: "center",
             render: (record) => (
-                <div style={{ display: "flex", justifyContent: "center" }}>
-                    
-                </div>
+                // <div style={{ display: "flex", justifyContent: "center" }}>
+                <Tooltip placement="top" title="Download file">
+                    <DownloadOutlined
+                        id={`tooltip_download_${record._id}`}
+                        style={{ color: "#09A863", cursor: "pointer" }}
+                    />
+                </Tooltip>
+                // </div>
             ),
         },
     ]
@@ -372,6 +390,12 @@ const CheckingResult = () => {
         } else {
             setCourseId()
         }
+    }
+
+    const [expandedRowKeys, setExpandedRowKeys] = useState([])
+
+    const onExpand = (expanded, record) => {
+        setExpandedRowKeys(expanded ? [record.key] : [])
     }
 
     return (
@@ -407,32 +431,39 @@ const CheckingResult = () => {
                         <h5>Kết quả trùng lặp so với CSDL mẫu: <span style={{ color: 'red' }}>{location?.state?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}%</span></h5>
                     </Col>
                     <Col md="12">
-                        <h6>1. Danh sách các tài liệu trùng lặp cao</h6>
-                        {loadingData === true ? <Spin style={{ position: 'relative', left: '50%' }} /> : <Table
-                            columns={columns}
-                            dataSource={data}
-                            bordered
-                            expandable={{
-                                expandedRowRender: (record) => <ContentModal
-                                    listSentenceByCheckingResult={record} />,
-                                rowExpandable: (record) => record.name !== 'Not Expandable',
-                                // expandRowByClick: true
-                            }}
-                            pagination={{
-                                defaultPageSize: 10,
-                                showSizeChanger: true,
-                                pageSizeOptions: ["10", "20", "30"],
-                                total: { count },
-                                locale: { items_per_page: "/ trang" },
-                                showSizeChanger: true,
-                                showTotal: (total, range) => <span>Tổng số: {total}</span>,
-                            }}
-                        // rowClassName={rowClassName}
-                        />}
-                    </Col>
-                    <Col md="12">
-                        <h6>2. Kết quả trùng lặp với các tài liệu cùng đợt kiểm tra</h6>
-                        <Select options={listCourse} placeholder="Chọn đợt kiểm tra" className="mb-1" style={{ float: 'right', width: '200px' }} allowClear onChange={(value) => handleChangeCourse(value)} />
+                        <h6 style={{ textTransform: 'uppercase' }}>1. Danh sách các tài liệu mẫu có độ trùng lặp cao</h6>
+                        <Row style={{ justifyContent: 'flex-end' }}>
+                            <Col md="4" style={{ display: 'flex' }}>
+                                <Label
+                                    className=""
+                                    style={{
+                                        width: "100px",
+                                        fontSize: "14px",
+                                        height: "34px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                    }}
+                                >
+                                    Tìm kiếm
+                                </Label>
+                                <Input
+                                    type="text"
+                                    placeholder="Tìm kiếm"
+                                    style={{ height: "34px" }}
+                                // onChange={(e) => {
+                                //     if (e.target.value === "") {
+                                //         setSearch("")
+                                //     }
+                                // }}
+                                // onKeyPress={(e) => {
+                                //     if (e.key === "Enter") {
+                                //         setSearch(e.target.value)
+                                //         setCurrentPage(1)
+                                //     }
+                                // }}
+                                />
+                            </Col>
+                        </Row>
                         {loadingData2 === true ? <Spin style={{ position: 'relative', left: '50%' }} /> : <Table
                             columns={columns}
                             dataSource={data2}
@@ -444,7 +475,7 @@ const CheckingResult = () => {
                                 // expandRowByClick: true
                             }}
                             pagination={{
-                                defaultPageSize: 10,
+                                defaultPageSize: 30,
                                 showSizeChanger: true,
                                 pageSizeOptions: ["10", "20", "30"],
                                 total: { count2 },
@@ -455,6 +486,35 @@ const CheckingResult = () => {
                         // rowClassName={rowClassName}
                         />}
                     </Col>
+                    {
+                        data && selectedCourse !== 1 ? <Col md="12">
+                            <h6 style={{ textTransform: 'uppercase' }}>2. Kết quả trùng lặp với các tài liệu cùng đợt kiểm tra</h6>
+                            {/* <Select options={listCourse} placeholder="Chọn đợt kiểm tra" className="mb-1" style={{ float: 'right', width: '200px' }} allowClear onChange={(value) => handleChangeCourse(value)} /> */}
+                            {loadingData === true ? <Spin style={{ position: 'relative', left: '50%' }} /> : <Table
+                                columns={columns}
+                                dataSource={data}
+                                bordered
+                                expandable={{
+                                    expandedRowRender: (record) => <ContentModal
+                                        listSentenceByCheckingResult={record} />,
+                                    rowExpandable: (record) => record.name !== 'Not Expandable',
+                                    // expandRowByClick: true
+                                }}
+                                expandedRowKeys={expandedRowKeys}
+                                onExpand={onExpand}
+                                pagination={{
+                                    defaultPageSize: 10,
+                                    showSizeChanger: true,
+                                    pageSizeOptions: ["10", "20", "30"],
+                                    total: { count },
+                                    locale: { items_per_page: "/ trang" },
+                                    showSizeChanger: true,
+                                    showTotal: (total, range) => <span>Tổng số: {total}</span>,
+                                }}
+                            // rowClassName={rowClassName}
+                            />}
+                        </Col> : <></>
+                    }
                 </Row>
             </Card>
         </Fragment>

@@ -1,4 +1,4 @@
-import { Table, Input, Card, CardTitle, Tag, Popconfirm, Space, Switch, TreeSelect, Spin } from "antd"
+import { Table, Input, Card, CardTitle, Tag, Popconfirm, Space, Switch, TreeSelect, Spin, Tooltip } from "antd"
 import React, { useState, Fragment, useEffect, useRef, useContext } from "react"
 import {
   Label,
@@ -37,7 +37,7 @@ const ListOrganizations = () => {
   const [data, setData] = useState([])
   const [count, setCount] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
-  const [rowsPerPage, setRowsPerpage] = useState(1000)
+  const [rowsPerPage, setRowsPerpage] = useState(100)
   const [search, setSearch] = useState("")
   const [isAdd, setIsAdd] = useState(false)
   const [isEdit, setIsEdit] = useState(false)
@@ -300,32 +300,32 @@ const ListOrganizations = () => {
       align: "center",
       render: (record) => (
         <div style={{ display: "flex", justifyContent: "center" }}>
-          {ability.can('update', 'DM_DON_VI') &&
+          {ability.can('update', 'DON_VI') &&
             <>
-              <EditOutlined
-                id={`tooltip_edit${record.ID}`}
-                style={{ color: "#09A863", cursor: 'pointer' }}
-                className="me-1"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  handleEdit(record)
-                }}
-              />
-              <UncontrolledTooltip placement="top" target={`tooltip_edit${record.ID}`}>
-                Chỉnh sửa
-              </UncontrolledTooltip>
+              <Tooltip placement="top" title="Chỉnh sửa">
+                <EditOutlined
+                  style={{ color: "#09A863", cursor: 'pointer' }}
+                  className="me-1"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleEdit(record)
+                  }}
+                />
+              </Tooltip>
             </>}
-          {ability.can('delete', 'DM_DON_VI') &&
+          {ability.can('delete', 'DON_VI') &&
             <Popconfirm
               title="Bạn chắc chắn xóa?"
               onConfirm={() => handleDelete(record)}
               cancelText="Hủy"
               okText="Đồng ý"
             >
-              <DeleteOutlined style={{ color: "red", cursor: 'pointer' }} id={`tooltip_delete${record.ID}`} />
-              <UncontrolledTooltip placement="top" target={`tooltip_delete${record.ID}`}>
-                Xóa
-              </UncontrolledTooltip>
+              <Tooltip placement="top" title="Xóa">
+                <DeleteOutlined style={{ color: "red", cursor: 'pointer' }} id={`tooltip_delete${record.ID}`} />
+                <UncontrolledTooltip placement="top" target={`tooltip_delete${record.ID}`}>
+                  Xóa
+                </UncontrolledTooltip>
+              </Tooltip>
             </Popconfirm>}
         </div>
       ),
@@ -369,7 +369,7 @@ const ListOrganizations = () => {
             }}
           />
         </Col>
-        {ability.can('create', 'DM_DON_VI') &&
+        {ability.can('create', 'DON_VI') &&
           <Col sm="7" style={{ display: "flex", justifyContent: "flex-end" }}>
             <Button
               onClick={(e) => setIsAdd(true)}
@@ -384,7 +384,7 @@ const ListOrganizations = () => {
           </Col>}
       </Row>
       {
-        loading && <div className="flex" style={{width: "100%", position: 'relative', left: '50%'}}>
+        loading && <div className="flex" style={{ width: "100%", position: 'relative', left: '50%' }}>
           <Spin />
         </div>
       }

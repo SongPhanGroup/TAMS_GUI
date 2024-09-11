@@ -260,7 +260,7 @@ const ListAccounts = () => {
       width: "200px",
       align: "center",
       render: (record) => (
-        <div style={{ display: "flex", justifyContent: "space-around" }}>
+        <div style={{ display: "flex", justifyContent: "center", gap: 10 }}>
           {
             ability.can('update', 'TAI_KHOAN') &&
             <>

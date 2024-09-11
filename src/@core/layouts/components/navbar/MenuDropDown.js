@@ -6,7 +6,8 @@ import { getHomeRouteForLoggedInUser } from "../../../../utility/Utils"
 // ** Third Party Components
 import InputNumber from "rc-input-number"
 import PerfectScrollbar from "react-perfect-scrollbar"
-import { ShoppingCart, X, Plus, Minus, Grid, Star, Heart } from "react-feather"
+import * as IconReact from "react-feather"
+const { ShoppingCart, X, Plus, Minus, Grid, Star, Heart } = IconReact
 
 // ** Reactstrap Imports
 import {
@@ -25,7 +26,6 @@ import {
   UncontrolledTooltip,
 } from "reactstrap"
 import classnames from "classnames"
-import * as IconReact from "react-feather"
 // ** Store & Actions
 import { useDispatch, useSelector } from "react-redux"
 import {
@@ -65,18 +65,19 @@ const CartDropdown = () => {
     toggle()
   }
   const handleClickRole = (key) => {
-    dispatch(setSelectedRole(key))
-    const routeItem = navigation.find(x => x.role === key)
-    if (routeItem && routeItem.children) {
-      const children = routeItem.children
-      if (children && children[0]?.children) {
-        navigate(children[0]?.children[0]?.navLink)
-      } else {
-        navigate(routeItem.children[0]?.navLink)
-      }
-    } else {
-      navigate(routeItem?.navLink ?? getHomeRouteForLoggedInUser('admin'))
-    }
+    // dispatch(setSelectedRole(key))
+    // const routeItem = navigation.find(x => x.role === key)
+    // if (routeItem && routeItem.children) {
+    //   const children = routeItem.children
+    //   if (children && children[0]?.children) {
+    //     navigate(children[0]?.children[0]?.navLink)
+    //   } else {
+    //     navigate(routeItem.children[0]?.navLink)
+    //   }
+    // } else {
+    //   navigate(routeItem?.navLink ?? getHomeRouteForLoggedInUser('admin'))
+    // }
+    navigate(key)
 
   }
   // ** Loops through Cart Array to return Cart Items
@@ -88,7 +89,7 @@ const CartDropdown = () => {
           return (
             <div className="subContainer">
               <Card className="ecommerce-card subSystem" key={item.id} onClick={(e) => {
-                handleClickRole(item?.role)
+                handleClickRole(item?.description)
                 //  setShow(!show)
                 toggle()
               }}>
@@ -132,7 +133,7 @@ const CartDropdown = () => {
           Danh sách chức năng
         </UncontrolledTooltip>
       </DropdownToggle>
-      {/* <DropdownMenu
+      <DropdownMenu
         end
         tag="ul"
         className="dropdown-menu-media dropdown-cart mt-0 shadow-box customMenu"
@@ -148,13 +149,13 @@ const CartDropdown = () => {
             >
               DANH SÁCH CHỨC NĂNG
             </h5>
-            <Badge color='light-primary' pill>
+            {/* <Badge color='light-primary' pill>
               {store.cart.length || 0} Items
-            </Badge>
+            </Badge> */}
           </DropdownItem>
         </li>
         <div className="ecommerce-application">{renderMenuItems()}</div>
-      </DropdownMenu> */}
+      </DropdownMenu>
     </Dropdown>
   )
 }

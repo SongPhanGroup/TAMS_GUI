@@ -309,6 +309,8 @@ const EditableCell = ({
     )
 }
 const App = () => {
+    const [currentPage, setCurrentPage] = useState(1)
+    const [rowsPerPage, setRowsPerpage] = useState(10)
     const [form] = Form.useForm()
     const [data, setData] = useState(originData)
     const [count, setCount] = useState()
@@ -361,6 +363,15 @@ const App = () => {
     }
 
     const columns = [
+        {
+            title: "STT",
+            dataIndex: "stt",
+            width: 30,
+            align: "center",
+            render: (text, record, index) => (
+                <span>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
+            ),
+        },
         {
             title: 'Tên tham số',
             dataIndex: 'name',
@@ -495,7 +506,21 @@ const App = () => {
                     columns={mergedColumns}
                     rowClassName="editable-row"
                     pagination={{
-                        onChange: cancel,
+                        current: currentPage,
+                        pageSize: rowsPerPage,
+                        defaultPageSize: rowsPerPage,
+                        showSizeChanger: true,
+                        pageSizeOptions: ["10", "20", "30", '100'],
+                        total: count,
+                        locale: { items_per_page: "/ trang" },
+                        showTotal: (total, range) => <span>Tổng số: {total}</span>,
+                        onShowSizeChange: (current, pageSize) => {
+                            setCurrentPage(current)
+                            setRowsPerpage(pageSize)
+                        },
+                        onChange: (pageNumber) => {
+                            setCurrentPage(pageNumber)
+                        }
                     }}
                 />
             </Form>

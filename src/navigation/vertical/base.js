@@ -65,10 +65,10 @@ export default [
     role: 0
   },
   {
-    id: 'statistic-document',
+    id: 'document-statistic',
     title: 'Thống kê tài liệu mẫu',
     icon: <BarChart size={12} />,
-    navLink: '/tams/statistic-document',
+    navLink: '/tams/document-statistic',
     action: 'read',
     resource: 'THONG_KE_TAI_LIEU_MAU',
     role: 0

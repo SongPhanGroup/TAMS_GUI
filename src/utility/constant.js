@@ -74,21 +74,21 @@ export const LIST_ROLE = [
     },
     {
         id: 'facilities',
-        title: 'Quản lý kho dữ liệu mẫu',
+        title: 'QL kho dữ liệu mẫu',
         icon: "Trello",
         role: 0,
         description: '/tams/document'
     },
     {
         id: 'science',
-        title: 'Quản lý tài khoản người dùng',
+        title: 'QL tài khoản người dùng',
         icon: "Users",
         role: 0,
         description: '/tams/accounts'
     },
     {
         id: 'map',
-        title: 'Quản lý người dùng và phân quyền',
+        title: 'QL người dùng và phân quyền',
         icon: "Hexagon",
         role: 0,
         description: '/tams/roles'

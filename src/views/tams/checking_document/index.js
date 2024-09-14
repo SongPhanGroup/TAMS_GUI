@@ -9,7 +9,8 @@ import {
     Collapse,
     Select,
     Spin,
-    Tooltip
+    Tooltip,
+    DatePicker
 } from "antd"
 import React, { useState, Fragment, useEffect, useRef, useContext } from "react"
 import {
@@ -51,6 +52,8 @@ import { deleteCheckingDocument, getCheckingDocument } from "../../../api/checki
 import VersionModal from "./modal/VersionModal"
 import { PAGE_DEFAULT, PER_PAGE_DEFAULT } from "../../../utility/constant"
 import { getCourse } from "../../../api/course"
+import dayjs from "dayjs"
+const { RangePicker } = DatePicker
 
 const oneWeekAgo = new Date()
 oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
@@ -359,10 +362,22 @@ const CheckingDocument = () => {
         setExpandedRowKeys(expanded ? [record.key] : [])
     }
 
+    const currentYear = new Date().getFullYear()
+
+    const handleChangeTime = (dates) => {
+        if (dates) {
+            setStartDate(dayjs(dates[0], 'YYYY-MM-DD'))
+            setEndDate(dayjs(dates[1], 'YYYY-MM-DD'))
+        } else {
+            setStartDate(dayjs(`${currentYear}-01-01`))
+            setEndDate(dayjs(`${currentYear}-12-31`))
+        }
+    }
+
     return (
         <Fragment>
             <Card
-                title="Danh sách kiểm tra tài liệu"
+                title="Danh sách tài liệu kiểm tra"
                 style={{ backgroundColor: "white", width: "100%", height: "100%" }}
             >
                 <Row>
@@ -449,7 +464,7 @@ const CheckingDocument = () => {
                                     >
                                         Ngày kiểm tra
                                     </Label>
-                                    <Flatpickr
+                                    {/* <Flatpickr
                                         style={{ padding: '0.35rem 1rem' }}
                                         className="form-control invoice-edit-input date-picker mb-50"
                                         options={{
@@ -462,6 +477,16 @@ const CheckingDocument = () => {
                                         }}
                                         placeholder="dd/mm/yyyy"
                                         onChange={(value => handleChangeDate(value))}
+                                    /> */}
+                                    <RangePicker
+                                        style={{
+                                            width: "100%",
+                                            height: '80%'
+                                        }}
+                                        // defaultValue={[dayjs(`${currentYear}-01-01`), dayjs(`${currentYear}-12-31`)]}
+                                        format={"DD-MM-YYYY"}
+                                        allowClear={true}
+                                        onChange={handleChangeTime}
                                     />
                                 </Col>
                             </Col>

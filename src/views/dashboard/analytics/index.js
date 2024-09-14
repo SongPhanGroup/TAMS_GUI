@@ -131,19 +131,23 @@ const AnalyticsDashboard = () => {
   return (
     <div id='dashboard-analytics'>
       <Row className='match-height'>
-        <Col lg='6' xs='12'>
+        <Col lg='6' md='12'>
           <DocumentByCategories />
         </Col>
-        <Col lg='6' xs='12'>
+        <Col lg='6' md='12'>
           <DocumentByAspects />
         </Col>
       </Row>
       <Row className='match-height'>
-        <CountNumChecking />
+        <Col lg='12' md='12'>
+          <CountNumChecking />
+        </Col>
       </Row>
 
       <Row className='match-height'>
-        <DocumentByTime />
+        <Col lg='12' md='12'>
+          <DocumentByTime />
+        </Col>
       </Row>
       <Row className='match-height'>
         <Col lg='12' md='12'>

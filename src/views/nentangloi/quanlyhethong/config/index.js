@@ -469,23 +469,21 @@ const App = () => {
         <Card
             title="Cấu hình tham số hệ thống"
             style={{ backgroundColor: "white", width: "100%", height: "100%" }}
-            extra={
+        >
+            <Form form={form} component={false}>
                 <Col md="12" style={{ display: "flex", justifyContent: "flex-end" }}>
                     <Button
                         onClick={handleAdd}
                         color="primary"
                         style={{
                             width: '100px',
-                            marginBottom: 0,
+                            marginBottom: '10px',
                             padding: '8px 15px'
                         }}
                     >
                         Thêm mới
                     </Button>
                 </Col>
-            }
-        >
-            <Form form={form} component={false}>
                 <Table
                     components={{
                         body: {

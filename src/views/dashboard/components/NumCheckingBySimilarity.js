@@ -6,8 +6,104 @@ import dayjs from "dayjs"
 // ** Reactstrap Imports
 import { Card, CardHeader, CardTitle, CardBody, CardSubtitle, Badge } from 'reactstrap'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
+import { toDateStringv2 } from '../../../utility/Utils'
+import { useEffect, useState } from 'react'
+import { getCheckingDocumentStatisticByDuplicate } from '../../../api/checking_document_statistic'
+
+const { RangePicker } = DatePicker
+
+const fakeData = [
+    {
+        name: "_15",
+        duplicate: [
+            { month: "1", count: "0" },
+            { month: "2", count: "0" },
+            { month: "3", count: "0" },
+            { month: "4", count: "0" },
+            { month: "5", count: "0" },
+            { month: "6", count: "0" },
+            { month: "7", count: "0" },
+            { month: "8", count: "1" },
+            { month: "9", count: "1" },
+            { month: "10", count: "0" },
+            { month: "11", count: "0" },
+            { month: "12", count: "0" }
+        ]
+    },
+    {
+        name: "15_30",
+        duplicate: [
+            { month: "1", count: "2" },
+            { month: "2", count: "5" },
+            { month: "3", count: "3" },
+            { month: "4", count: "6" },
+            { month: "5", count: "0" },
+            { month: "6", count: "4" },
+            { month: "7", count: "0" },
+            { month: "10", count: "0" },
+            { month: "11", count: "0" },
+            { month: "12", count: "0" }
+        ]
+    },
+    {
+        name: "30_50",
+        duplicate: [
+            { month: "1", count: "1" },
+            { month: "2", count: "0" },
+            { month: "3", count: "2" },
+            { month: "4", count: "4" },
+            { month: "5", count: "3" },
+            { month: "6", count: "0" },
+            { month: "7", count: "5" },
+            { month: "10", count: "6" },
+            { month: "11", count: "0" },
+            { month: "12", count: "0" }
+        ]
+    },
+    {
+        name: "50_",
+        duplicate: [
+            { month: "1", count: "4" },
+            { month: "2", count: "0" },
+            { month: "3", count: "6" },
+            { month: "4", count: "7" },
+            { month: "5", count: "8" },
+            { month: "6", count: "0" },
+            { month: "7", count: "1" },
+            { month: "10", count: "2" },
+            { month: "11", count: "0" },
+            { month: "12", count: "0" }
+        ]
+    }
+]
 
 const NumCheckingBySimilarity = () => {
+    const [data, setData] = useState([])
+    const currentYear = new Date().getFullYear()
+    const [filter, setFilter] = useState({
+        startDate: dayjs(`${currentYear}-01-01`),
+        endDate: dayjs(`${currentYear}-12-31`)
+    })
+
+    useEffect(() => {
+        if (filter) {
+            getCheckingDocumentStatisticByDuplicate({
+                params: {
+                    startDate: dayjs(filter?.startDate).format('YYYY-MM-DD'),
+                    endDate: dayjs(filter?.endDate).format('YYYY-MM-DD')
+                }
+            }).then(res => {
+                setData(res.data)
+            })
+        }
+    }, [filter])
+
+    const categories = data.map(item => {
+        return item.duplicate.map(item => {
+            return `Tháng ${item.month}`
+        })
+    })
+
     const direction = 'ltr'
     const warning = '#ff9f43'
     // ** Chart Options
@@ -58,46 +154,39 @@ const NumCheckingBySimilarity = () => {
             }
         },
         xaxis: {
-            categories: [
-                'Tháng 1',
-                'Tháng 2',
-                'Tháng 3',
-                'Tháng 4',
-                'Tháng 5',
-                'Tháng 6',
-                'Tháng 7',
-                'Tháng 8',
-                'Tháng 9',
-                'Tháng 10',
-                'Tháng 11',
-                'Tháng 12'
-            ]
+            categories: categories[0]
         },
         yaxis: {
             opposite: direction === 'rtl'
         }
     }
 
+    const nameMapping = {
+        _15: '<15%',
+        '15_30': '15-30%',
+        '30_50': '30-50%',
+    }
+
+    const data__ = data.map(item => ({
+        name: nameMapping[item.name] || '>50%',
+        data: item.duplicate.map(i => parseInt(i.count))
+    }))
     // ** Chart Series
-    const series = [
-        {
-            name: '<15%',
-            data: [28, 20, 22, 18, 27, 25, 7, 9, 20, 15, 16, 10]
-        },
-        {
-            name: '15-30%',
-            data: [5, 7, 15, 20, 28, 20, 7, 15, 22, 17, 10, 19]
-        },
-        {
-            name: '30-50%',
-            data: [8, 5, 22, 19, 32, 11, 6, 24, 14, 19, 11, 24]
-        },
-        {
-            name: '>50%',
-            data: [10, 9, 3, 10, 15, 14, 5, 17, 25, 17, 16, 22]
+    const series = data__
+
+    const handleChangeTime = (dates) => {
+        if (dates) {
+            setFilter({
+                startDate: dayjs(dates[0], 'YYYY-MM-DD'),
+                endDate: dayjs(dates[1], 'YYYY-MM-DD')
+            })
+        } else {
+            setFilter({
+                startDate: dayjs(`${currentYear}-01-01`),
+                endDate: dayjs(`${currentYear}-12-31`)
+            })
         }
-    ]
-    const currentYear = new Date().getFullYear()
+    }
 
     return (
         <Card>
@@ -119,14 +208,14 @@ const NumCheckingBySimilarity = () => {
             <CardBody>
                 <div className="d-flex col col-4" style={{ justifyContent: "flex-start", marginRight: "1rem", alignItems: "center" }}>
                     <span style={{ marginRight: "1rem" }}>Thời gian</span>
-                    <DatePicker.RangePicker
+                    <RangePicker
                         style={{
                             width: "70%",
                         }}
-                        defaultValue={[dayjs(`${currentYear}-01-01`), dayjs(`${currentYear}-12-31`)]}
+                        // defaultValue={[dayjs(`${currentYear}-01-01`), dayjs(`${currentYear}-12-31`)]}
                         format={"DD/MM/YYYY"}
-                        allowClear={false}
-                    // onChange={handleChangeYear}
+                        allowClear={true}
+                        onChange={handleChangeTime}
                     />
                 </div>
                 <Chart options={options} series={series} type='line' height={400} />

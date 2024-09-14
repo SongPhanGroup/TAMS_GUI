@@ -8,7 +8,9 @@ import {
     Collapse,
     Spin,
     Select,
-    Tooltip
+    Tooltip,
+    Dropdown,
+    Space
 } from "antd"
 import React, { useState, Fragment, useEffect, useRef, useContext } from "react"
 import {
@@ -24,13 +26,17 @@ import {
     UncontrolledTooltip,
     CardBody,
     CardTitle,
+    Spinner,
 } from "reactstrap"
 import { Link, NavLink, useLocation, useNavigate, useParams } from "react-router-dom"
 import { Plus, X } from "react-feather"
 import {
     AppstoreAddOutlined,
     DeleteOutlined,
+    DownCircleFilled,
+    DownCircleOutlined,
     DownloadOutlined,
+    DownOutlined,
     EditOutlined,
     LockOutlined,
     RightCircleOutlined,
@@ -47,30 +53,12 @@ import { useForm, Controller } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import classnames from "classnames"
 import { toDateString, toDateTimeString } from "../../../utility/Utils"
-// import {
-//     getRole,
-//     createRole,
-//     updateRole,
-//     deleteRole,
-//     listAllRoleUserCount,
-// } from "../../../../api/roles"
-// import {
-//     listAllUser,
-//     getListUserByRole
-// } from "../../../../api/users"
-// import { getGroupPermission } from "../../../../api/permissionGroups"
-// import {
-//     getPerByRoleId,
-//     getAllRolePer,
-//     updateRoleManyPer,
-// } from "../../../../api/rolePermissions"
-// import { getPermission } from "../../../../api/permissions"
-// import ListPermission from './detail'
 import { deleteCheckingDocument, getCheckingDocument } from "../../../api/checking_document"
 import ContentModal from "./modal/ContentModal"
 import { getCheckingResult, getSimilarDocument, getTop3SimilarDocument } from "../../../api/checking_result"
 import { getCourse } from "../../../api/course"
 import { PAGE_DEFAULT, PER_PAGE_DEFAULT } from "../../../utility/constant"
+import { downloadFileCheckingDocumentVersion, getDuplicateCheckingDocumentVersion, getSimilarityReport } from "../../../api/checking_document_version"
 
 const CheckingResult = () => {
     const [loadingData, setLoadingData] = useState(false)
@@ -97,6 +85,9 @@ const CheckingResult = () => {
     const [listPermissionSelected, setListPermissionSelected] = useState([])
     const [checkingDocumentSelected, setCheckingDocumentSelected] = useState()
     const [selectedCourse, setSelectedCourse] = useState()
+    const [isLoadingDownload, setIsLoadingDownload] = useState(false)
+    const [isLoadingReport, setIsLoadingReport] = useState(false)
+    const [loadingId, setLoadingId] = useState(null)
 
     const [listCourse, setListCourse] = useState([])
 
@@ -135,7 +126,7 @@ const CheckingResult = () => {
     const params = useParams()
     const getData = () => {
         setLoadingData(true)
-        getTop3SimilarDocument(Number(params?.id))
+        getDuplicateCheckingDocumentVersion(Number(params?.id))
             .then((res) => {
                 const result = res?.data?.map(((item, index) => {
                     return { ...item, _id: item.id, key: index }
@@ -238,6 +229,26 @@ const CheckingResult = () => {
 
     const handleButtonClick2 = (record) => {
         navigate(`/tams/detail-result2/${record?.id}`, { state: record })
+    }
+
+    const handleDownloadFile = (id) => {
+        setIsLoadingDownload(true)
+        setLoadingId(id)
+        downloadFileCheckingDocumentVersion(id)
+            .then(res => {
+                const originalURL = window.URL.createObjectURL(new Blob([res]))
+                const link = document.createElement('a')
+                link.href = originalURL
+                link.setAttribute('download', `Tài liệu kiểm tra.docx`)
+                document.body.appendChild(link)
+                link.click()
+            })
+            .catch(error => {
+                console.log(error)
+            }).finally(() => {
+                setIsLoadingDownload(false)
+                setLoadingId(null)
+            })
     }
 
     const columns = [
@@ -372,12 +383,17 @@ const CheckingResult = () => {
             align: "center",
             render: (record) => (
                 // <div style={{ display: "flex", justifyContent: "center" }}>
-                <Tooltip placement="top" title="Download file">
-                    <DownloadOutlined
-                        id={`tooltip_download_${record._id}`}
-                        style={{ color: "#09A863", cursor: "pointer" }}
-                    />
-                </Tooltip>
+                <>
+                    {
+                        isLoadingDownload === true && loadingId === record.id ? <Spinner color="#fff" style={{width: '14px', height: '14px', backgroundColor: '#fff'}} /> : <Tooltip placement="top" title="Download file">
+                            <DownloadOutlined
+                                id={`tooltip_download_${record._id}`}
+                                style={{ color: "#09A863", cursor: "pointer" }}
+                                onClick={() => handleDownloadFile(record.id)}
+                            />
+                        </Tooltip>
+                    }
+                </>
                 // </div>
             ),
         },
@@ -397,15 +413,88 @@ const CheckingResult = () => {
         setExpandedRowKeys(expanded ? [record.key] : [])
     }
 
+    const handleReport = () => {
+        setIsLoadingReport(true)
+        getSimilarityReport({
+            params: {
+                checkingDocumentVersionId: Number(params.id)
+            }
+        })
+            .then(res => {
+                const originalURL = window.URL.createObjectURL(new Blob([res]))
+                const link = document.createElement('a')
+                link.href = originalURL
+                link.setAttribute('download', `DS tài liệu trùng với phiên bản kiểm tra.bin`)
+                document.body.appendChild(link)
+                link.click()
+            })
+            .catch(error => {
+                console.log(error)
+            }).finally(() => {
+                setIsLoadingReport(false)
+            })
+    }
+
+    const items = [
+        {
+            label: 'Báo cáo DS trùng lặp theo khóa',
+            key: '1',
+            icon: <DownCircleFilled />,
+        },
+        {
+            label: 'Báo cáo DS trùng lặp cao',
+            key: '2',
+            icon: <DownCircleOutlined />,
+        }
+    ]
+
+    const menuProps = {
+        items,
+        onClick: handleReport,
+    }
+
     return (
         <Fragment>
             <Card
                 title="Kết quả kiểm tra tài liệu"
                 style={{ backgroundColor: "white", width: "100%", height: "100%" }}
                 extra={
-                    <Col md="12" style={{ display: "flex", justifyContent: "flex-end" }}>
+                    <>
+
+                    </>
+                }
+            >
+
+                <Row>
+                    <Col md="12" style={{ display: "flex", justifyContent: "flex-end", gap: 16 }}>
+                        <Dropdown menu={menuProps}>
+                            <Button color="primary">
+                                <Space>
+                                    Báo cáo
+                                    {
+                                        isLoadingReport === true ? <Spinner color="#fff" style={{width: '14px', height: '14px'}} /> : <DownOutlined />
+                                    }
+                                </Space>
+                            </Button>
+                        </Dropdown>
+                        {/* {ability.can('create', 'PHAN_QUYEN_VAI_TRO') &&
+                            <Button
+                                onClick={handleReport}
+                                color="primary"
+                                className=""
+                                style={{
+                                    width: '120px',
+                                    marginBottom: 0,
+                                    padding: '8px 15px'
+                                }}
+                            >
+                                Báo cáo {
+                                    isLoadingReport === true ? <Spin /> : ''
+                                }
+                            </Button>
+                        } */}
                         {ability.can('create', 'PHAN_QUYEN_VAI_TRO') &&
-                            <Link to="/tams/checking-specialized">
+                            <Link to="/tams/checking-document">
                                 <Button
                                     // onClick={(e) => setIsAdd(true)}
                                     color="primary"
@@ -413,7 +502,7 @@ const CheckingResult = () => {
                                     style={{
                                         width: '100px',
                                         marginBottom: 0,
-                                        padding: '8px 15px'
+                                        // padding: '8px 15px'
                                     }}
                                     outline
                                 >
@@ -422,10 +511,6 @@ const CheckingResult = () => {
                             </Link>
                         }
                     </Col>
-                }
-            >
-
-                <Row>
                     <Col md="12" style={{ textAlign: 'center' }}>
                         <h5>Kết quả trùng lặp so với CSDL mẫu: <span style={{ color: 'red' }}>{location?.state?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}%</span></h5>
                     </Col>

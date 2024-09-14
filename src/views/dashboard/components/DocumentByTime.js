@@ -116,7 +116,7 @@ const fakeData = [
         backgroundColor: "rgba(245,34,45,0.8)"
     },
     {
-        count: 2,
+        count1: 2,
         month: "Tháng 12",
         backgroundColor: "rgba(245,34,45,0.8)"
     }
@@ -230,10 +230,17 @@ export default function DocumentByTime() {
         })
     }, [filter])
     const handleChangeDates = (dates) => {
-        setFilter({
-            startDate: dayjs(dates[0], 'YYYY-MM-DD'),
-            endDate: dayjs(dates[1], 'YYYY-MM-DD')
-        })
+        if (dates) {
+            setFilter({
+                startDate: dayjs(dates[0], 'YYYY-MM-DD'),
+                endDate: dayjs(dates[1], 'YYYY-MM-DD')
+            })
+        } else {
+            setFilter({
+                startDate: dayjs(`${currentYear}-01-01`),
+                endDate: dayjs(`${currentYear}-12-31`)
+            })
+        }
     }
     return (
         <Card style={{ position: "relative", width: "100%" }}>
@@ -253,7 +260,7 @@ export default function DocumentByTime() {
                         }}
                         value={[dayjs(filter?.startDate), dayjs(filter?.endDate)]}
                         format={"DD-MM-YYYY"}
-                        allowClear={false}
+                        allowClear={true}
                         onChange={handleChangeDates}
                     />
                 </div>

@@ -190,6 +190,7 @@ const CheckingDocument = () => {
         setIsEdit(true)
     }
     const handleChangeCourse = (value) => {
+        console.log(value)
         if (value) {
             setCourseId(value.join(','))
             setCurrentPage(1)

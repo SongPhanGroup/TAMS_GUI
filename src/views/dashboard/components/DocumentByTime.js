@@ -127,7 +127,7 @@ const getRandomColor = () => {
     const b = Math.floor(Math.random() * 255)
     return `rgba(${r},${g},${b},0.8)`
 }
-export default function DocumentByTime() {
+export default function DocumentByTime({colorForLabel}) {
     const currentYear = new Date().getFullYear()
     const [filter, setFilter] = useState({
         startDate: dayjs(`${currentYear}-01-01`),
@@ -207,14 +207,16 @@ export default function DocumentByTime() {
             const majorLabels = Array.from(allMajors)
 
             // Tạo mảng `datasets` động
-            const datasets_ = majorLabels?.map(majorName => ({
-                label: majorName,
-                data: apiData?.map(item => {
-                    const major = item?.major?.find(majorItem => majorItem.name === majorName)
-                    return major ? parseInt(major.count, 10) : 0 // Nếu không tìm thấy, trả về 0
-                }),
-                backgroundColor: getRandomColor() // Gán màu ngẫu nhiên
-            }))
+            const datasets_ = majorLabels?.map(majorName => {
+                return {
+                    label: majorName,
+                    data: apiData?.map(item => {
+                        const major = item?.major?.find(majorItem => majorItem.name === majorName)
+                        return major ? parseInt(major.count, 10) : 0 // Nếu không tìm thấy, trả về 0
+                    }),
+                    backgroundColor: colorForLabel(majorName) // Gán màu ngẫu nhiên
+                }
+            })
 
             // Tạo mảng `labels` cho các tháng
             const labelData = apiData?.map(item => `Tháng ${item.month}/${item.year}`)
@@ -258,7 +260,7 @@ export default function DocumentByTime() {
                         style={{
                             width: "70%",
                         }}
-                        value={[dayjs(filter?.startDate), dayjs(filter?.endDate)]}
+                        // value={[dayjs(filter?.startDate), dayjs(filter?.endDate)]}
                         format={"DD-MM-YYYY"}
                         allowClear={true}
                         onChange={handleChangeDates}

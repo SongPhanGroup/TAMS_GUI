@@ -19,18 +19,6 @@ import { ThemeColors } from '@src/utility/context/ThemeColors'
 import { Row, Col, Card, CardHeader, CardTitle, CardBody } from 'reactstrap'
 
 // ** Demo Components
-import InvoiceList from '@src/views/apps/invoice/list'
-import Sales from '@src/views/ui-elements/cards/analytics/Sales'
-import AvgSessions from '@src/views/ui-elements/cards/analytics/AvgSessions'
-import CardAppDesign from '@src/views/ui-elements/cards/advance/CardAppDesign'
-import SupportTracker from '@src/views/ui-elements/cards/analytics/SupportTracker'
-import OrdersReceived from '@src/views/ui-elements/cards/statistics/OrdersReceived'
-import SubscribersGained from '@src/views/ui-elements/cards/statistics/SubscribersGained'
-import CardCongratulations from '@src/views/ui-elements/cards/advance/CardCongratulations'
-import CountNumChecking from '../components/CountNumChecking'
-import DocumentByTime from '../components/DocumentByTime'
-import NumCheckingBySimilarity from '../components/NumCheckingBySimilarity'
-import DocumentByCategories from '../components/DocumentByCategories'
 
 // ** Images
 import jsonImg from '@src/assets/images/icons/json.png'
@@ -38,9 +26,29 @@ import ceo from '@src/assets/images/portrait/small/avatar-s-9.jpg'
 
 // ** Styles
 import '@styles/react/libs/charts/apex-charts.scss'
-import DocumentByAspects from '../components/DocumentByAspects'
+import DocumentByCategories from '../../dashboard/components/DocumentByCategories'
+import DocumentByAspects from '../../dashboard/components/DocumentByAspects'
+import DocumentByTime from '../../dashboard/components/DocumentByTime'
 
-const AnalyticsDashboard = () => {
+const getRandomColor = () => {
+    const r = Math.floor(Math.random() * 255)
+    const g = Math.floor(Math.random() * 255)
+    const b = Math.floor(Math.random() * 255)
+    return `rgb(${r}, ${g}, ${b})`
+  }
+
+  const colorMap = {}
+
+  const getColorForLabel = (label) => {
+    if (!colorMap[label]) {
+      // Nếu nhãn chưa có màu, tạo màu ngẫu nhiên và lưu lại
+      colorMap[label] = getRandomColor()
+    }
+    // Trả về màu đã lưu cho nhãn
+    return colorMap[label]
+  }
+
+const DocumentStatistic = () => {
   // ** Context
   const { colors } = useContext(ThemeColors)
 
@@ -128,24 +136,6 @@ const AnalyticsDashboard = () => {
     }
   ]
 
-  const getRandomColor = () => {
-    const r = Math.floor(Math.random() * 255)
-    const g = Math.floor(Math.random() * 255)
-    const b = Math.floor(Math.random() * 255)
-    return `rgb(${r}, ${g}, ${b})`
-  }
-
-  const colorMap = {}
-
-  const getColorForLabel = (label) => {
-    if (!colorMap[label]) {
-      // Nếu nhãn chưa có màu, tạo màu ngẫu nhiên và lưu lại
-      colorMap[label] = getRandomColor()
-    }
-    // Trả về màu đã lưu cho nhãn
-    return colorMap[label]
-  }
-
   return (
     <div id='dashboard-analytics'>
       <Row className='match-height'>
@@ -161,45 +151,8 @@ const AnalyticsDashboard = () => {
           <DocumentByTime colorForLabel={getColorForLabel} />
         </Col>
       </Row>
-      <Row className='match-height'>
-        <Col lg='12' md='12'>
-          <CountNumChecking />
-        </Col>
-      </Row>
-
-      <Row className='match-height'>
-        <Col lg='12' md='12'>
-          <NumCheckingBySimilarity />
-        </Col>
-      </Row>
-      {/* <Row className='match-height'>
-        <Col lg='4' xs='12'>
-          <Card className='card-user-timeline'>
-            <CardHeader>
-              <div className='d-flex align-items-center'>
-                <List className='user-timeline-title-icon' />
-                <CardTitle tag='h4'>User Timeline</CardTitle>
-              </div>
-            </CardHeader>
-            <CardBody>
-              <Timeline className='ms-50 mb-0' data={data} />
-            </CardBody>
-          </Card>
-        </Col>
-        <Col lg='4' md='6' xs='12'>
-          <Sales primary={colors.primary.main} info={colors.info.main} />
-        </Col>
-        <Col lg='4' md='6' xs='12'>
-          <CardAppDesign />
-        </Col>
-      </Row>
-      <Row className='match-height'>
-        <Col xs='12'>
-          <InvoiceList />
-        </Col>
-      </Row> */}
     </div>
   )
 }
 
-export default AnalyticsDashboard
+export default DocumentStatistic

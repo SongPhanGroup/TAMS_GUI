@@ -213,7 +213,7 @@ const NumCheckingBySimilarity = () => {
                             width: "70%",
                         }}
                         // defaultValue={[dayjs(`${currentYear}-01-01`), dayjs(`${currentYear}-12-31`)]}
-                        format={"DD/MM/YYYY"}
+                        format={"DD-MM-YYYY"}
                         allowClear={true}
                         onChange={handleChangeTime}
                     />

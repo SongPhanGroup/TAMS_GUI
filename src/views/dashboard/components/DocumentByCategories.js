@@ -13,31 +13,44 @@ const getRandomColor = () => {
     const b = Math.floor(Math.random() * 255)
     return `rgb(${r}, ${g}, ${b})`
 }
-const convertDataForChart = (apiData) => {
-    return {
-        labels: apiData.map(item => item.name),  // Lấy tên các phần (labels)
-        datasets: [
-            {
-                label: '# tài liệu',
-                data: apiData.map(item => parseInt(item.count)),  // Chuyển đổi count thành số nguyên
-                backgroundColor: apiData.map(() => getRandomColor()),  // Tạo màu ngẫu nhiên cho mỗi phần
-                borderColor: apiData.map(() => 'rgba(255, 255, 255, 1)'),  // Màu viền luôn là màu trắng
-                borderWidth: 1,
-            },
-        ],
+
+const colorMap = {}
+
+const getColorForLabel = (label) => {
+    if (!colorMap[label]) {
+        // Nếu nhãn chưa có màu, tạo màu ngẫu nhiên và lưu lại
+        colorMap[label] = getRandomColor()
     }
+    // Trả về màu đã lưu cho nhãn
+    return colorMap[label]
 }
+
 const getTotalDocuments = (data) => {
     return data.reduce((total, item) => total + parseInt(item.count), 0)
 }
 
 // Sử dụng hàm tính tổng
-const DocumentByCategories = () => {
+const DocumentByCategories = ({colorForLabel}) => {
     const [total, setTotal] = useState()
     const [dataChart, setDataChart] = useState({
         labels: [],
         datasets: [],
     })
+
+    const convertDataForChart = (apiData) => {
+        return {
+            labels: apiData.map(item => item.name),  // Lấy tên các phần (labels)
+            datasets: [
+                {
+                    label: '# tài liệu',
+                    data: apiData.map(item => parseInt(item.count)),  // Chuyển đổi count thành số nguyên
+                    backgroundColor: apiData.map((item) => colorForLabel(item.name)),  // Tạo màu ngẫu nhiên cho mỗi phần
+                    borderColor: apiData.map(() => 'rgba(255, 255, 255, 1)'),  // Màu viền luôn là màu trắng
+                    borderWidth: 1,
+                },
+            ],
+        }
+    }
     const data = {
         labels: ['Luận văn', 'Luận án'],
         datasets: [

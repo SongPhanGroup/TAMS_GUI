@@ -8,7 +8,9 @@ import {
     Collapse,
     Spin,
     Select,
-    Tooltip
+    Tooltip,
+    Dropdown,
+    Space
 } from "antd"
 import React, { useState, Fragment, useEffect, useRef, useContext } from "react"
 import {
@@ -24,13 +26,17 @@ import {
     UncontrolledTooltip,
     CardBody,
     CardTitle,
+    Spinner,
 } from "reactstrap"
 import { Link, NavLink, useLocation, useNavigate, useParams } from "react-router-dom"
 import { Plus, X } from "react-feather"
 import {
     AppstoreAddOutlined,
     DeleteOutlined,
+    DownCircleFilled,
+    DownCircleOutlined,
     DownloadOutlined,
+    DownOutlined,
     EditOutlined,
     LockOutlined,
     RightCircleOutlined,
@@ -71,7 +77,7 @@ import ContentModal from "./modal/ContentModal"
 import { getCheckingResult, getSimilarDocument, getTop3SimilarDocument } from "../../../api/checking_result"
 import { getCourse } from "../../../api/course"
 import { PAGE_DEFAULT, PER_PAGE_DEFAULT } from "../../../utility/constant"
-import { downloadFileCheckingDocumentVersion } from "../../../api/checking_document_version"
+import { downloadFileCheckingDocumentVersion, getDuplicateCheckingDocumentVersion, getSimilarityReport } from "../../../api/checking_document_version"
 
 const CheckingResult = () => {
     const [loadingData, setLoadingData] = useState(false)
@@ -100,6 +106,7 @@ const CheckingResult = () => {
     const [listAllRole, setListAllRole] = useState([])
     const [selectedCourse, setSelectedCourse] = useState()
     const [isLoadingDownload, setIsLoadingDownload] = useState(false)
+    const [isLoadingReport, setIsLoadingReport] = useState(false)
     const [loadingId, setLoadingId] = useState(null)
 
     const [listCourse, setListCourse] = useState([])
@@ -136,10 +143,11 @@ const CheckingResult = () => {
         setListCourse(courses)
     }
 
+
     const params = useParams()
     const getData = () => {
         setLoadingData(true)
-        getTop3SimilarDocument(Number(params?.id))
+        getDuplicateCheckingDocumentVersion(Number(params?.id))
             .then((res) => {
                 const result = res?.data?.map(((item, index) => {
                     return { ...item, _id: item.id, key: index }
@@ -398,7 +406,7 @@ const CheckingResult = () => {
                 // <div style={{ display: "flex", justifyContent: "center" }}>
                 <>
                     {
-                        isLoadingDownload === true && loadingId === record.id ? <Spin /> : <Tooltip placement="top" title="Download file">
+                        isLoadingDownload === true && loadingId === record.id ? <Spinner color="#fff" style={{width: '14px', height: '14px', backgroundColor: '#fff'}} /> : <Tooltip placement="top" title="Download file">
                             <DownloadOutlined
                                 id={`tooltip_download_${record._id}`}
                                 style={{ color: "#09A863", cursor: "pointer" }}
@@ -426,6 +434,46 @@ const CheckingResult = () => {
         setExpandedRowKeys(expanded ? [record.key] : [])
     }
 
+    const handleReport = () => {
+        setIsLoadingReport(true)
+        getSimilarityReport({
+            params: {
+                checkingDocumentVersionId: Number(params.id)
+            }
+        })
+            .then(res => {
+                const originalURL = window.URL.createObjectURL(new Blob([res]))
+                const link = document.createElement('a')
+                link.href = originalURL
+                link.setAttribute('download', `DS tài liệu trùng với phiên bản kiểm tra.bin`)
+                document.body.appendChild(link)
+                link.click()
+            })
+            .catch(error => {
+                console.log(error)
+            }).finally(() => {
+                setIsLoadingReport(false)
+            })
+    }
+
+    const items = [
+        {
+            label: 'Báo cáo DS trùng lặp theo khóa',
+            key: '1',
+            icon: <DownCircleFilled />,
+        },
+        {
+            label: 'Báo cáo DS trùng lặp cao',
+            key: '2',
+            icon: <DownCircleOutlined />,
+        }
+    ]
+
+    const menuProps = {
+        items,
+        onClick: handleReport,
+    }
+
     return (
         <Fragment>
             <Card
@@ -433,8 +481,42 @@ const CheckingResult = () => {
                 style={{ backgroundColor: "white", width: "100%", height: "100%" }}
                 extra={
                     <>
-                        <Col md="12" style={{ display: "flex", justifyContent: "flex-end", gap: 16 }}>
-                            {ability.can('create', 'PHAN_QUYEN_VAI_TRO') &&
+
+                    </>
+                }
+            >
+
+                <Row>
+                    <Col md="12" style={{ display: "flex", justifyContent: "flex-end", gap: 16 }}>
+                        <Dropdown menu={menuProps}>
+                            <Button color="primary">
+                                <Space>
+                                    Báo cáo
+                                    {
+                                        isLoadingReport === true ? <Spinner color="#fff" style={{width: '14px', height: '14px'}} /> : <DownOutlined />
+                                    }
+                                </Space>
+                            </Button>
+                        </Dropdown>
+                        {/* {ability.can('create', 'PHAN_QUYEN_VAI_TRO') &&
+                            <Button
+                                onClick={handleReport}
+                                color="primary"
+                                className=""
+                                style={{
+                                    width: '120px',
+                                    marginBottom: 0,
+                                    padding: '8px 15px'
+                                }}
+                        
+                            >
+                                Báo cáo {
+                                    isLoadingReport === true ? <Spin /> : ''
+                                }
+                            </Button>
+                        } */}
+                        {ability.can('create', 'PHAN_QUYEN_VAI_TRO') &&
+                            <Link to="/tams/checking-document">
                                 <Button
                                     // onClick={(e) => setIsAdd(true)}
                                     color="primary"
@@ -442,36 +524,15 @@ const CheckingResult = () => {
                                     style={{
                                         width: '100px',
                                         marginBottom: 0,
-                                        padding: '8px 15px'
+                                        // padding: '8px 15px'
                                     }}
                                     outline
                                 >
-                                    Báo cáo
+                                    Quay lại
                                 </Button>
-                            }
-                            {ability.can('create', 'PHAN_QUYEN_VAI_TRO') &&
-                                <Link to="/tams/checking-document">
-                                    <Button
-                                        // onClick={(e) => setIsAdd(true)}
-                                        color="primary"
-                                        className=""
-                                        style={{
-                                            width: '100px',
-                                            marginBottom: 0,
-                                            padding: '8px 15px'
-                                        }}
-                                        outline
-                                    >
-                                        Quay lại
-                                    </Button>
-                                </Link>
-                            }
-                        </Col>
-                    </>
-                }
-            >
-
-                <Row>
+                            </Link>
+                        }
+                    </Col>
                     <Col md="12" style={{ textAlign: 'center' }}>
                         <h5>Kết quả trùng lặp so với CSDL mẫu: <span style={{ color: 'red' }}>{location?.state?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}%</span></h5>
                     </Col>
@@ -519,6 +580,8 @@ const CheckingResult = () => {
                                 rowExpandable: (record) => record.name !== 'Not Expandable',
                                 // expandRowByClick: true
                             }}
+                            expandedRowKeys={expandedRowKeys}
+                            onExpand={onExpand}
                             pagination={{
                                 defaultPageSize: 30,
                                 showSizeChanger: true,

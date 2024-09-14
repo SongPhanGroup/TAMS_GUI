@@ -12,25 +12,97 @@ import { getCheckingDocumentStatisticByDuplicate } from '../../../api/checking_d
 
 const { RangePicker } = DatePicker
 
+const fakeData = [
+    {
+        name: "_15",
+        duplicate: [
+            { month: "1", count: "0" },
+            { month: "2", count: "0" },
+            { month: "3", count: "0" },
+            { month: "4", count: "0" },
+            { month: "5", count: "0" },
+            { month: "6", count: "0" },
+            { month: "7", count: "0" },
+            { month: "8", count: "1" },
+            { month: "9", count: "1" },
+            { month: "10", count: "0" },
+            { month: "11", count: "0" },
+            { month: "12", count: "0" }
+        ]
+    },
+    {
+        name: "15_30",
+        duplicate: [
+            { month: "1", count: "2" },
+            { month: "2", count: "5" },
+            { month: "3", count: "3" },
+            { month: "4", count: "6" },
+            { month: "5", count: "0" },
+            { month: "6", count: "4" },
+            { month: "7", count: "0" },
+            { month: "10", count: "0" },
+            { month: "11", count: "0" },
+            { month: "12", count: "0" }
+        ]
+    },
+    {
+        name: "30_50",
+        duplicate: [
+            { month: "1", count: "1" },
+            { month: "2", count: "0" },
+            { month: "3", count: "2" },
+            { month: "4", count: "4" },
+            { month: "5", count: "3" },
+            { month: "6", count: "0" },
+            { month: "7", count: "5" },
+            { month: "10", count: "6" },
+            { month: "11", count: "0" },
+            { month: "12", count: "0" }
+        ]
+    },
+    {
+        name: "50_",
+        duplicate: [
+            { month: "1", count: "4" },
+            { month: "2", count: "0" },
+            { month: "3", count: "6" },
+            { month: "4", count: "7" },
+            { month: "5", count: "8" },
+            { month: "6", count: "0" },
+            { month: "7", count: "1" },
+            { month: "10", count: "2" },
+            { month: "11", count: "0" },
+            { month: "12", count: "0" }
+        ]
+    }
+]
+
 const NumCheckingBySimilarity = () => {
     const [data, setData] = useState([])
-    const [start_date, setStartDate] = useState(toDateStringv2(new Date(new Date().getFullYear(), 0, 1)))
-    const [end_date, setEndDate] = useState(toDateStringv2(new Date(new Date().getFullYear(), 11, 31)))
+    const currentYear = new Date().getFullYear()
+    const [filter, setFilter] = useState({
+        startDate: dayjs(`${currentYear}-01-01`),
+        endDate: dayjs(`${currentYear}-12-31`)
+    })
 
     useEffect(() => {
-        if (start_date && end_date) {
+        if (filter) {
             getCheckingDocumentStatisticByDuplicate({
                 params: {
-                    startDate: start_date,
-                    endDate: end_date
+                    startDate: dayjs(filter?.startDate).format('YYYY-MM-DD'),
+                    endDate: dayjs(filter?.endDate).format('YYYY-MM-DD')
                 }
             }).then(res => {
                 setData(res.data)
             })
         }
-    }, [start_date, end_date])
+    }, [filter])
 
-    console.log(data)
+    const categories = data.map(item => {
+        return item.duplicate.map(item => {
+            return `Tháng ${item.month}`
+        })
+    })
 
     const direction = 'ltr'
     const warning = '#ff9f43'
@@ -82,54 +154,37 @@ const NumCheckingBySimilarity = () => {
             }
         },
         xaxis: {
-            categories: [
-                'Tháng 1',
-                'Tháng 2',
-                'Tháng 3',
-                'Tháng 4',
-                'Tháng 5',
-                'Tháng 6',
-                'Tháng 7',
-                'Tháng 8',
-                'Tháng 9',
-                'Tháng 10',
-                'Tháng 11',
-                'Tháng 12'
-            ]
+            categories: categories[0]
         },
         yaxis: {
             opposite: direction === 'rtl'
         }
     }
 
-    // ** Chart Series
-    const series = [
-        {
-            name: '<15%',
-            data: [28, 20, 22, 18, 27, 25, 7, 9, 20, 15, 16, 10]
-        },
-        {
-            name: '15-30%',
-            data: [5, 7, 15, 20, 28, 20, 7, 15, 22, 17, 10, 19]
-        },
-        {
-            name: '30-50%',
-            data: [8, 5, 22, 19, 32, 11, 6, 24, 14, 19, 11, 24]
-        },
-        {
-            name: '>50%',
-            data: [10, 9, 3, 10, 15, 14, 5, 17, 25, 17, 16, 22]
-        }
-    ]
-    const currentYear = new Date().getFullYear()
+    const nameMapping = {
+        _15: '<15%',
+        '15_30': '15-30%',
+        '30_50': '30-50%',
+    }
 
-    const handleChangeTime = (date, dateString) => {
-        if (!dateString[0] && !dateString[1]) {
-            setStartDate(toDateStringv2(new Date(new Date().getFullYear(), 0, 1)))
-            setEndDate(toDateStringv2(new Date(new Date().getFullYear(), 11, 31)))
+    const data__ = data.map(item => ({
+        name: nameMapping[item.name] || '>50%',
+        data: item.duplicate.map(i => parseInt(i.count))
+    }))
+    // ** Chart Series
+    const series = data__
+
+    const handleChangeTime = (dates) => {
+        if (dates) {
+            setFilter({
+                startDate: dayjs(dates[0], 'YYYY-MM-DD'),
+                endDate: dayjs(dates[1], 'YYYY-MM-DD')
+            })
         } else {
-            setStartDate(toDateStringv2(dateString[0]))
-            setEndDate(toDateStringv2(dateString[1]))
+            setFilter({
+                startDate: dayjs(`${currentYear}-01-01`),
+                endDate: dayjs(`${currentYear}-12-31`)
+            })
         }
     }
 

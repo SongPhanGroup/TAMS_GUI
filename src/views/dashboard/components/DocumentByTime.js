@@ -143,21 +143,18 @@ export default function DocumentByTime() {
     // data format
     const dataChart_ = {
         labels: labelData,
-        // datasets: [
-        //     {
-        //         label: "Luận văn",
-        //         data: data?.map(item => item.count1),
-        //         backgroundColor: "rgba(245,34,45,0.8)"
-        //     },
-        //     {
-        //         label: "Luận án",
-        //         data: data?.map(item => item.count2),
-        //         backgroundColor: "rgba(34,150,245,1)"
-        //     }
-        // ]
-        datasets: dataSample.map(item => {
-            return item
-        })
+        datasets: [
+            {
+                label: "Luận văn",
+                data: fakeData?.map(item => item.count1),
+                backgroundColor: "rgba(245,34,45,0.8)"
+            },
+            {
+                label: "Luận án",
+                data: fakeData?.map(item => item.count2),
+                backgroundColor: "rgba(34,150,245,1)"
+            }
+        ]
     }
     const options = {
         responsive: true,
@@ -233,10 +230,17 @@ export default function DocumentByTime() {
         })
     }, [filter])
     const handleChangeDates = (dates) => {
-        setFilter({
-            startDate: dayjs(dates[0], 'YYYY-MM-DD'),
-            endDate: dayjs(dates[1], 'YYYY-MM-DD')
-        })
+        if (dates) {
+            setFilter({
+                startDate: dayjs(dates[0], 'YYYY-MM-DD'),
+                endDate: dayjs(dates[1], 'YYYY-MM-DD')
+            })
+        } else {
+            setFilter({
+                startDate: dayjs(`${currentYear}-01-01`),
+                endDate: dayjs(`${currentYear}-12-31`)
+            })
+        }
     }
     return (
         <Card style={{ position: "relative", width: "100%" }}>
@@ -250,13 +254,13 @@ export default function DocumentByTime() {
             <CardBody>
                 <div className="d-flex col col-4" style={{ justifyContent: "flex-start", marginRight: "1rem", alignItems: "center" }}>
                     <span style={{ marginRight: "1rem" }}>Thời gian</span>
-                    <RangePicker
+                    <DatePicker.RangePicker
                         style={{
                             width: "70%",
                         }}
                         value={[dayjs(filter?.startDate), dayjs(filter?.endDate)]}
                         format={"DD-MM-YYYY"}
-                        allowClear={false}
+                        allowClear={true}
                         onChange={handleChangeDates}
                     />
                 </div>

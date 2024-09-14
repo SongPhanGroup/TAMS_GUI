@@ -36,3 +36,21 @@ export const downloadFileCheckingDocumentVersion = async (id) => {
   const res = await API_TAMS.get(uri, {responseType: 'blob'})
   return res
 }
+
+export const getSimilarityReport = async (query) => {
+  const uri = `/getSimilarityReport`
+  const res = await API_TAMS.get(uri, query, {responseType: 'blob'})
+  return res
+}
+
+export const getDuplicateCheckingDocumentVersion = async (id) => {
+  const uri = `/checking-document-version/${id}/duplicate-document`
+  const res = await API_TAMS.get(uri)
+  return res
+}
+
+export const getDuplicateSentenceDocument = async (query, id) => {
+  const uri = `/checking-document-version/${id}/duplicate-sentence-document`
+  const res = await API_TAMS.get(uri, query)
+  return res
+}

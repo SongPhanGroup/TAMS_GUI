@@ -53,21 +53,26 @@ ChartJS.register(
 
 export default function CountNumChecking() {
     const [data, setData] = useState([])
-    const [start_date, setStartDate] = useState(toDateStringv2(new Date(new Date().getFullYear(), 0, 1)))
-    const [end_date, setEndDate] = useState(toDateStringv2(new Date(new Date().getFullYear(), 11, 31)))
+    const currentYear = new Date().getFullYear()
+    const [filter, setFilter] = useState({
+        startDate: dayjs(`${currentYear}-01-01`),
+        endDate: dayjs(`${currentYear}-12-31`)
+    })
 
     useEffect(() => {
-        if (start_date && end_date) {
+        if (filter) {
             getCheckingDocumentStatisticByTime({
                 params: {
-                    startDate: start_date,
-                    endDate: end_date
+                    startDate: dayjs(filter?.startDate).format('YYYY-MM-DD'),
+                    endDate: dayjs(filter?.endDate).format('YYYY-MM-DD')
                 }
             }).then(res => {
                 setData(res.data)
+            }).catch(error => {
+                console.log(error)
             })
         }
-    }, [start_date, end_date])
+    }, [filter])
 
     const title = "Số lượt kiểm tra tài liệu theo thời gian"
     const labelData = data?.map(item => `Tháng ${item.month}`)
@@ -115,15 +120,17 @@ export default function CountNumChecking() {
         },
     }
 
-    const currentYear = new Date().getFullYear()
-
-    const handleChangeTime = (date, dateString) => {
-        if (!dateString[0] && !dateString[1]) {
-            setStartDate(toDateStringv2(new Date(new Date().getFullYear(), 0, 1)))
-            setEndDate(toDateStringv2(new Date(new Date().getFullYear(), 11, 31)))
+    const handleChangeTime = (dates) => {
+        if (dates) {
+            setFilter({
+                startDate: dayjs(dates[0], 'YYYY-MM-DD'),
+                endDate: dayjs(dates[1], 'YYYY-MM-DD')
+            })
         } else {
-            setStartDate(toDateStringv2(dateString[0]))
-            setEndDate(toDateStringv2(dateString[1]))
+            setFilter({
+                startDate: dayjs(`${currentYear}-01-01`),
+                endDate: dayjs(`${currentYear}-12-31`)
+            })
         }
     }
 

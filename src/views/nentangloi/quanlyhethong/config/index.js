@@ -224,55 +224,59 @@
 
 // export default ChangePass
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Form, Input, InputNumber, Popconfirm, Table, Tooltip, Typography, Card } from 'antd'
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
 import { Check, X } from 'react-feather'
 import { Button, Col } from 'reactstrap'
-const originData = [
-    {
-        key: 1,
-        name: 'Ngưỡng trùng lặp câu',
-        code: `THRESHOLDSENTENCE`,
-        value: 20,
-        description: `Dùng cho việc phân loại các tài liệu có câu trùng nhiều`,
-    },
-    {
-        key: 2,
-        name: 'Ngưỡng trùng lặp văn bản',
-        code: `THRESHOLDTEXT`,
-        value: 30,
-        description: `Dùng cho các văn bản có độ trùng lặp cao`,
-    },
-    {
-        key: 3,
-        name: 'Độ dài câu so sánh',
-        code: `COMPAREDLENGTH`,
-        value: 100,
-        description: `Ngưỡng thấp nhất số ký tự của một câu đem ra so sánh`,
-    },
-    {
-        key: 4,
-        name: 'Có bỏ qua câu trích dẫn hay không',
-        code: `STATUSQUOTE`,
-        value: 32,
-        description: `Phần trăm trùng lặp có tính cả câu trích dẫn hay không`,
-    },
-    {
-        key: 5,
-        name: 'Họ tên người ký',
-        code: `SIGNATURENAME`,
-        value: 32,
-        description: `Tên của người chịu trách nhiệm cho quá trình kiểm tra`,
-    },
-    {
-        key: 6,
-        name: 'Chức vụ người ký',
-        code: `SIGNATUREPOSITION`,
-        value: 32,
-        description: `Chức vụ của người chịu trách nhiệm cho quá trình kiểm tra`,
-    }
-]
+import AddNewParameter from './modal/AddNewModal'
+import { deleteSystemParameter, editSystemParameter, getSystemParameter } from '../../../../api/system_parameter'
+import withReactContent from 'sweetalert2-react-content'
+import Swal from 'sweetalert2'
+// const originData = [
+//     {
+//         key: 1,
+//         name: 'Ngưỡng trùng lặp câu',
+//         code: `THRESHOLDSENTENCE`,
+//         value: 20,
+//         description: `Dùng cho việc phân loại các tài liệu có câu trùng nhiều`,
+//     },
+//     {
+//         key: 2,
+//         name: 'Ngưỡng trùng lặp văn bản',
+//         code: `THRESHOLDTEXT`,
+//         value: 30,
+//         description: `Dùng cho các văn bản có độ trùng lặp cao`,
+//     },
+//     {
+//         key: 3,
+//         name: 'Độ dài câu so sánh',
+//         code: `COMPAREDLENGTH`,
+//         value: 100,
+//         description: `Ngưỡng thấp nhất số ký tự của một câu đem ra so sánh`,
+//     },
+//     {
+//         key: 4,
+//         name: 'Có bỏ qua câu trích dẫn hay không',
+//         code: `STATUSQUOTE`,
+//         value: 32,
+//         description: `Phần trăm trùng lặp có tính cả câu trích dẫn hay không`,
+//     },
+//     {
+//         key: 5,
+//         name: 'Họ tên người ký',
+//         code: `SIGNATURENAME`,
+//         value: 32,
+//         description: `Tên của người chịu trách nhiệm cho quá trình kiểm tra`,
+//     },
+//     {
+//         key: 6,
+//         name: 'Chức vụ người ký',
+//         code: `SIGNATUREPOSITION`,
+//         value: 32,
+//         description: `Chức vụ của người chịu trách nhiệm cho quá trình kiểm tra`,
+//     }
+// ]
 
 const EditableCell = ({
     editing,
@@ -296,7 +300,7 @@ const EditableCell = ({
                     rules={[
                         {
                             required: true,
-                            message: `Please Input ${title}!`,
+                            message: `Vui lòng nhập ${title}!`,
                         },
                     ]}
                 >
@@ -309,21 +313,34 @@ const EditableCell = ({
     )
 }
 const App = () => {
+    const MySwal = withReactContent(Swal)
     const [currentPage, setCurrentPage] = useState(1)
     const [rowsPerPage, setRowsPerpage] = useState(10)
     const [form] = Form.useForm()
-    const [data, setData] = useState(originData)
+    const [data, setData] = useState([])
     const [count, setCount] = useState()
     const [editingKey, setEditingKey] = useState('')
     const [isHidden, setIsHidden] = useState(false)
+    const [modalParameter, setModalParameter] = useState(false)
+
+    const getData = () => {
+        getSystemParameter().then(res => {
+            setData(res.data)
+        })
+    }
+
+    useEffect(() => {
+        getData()
+    }, [])
+
     const isEditing = (record) => record.key === editingKey
     const edit = (record) => {
-        form.setFieldsValue({
-            name: '',
-            code: '',
-            value: '',
-            description: '',
-            ...record,
+        const editValue = form.setFieldsValue({
+            name: record.name,
+            code: record.code,
+            value: record.value,
+            description: record.description,
+            ...record
         })
         setEditingKey(record.key)
         setIsHidden(true)
@@ -332,34 +349,72 @@ const App = () => {
         setEditingKey('')
         setIsHidden(false)
     }
-    const save = async (key) => {
-        try {
-            const row = await form.validateFields()
-            const newData = [...data]
-            const index = newData.findIndex((item) => key === item.key)
-            if (index > -1) {
-                const item = newData[index]
-                newData.splice(index, 1, {
-                    ...item,
-                    ...row,
+    const save = async (id) => {
+        editSystemParameter(id, {
+            name: form.getFieldValue('name'),
+            code: form.getFieldValue('code'),
+            value: form.getFieldValue('value'),
+            description: form.getFieldValue('description')
+        }).then(result => {
+            if (result.status === 'success') {
+                Swal.fire({
+                    title: "Cập nhật tham số thành công",
+                    text: "",
+                    icon: "success",
+                    customClass: {
+                        confirmButton: "btn btn-success"
+                    }
                 })
-                setData(newData)
-                setEditingKey('')
-                setIsHidden(false)
             } else {
-                newData.push(row)
-                setData(newData)
-                setEditingKey('')
-                setIsHidden(false)
+                Swal.fire({
+                    title: "Cập nhật tham số thất bại",
+                    text: "Vui lòng kiểm tra lại thông tin!",
+                    icon: "error",
+                    customClass: {
+                        confirmButton: "btn btn-danger"
+                    }
+                })
             }
-        } catch (errInfo) {
-            console.log('Validate Failed:', errInfo)
-        }
+            getData()
+        }).catch(error => {
+            Swal.fire({
+                title: "Cập nhật tham số thất bại",
+                text: `Có lỗi xảy ra - ${error.message}!`,
+                icon: "error",
+                customClass: {
+                    confirmButton: "btn btn-danger"
+                }
+            })
+        })
     }
 
-    const handleDelete = (key) => {
-        const newData = data.filter((item) => item.key !== key)
-        setData(newData)
+    const handleDelete = (id) => {
+        deleteSystemParameter(id)
+            .then((res) => {
+                MySwal.fire({
+                    title: "Xóa tham số thành công",
+                    icon: "success",
+                    customClass: {
+                        confirmButton: "btn btn-success",
+                    },
+                }).then((result) => {
+                    if (currentPage === 1) {
+                        getData(1, rowsPerPage)
+                    } else {
+                        setCurrentPage(1)
+                    }
+                })
+            })
+            .catch((error) => {
+                MySwal.fire({
+                    title: "Xóa tham số thất bại",
+                    icon: "error",
+                    customClass: {
+                        confirmButton: "btn btn-danger",
+                    },
+                })
+                console.log(error)
+            })
     }
 
     const columns = [
@@ -389,7 +444,7 @@ const App = () => {
             title: 'Giá trị',
             dataIndex: 'value',
             align: 'center',
-            width: '15%',
+            width: '10%',
             editable: true,
         },
         {
@@ -399,10 +454,10 @@ const App = () => {
             editable: true,
         },
         {
-            title: 'Tác vụ',
+            title: 'Thao tác',
             dataIndex: 'action',
             align: 'center',
-            width: '20%',
+            width: '25%',
             render: (_, record) => {
                 const editable = isEditing(record)
                 return (
@@ -411,7 +466,9 @@ const App = () => {
                             editable ? (
                                 <span>
                                     <Typography.Link
-                                        onClick={() => save(record.key)}
+                                        onClick={() => {
+                                            save(record.id)
+                                        }}
                                         style={{
                                             marginInlineEnd: 8,
                                         }}
@@ -438,7 +495,9 @@ const App = () => {
                         }
                         {
                             !editable && data.length >= 1 ? (
-                                <Popconfirm title="Bạn có chắc chắn muốn xóa không?" onConfirm={() => handleDelete(record.key)}>
+                                <Popconfirm title="Bạn có chắc chắn muốn xóa không?" onConfirm={() => {
+                                    handleDelete(record.id)
+                                }}>
                                     <a><DeleteOutlined style={{ color: "red", cursor: 'pointer' }} /></a>
                                 </Popconfirm>
                             ) : null
@@ -464,67 +523,62 @@ const App = () => {
         }
     })
 
-    const handleAdd = () => {
-        const newData = {
-            key: 7,
-            name: 'Test',
-            code: `TEST`,
-            value: '100',
-            description: `Test thử nút bấm`,
-        }
-        setData([...data, newData])
-        setCount(count + 1)
+    const handleModal = () => {
+        setModalParameter(false)
     }
 
     return (
-        <Card
-            title="Cấu hình tham số hệ thống"
-            style={{ backgroundColor: "white", width: "100%", height: "100%" }}
-        >
-            <Form form={form} component={false}>
-                <Col md="12" style={{ display: "flex", justifyContent: "flex-end" }}>
-                    <Button
-                        onClick={handleAdd}
-                        color="primary"
-                        style={{
-                            width: '100px',
-                            marginBottom: '10px',
-                            padding: '8px 15px'
+        <>
+            <Card
+                title="Cấu hình tham số hệ thống"
+                style={{ backgroundColor: "white", width: "100%", height: "100%" }}
+            >
+                <Form form={form} component={false}>
+                    <Col md="12" style={{ display: "flex", justifyContent: "flex-end" }}>
+                        <Button
+                            onClick={() => setModalParameter(true)}
+                            color="primary"
+                            style={{
+                                width: '100px',
+                                marginBottom: '10px',
+                                padding: '8px 15px'
+                            }}
+                        >
+                            Thêm mới
+                        </Button>
+                    </Col>
+                    <Table
+                        components={{
+                            body: {
+                                cell: EditableCell,
+                            },
                         }}
-                    >
-                        Thêm mới
-                    </Button>
-                </Col>
-                <Table
-                    components={{
-                        body: {
-                            cell: EditableCell,
-                        },
-                    }}
-                    bordered
-                    dataSource={data}
-                    columns={mergedColumns}
-                    rowClassName="editable-row"
-                    pagination={{
-                        current: currentPage,
-                        pageSize: rowsPerPage,
-                        defaultPageSize: rowsPerPage,
-                        showSizeChanger: true,
-                        pageSizeOptions: ["10", "20", "30", '100'],
-                        total: count,
-                        locale: { items_per_page: "/ trang" },
-                        showTotal: (total, range) => <span>Tổng số: {total}</span>,
-                        onShowSizeChange: (current, pageSize) => {
-                            setCurrentPage(current)
-                            setRowsPerpage(pageSize)
-                        },
-                        onChange: (pageNumber) => {
-                            setCurrentPage(pageNumber)
-                        }
-                    }}
-                />
-            </Form>
-        </Card>
+                        bordered
+                        dataSource={data}
+                        columns={mergedColumns}
+                        rowClassName="editable-row"
+                        pagination={{
+                            current: currentPage,
+                            pageSize: rowsPerPage,
+                            defaultPageSize: rowsPerPage,
+                            showSizeChanger: true,
+                            pageSizeOptions: ["10", "20", "30", '100'],
+                            total: count,
+                            locale: { items_per_page: "/ trang" },
+                            showTotal: (total, range) => <span>Tổng số: {total}</span>,
+                            onShowSizeChange: (current, pageSize) => {
+                                setCurrentPage(current)
+                                setRowsPerpage(pageSize)
+                            },
+                            onChange: (pageNumber) => {
+                                setCurrentPage(pageNumber)
+                            }
+                        }}
+                    />
+                </Form>
+            </Card>
+            <AddNewParameter open={modalParameter} handleModal={handleModal} getData={getData} />
+        </>
     )
 }
 export default App

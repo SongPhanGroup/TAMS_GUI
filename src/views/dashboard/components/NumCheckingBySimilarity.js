@@ -94,6 +94,8 @@ const NumCheckingBySimilarity = () => {
                 }
             }).then(res => {
                 setData(res.data)
+            }).catch(error => {
+                console.log(error)
             })
         }
     }, [filter])

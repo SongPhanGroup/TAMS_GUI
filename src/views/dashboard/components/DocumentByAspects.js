@@ -10,6 +10,11 @@ ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels)
 
 const DocumentByAspects = () => {
     const [data, setData] = useState([])
+    const [total, setTotal] = useState()
+    const [dataChart, setDataChart] = useState({
+        labels: [],
+        datasets: [],
+    })
     useEffect(() => {
         getDocumentStatisticByMajor().then(res => {
             setData(res.data)

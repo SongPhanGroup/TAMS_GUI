@@ -22,7 +22,9 @@ export default [
   },
   {
     header: "Kiểm tra tài liệu",
-    role: 0
+    role: 0,
+    action: 'read',
+    resource: ['DOT_KIEM_TRA', 'KIEM_TRA_TRUNG_LAP_TUYET_DOI', 'KIEM_TRA_TRUNG_LAP_XAP_XI']
   },
   {
     id: 'course',
@@ -53,7 +55,9 @@ export default [
   },
   {
     header: "Tài liệu mẫu",
-    role: 0
+    role: 0,
+    action: 'read',
+    resource: ['QL_KHO_TAI_LIEU_MAU', 'THONG_KE_TAI_LIEU_MAU']
   },
   {
     id: 'document',
@@ -75,7 +79,9 @@ export default [
   },
   {
     header: "Quản lý danh mục",
-    role: 0
+    role: 0,
+    action: 'read',
+    resource: ['LOAI_TAI_LIEU', 'NGUON_TAI_LIEU', 'LINH_VUC_TAI_LIEU', 'LOAI_DON_VI']
   },
   {
     id: 'document-type',
@@ -115,7 +121,9 @@ export default [
   },
   {
     header: "Quản lý hệ thống",
-    role: 0
+    role: 0,
+    action: 'read',
+    resource: ['DON_VI', 'QL_TAI_KHOAN', 'PHAN_QUYEN_VAI_TRO', 'QL_QUYEN_CO_BAN', 'CAU_HINH_THAM_SO'],
   },
   {
     id: 'organization',

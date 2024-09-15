@@ -1,6 +1,6 @@
 // ** React Imports
 import { Link, useNavigate } from "react-router-dom"
-import { useEffect, Fragment, useState } from "react"
+import { useEffect, Fragment, useState, useContext } from "react"
 import { getHomeRouteForLoggedInUser } from "../../../../utility/Utils"
 
 // ** Third Party Components
@@ -40,7 +40,10 @@ import { setSelectedRole } from "../../../../views/apps/ecommerce/store"
 import "@styles/react/libs/input-number/input-number.scss"
 import navigation from '@src/navigation/vertical'
 import menuIcon from "@src/assets/images/icons/menu.png"
+import { AbilityContext } from '@src/utility/context/Can'
 const CartDropdown = () => {
+  const ability = useContext(AbilityContext)
+
   // ** State
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [show, setShow] = useState(false)
@@ -85,28 +88,30 @@ const CartDropdown = () => {
     return (
       <div className="grid-view" style={{ padding: '0 1rem' }}>
         {listRoles?.map((item, index) => {
-          const IconTag = IconReact[item.icon]
-          return (
-            <div className="subContainer">
-              <Card className="ecommerce-card subSystem" key={item.id} onClick={(e) => {
-                handleClickRole(item?.description)
-                //  setShow(!show)
-                toggle()
-              }}>
-                <div
-                  className="item-img text-center mx-auto"
-                  style={{ minHeight: "60px", paddingTop: '0rem' }}
-                >
-                  <Link className="iconContainer" to={item.navLink}><IconTag className="font-large-1" style={{ stroke: "#09A863" }} /></Link>
-                </div>
-              </Card>
-              <h6 className="item-name" style={{ marginBottom: '0.5rem', textAlign: 'center' }}>
-                <Link className="" to={item.navLink} style={{ justifyContent: 'center', marginTop: '0.75rem', fontSize: '15px' }}>
-                  {item.title}
-                </Link>
-              </h6>
-            </div>
-          )
+          if (ability.can(item.action, item.resource)) {
+            const IconTag = IconReact[item.icon]
+            return (
+              <div className="subContainer">
+                <Card className="ecommerce-card subSystem" key={item.id} onClick={(e) => {
+                  handleClickRole(item?.description)
+                  //  setShow(!show)
+                  toggle()
+                }}>
+                  <div
+                    className="item-img text-center mx-auto"
+                    style={{ minHeight: "60px", paddingTop: '0rem' }}
+                  >
+                    <Link className="iconContainer" to={item.navLink}><IconTag className="font-large-1" style={{ stroke: "#09A863" }} /></Link>
+                  </div>
+                </Card>
+                <h6 className="item-name" style={{ marginBottom: '0.5rem', textAlign: 'center' }}>
+                  <Link className="" to={item.navLink} style={{ justifyContent: 'center', marginTop: '0.75rem', fontSize: '15px' }}>
+                    {item.title}
+                  </Link>
+                </h6>
+              </div>
+            )
+          } else return null
         })}
       </div>
     )

@@ -30,7 +30,7 @@ const getTotalDocuments = (data) => {
 }
 
 // Sử dụng hàm tính tổng
-const DocumentByCategories = ({colorForLabel}) => {
+const DocumentByCategories = ({ colorForLabel }) => {
     const [total, setTotal] = useState()
     const [dataChart, setDataChart] = useState({
         labels: [],
@@ -99,6 +99,7 @@ const DocumentByCategories = ({colorForLabel}) => {
                         sum += data
                     })
                     const percentage = `${(value * 100 / sum).toFixed(2)}%`
+                    console.log(value, sum, percentage)
                     return percentage // Hiển thị phần trăm
                 },
                 font: {

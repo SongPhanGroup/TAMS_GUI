@@ -202,7 +202,6 @@ const Login = () => {
                       }
                     }
                   } else {
-                    console.log(routeItem.navLink)
                     navigate(routeItem.navLink ?? getHomeRouteForLoggedInUser("admin"))
                   }
                 }

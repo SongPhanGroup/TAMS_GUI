@@ -102,7 +102,7 @@ const EditModal = ({ open, currentPage, rowsPerPage, getData, listTypes, setCurr
       isOpen={open}
       toggle={handleModal}
       // autoFocus={false}
-      className="modal-dialog-top modal-md"
+      className="modal-dialog-top modal-lg"
     >
       <ModalHeader className='bg-transparent' toggle={handleModal}>
       </ModalHeader>

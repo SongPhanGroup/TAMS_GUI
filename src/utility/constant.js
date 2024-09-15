@@ -63,42 +63,54 @@ export const LIST_ROLE = [
         title: 'Kiểm tra trùng lặp tuyệt đối',
         icon: "Globe",
         role: 0,
-        description: '/tams/checking-document'
+        description: '/tams/checking-document',
+        action: "read",
+        resource: 'KIEM_TRA_TRUNG_LAP_TUYET_DOI'
     },
     {
         id: 'training',
         title: 'Kiểm tra trùng lặp xấp xỉ',
         icon: "BookOpen",
         role: 0,
-        description: '/tams/checking-specialized'
+        description: '/tams/checking-specialized',
+        action: 'read',
+        resource: 'KIEM_TRA_TRUNG_LAP_XAP_XI'
     },
     {
         id: 'facilities',
-        title: 'QL kho dữ liệu mẫu',
+        title: 'QL kho tài liệu mẫu',
         icon: "Trello",
         role: 0,
-        description: '/tams/document'
+        description: '/tams/document',
+        action: 'read',
+        resource: 'QL_KHO_TAI_LIEU_MAU'
     },
     {
         id: 'science',
         title: 'QL tài khoản người dùng',
         icon: "Users",
         role: 0,
-        description: '/tams/accounts'
+        description: '/tams/accounts',
+        action: 'read',
+        resource: 'QL_TAI_KHOAN'
     },
     {
         id: 'map',
         title: 'QL người dùng và phân quyền',
         icon: "Hexagon",
         role: 0,
-        description: '/tams/roles'
+        description: '/tams/roles',
+        action: 'read',
+        resource: 'PHAN_QUYEN_VAI_TRO'
     },
     {
         id: 'plan',
         title: 'Quản lý đơn vị',
         icon: "Map",
         role: 0,
-        description: '/tams/organization'
+        description: '/tams/organization',
+        action: 'read',
+        resource: 'DON_VI'
     },
     // {
     //     id: 'information',

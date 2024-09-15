@@ -85,6 +85,7 @@ const CheckingDocument = () => {
     const [listAllRole, setListAllRole] = useState([])
 
     const [listCourse, setListCourse] = useState([])
+    const [listCourseId, setListCourseId] = useState([])
 
     const getAllDataPromises = async () => {
         const coursePromise = getCourse({ params: { page: PAGE_DEFAULT, perPage: PER_PAGE_DEFAULT, search: '' } })
@@ -108,6 +109,7 @@ const CheckingDocument = () => {
         })
 
         const resCourse = courseRes?.data?.filter(item => item.isActive === 1)
+        const courseIds = courseRes?.data?.filter(item => item.isActive === 1)?.map(item => item.id)
         const courses = resCourse?.map((res) => {
             return {
                 value: res.id,
@@ -115,6 +117,7 @@ const CheckingDocument = () => {
             }
         })
         setListCourse(courses)
+        setListCourseId(courseIds)
     }
 
     const getData = (page, limit, search, courseIds, startDate, endDate) => {
@@ -131,9 +134,14 @@ const CheckingDocument = () => {
                 }
             })
                 .then((res) => {
-                    const result = res?.data?.map(((item, index) => {
-                        return { ...item, _id: item.id, key: index }
-                    }))
+                    // const result = res?.data?.map(((item, index) => {
+                    //     return { ...item, _id: item.id, key: index }
+                    // }))
+                    const result = res?.data
+                        ?.filter(item => listCourseId.includes(item.courseId)) // Lọc dựa trên courseId
+                        .map((item, index) => {
+                            return { ...item, _id: item.id, key: index }
+                        })
                     setData(result)
                     setCount(res?.pagination?.totalRecords)
                 })
@@ -154,9 +162,14 @@ const CheckingDocument = () => {
                 }
             })
                 .then((res) => {
-                    const result = res?.data?.map(((item, index) => {
-                        return { ...item, _id: item.id, key: index }
-                    }))
+                    // const result = res?.data?.map(((item, index) => {
+                    //     return { ...item, _id: item.id, key: index }
+                    // }))
+                    const result = res?.data
+                        ?.filter(item => listCourseId.includes(item.courseId)) // Lọc dựa trên courseId
+                        .map((item, index) => {
+                            return { ...item, _id: item.id, key: index }
+                        })
                     setData(result)
                     setCount(res?.pagination?.totalRecords)
                 })
@@ -177,6 +190,8 @@ const CheckingDocument = () => {
     useEffect(() => {
         getAllDataPromises()
     }, [])
+
+    console.log('Data đây', data)
 
     const handleModal = () => {
         setIsAdd(false)
@@ -251,67 +266,134 @@ const CheckingDocument = () => {
             dataIndex: "stt",
             width: 30,
             align: "center",
-            render: (text, record, index) => (
-                <span>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
-            ),
+            render: (text, record, index) => {
+                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) * 100 >= 40 || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) * 100 >= 40) {
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
+                    )
+                } else {
+                    return (
+                        <span>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
+                    )
+                }
+            },
         },
         {
             title: "Tiêu đề",
             dataIndex: "title",
             width: 500,
             align: "left",
-            render: (text, record, index) => (
-                <span style={{ whiteSpace: 'break-spaces' }}>{record.title}</span>
-            ),
+            render: (text, record, index) => {
+                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) * 100 >= 40 || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) * 100 >= 40) {
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record.title}</span>
+                    )
+                } else {
+                    return (
+                        <span>{record.title}</span>
+                    )
+                }
+            },
         },
         {
             title: "Tác giả",
             dataIndex: "author",
             width: 220,
             align: "left",
-            render: (text, record, index) => (
-                <span style={{ whiteSpace: 'break-spaces' }}>{record.author}</span>
-            ),
+            render: (text, record, index) => {
+                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) * 100 >= 40 || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) * 100 >= 40) {
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record.author}</span>
+                    )
+                } else {
+                    return (
+                        <span>{record.author}</span>
+                    )
+                }
+            },
         },
         {
             title: "Đợt kiểm tra",
             dataIndex: "course",
             width: 150,
             align: "left",
-            render: (text, record, index) => (
-                <span style={{ whiteSpace: 'break-spaces' }}>{record?.course?.name}</span>
-            ),
+            render: (text, record, index) => {
+                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) * 100 >= 40 || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) * 100 >= 40) {
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.course?.name}</span>
+                    )
+                } else {
+                    return (
+                        <span>{record?.course?.name}</span>
+                    )
+                }
+            },
         },
         {
             title: "Ngày tạo",
             dataIndex: "createdAt",
             width: 120,
             align: "center",
-            render: (text, record, index) => (
-                <span style={{ whiteSpace: 'break-spaces' }}>{toDateTimeString(record.createdAt)}</span>
-            ),
+            render: (text, record, index) => {
+                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) * 100 >= 40 || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) * 100 >= 40) {
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{toDateTimeString(record.createdAt)}</span>
+                    )
+                } else {
+                    return (
+                        <span>{toDateTimeString(record.createdAt)}</span>
+                    )
+                }
+            },
         },
         {
             title: "Trùng với TL cùng đợt (%)",
             width: 120,
             align: "center",
-            render: (text, record, index) => (
-                <span style={{ whiteSpace: 'break-spaces' }}>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal}</span>
-            ),
+            render: (text, record, index) => {
+                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) * 100 >= 40 || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) * 100 >= 40) {
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal}</span>
+                    )
+                } else {
+                    return (
+                        <span>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal}</span>
+                    )
+                }
+            },
         },
         {
             title: "Trùng với DL mẫu (%)",
             width: 120,
             align: "center",
-            render: (text, record, index) => (
-                <span style={{ whiteSpace: 'break-spaces' }}>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}</span>
-            ),
+            render: (text, record, index) => {
+                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) * 100 >= 40 || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) * 100 >= 40) {
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}</span>
+                    )
+                } else {
+                    return (
+                        <span>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}</span>
+                    )
+                }
+            },
         },
         {
             title: "Mô tả",
             dataIndex: "description",
             align: 'left',
             width: 200,
+            render: (text, record, index) => {
+                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) * 100 >= 40 || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) * 100 >= 40) {
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.description}</span>
+                    )
+                } else {
+                    return (
+                        <span>{record?.description}</span>
+                    )
+                }
+            },
         },
         {
             title: "Thao tác",

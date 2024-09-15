@@ -173,7 +173,6 @@ const EditCheckingDocumentVersion = ({ open, handleModal, infoEditVersion, getDa
                             Tài liệu <span style={{ color: 'red' }}>(*)</span>
                         </Label>
                         <Controller
-                            disabled
                             defaultValue={infoEditVersion?.fileName ?? ''}
                             name='file'
                             control={control}
@@ -182,7 +181,7 @@ const EditCheckingDocumentVersion = ({ open, handleModal, infoEditVersion, getDa
                                 //     handleChangeFile(event)
                                 //     field.onChange(event)
                                 // }} />)}
-                                <Input {...field} id="file" placeholder="Nhập tài liệu" />)}
+                                <Input {...field} disabled id="file" placeholder="Nhập tài liệu" />)}
                         />
                     </Col>
                     <Col xs={12} className='text-center mt-2 pt-50'>

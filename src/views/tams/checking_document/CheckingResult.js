@@ -445,7 +445,7 @@ const CheckingResult = () => {
                 const originalURL = window.URL.createObjectURL(new Blob([res]))
                 const link = document.createElement('a')
                 link.href = originalURL
-                link.setAttribute('download', `DS tài liệu trùng với phiên bản kiểm tra.bin`)
+                link.setAttribute('download', `DS tài liệu trùng với phiên bản kiểm tra.excel`)
                 document.body.appendChild(link)
                 link.click()
             })

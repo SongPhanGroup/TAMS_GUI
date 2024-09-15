@@ -60,6 +60,7 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
     const [file, setFile] = useState()
     const [listCourse, setListCourse] = useState([])
     const [loadingAdd, setLoadingAdd] = useState(false)
+    const [successMessage, setSuccessMessage] = useState('')
 
     const getAllDataPromises = async () => {
         const coursePromise = getCourse({ params: { page: 1, perPage: 10, search: '' } })
@@ -133,6 +134,8 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
                             }
                         })
                     }
+                    setSuccessMessage(`Thêm mới ${file.name} thành công!!!`)
+                    getData()
                 })
             } else {
                 Swal.fire({
@@ -144,7 +147,6 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
                     }
                 })
             }
-            getData()
             setValue('title', '')
             setValue('author', '')
             setValue('description', '')

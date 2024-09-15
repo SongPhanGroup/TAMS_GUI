@@ -185,7 +185,7 @@ const CheckingDocument = () => {
         if ((startDate && endDate) || (!startDate && !endDate)) {
             getData(currentPage, rowsPerPage, search, courseId, startDate, endDate)
         }
-    }, [currentPage, rowsPerPage, search, courseId, startDate, endDate])
+    }, [currentPage, rowsPerPage, search, courseId, startDate, endDate, listCourseId])
 
     useEffect(() => {
         getAllDataPromises()

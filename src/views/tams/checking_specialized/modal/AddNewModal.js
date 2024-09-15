@@ -133,6 +133,7 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
                             }
                         })
                     }
+                    getData()
                 })
             } else {
                 Swal.fire({
@@ -144,7 +145,6 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
                     }
                 })
             }
-            getData()
             setValue('title', '')
             setValue('author', '')
             setValue('description', '')

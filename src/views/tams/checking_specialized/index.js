@@ -181,7 +181,6 @@ const CheckingDocument = () => {
                 })
         }
     }
-
     
     useEffect(() => {
         if ((startDate && endDate) || (!startDate && !endDate)) {
@@ -193,7 +192,6 @@ const CheckingDocument = () => {
         getAllDataPromises()
     }, [])
 
-    console.log('Data nè', data)
     const handleModal = () => {
         setIsAdd(false)
         setIsEdit(false)

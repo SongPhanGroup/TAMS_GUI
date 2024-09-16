@@ -127,7 +127,7 @@ const getRandomColor = () => {
     const b = Math.floor(Math.random() * 255)
     return `rgba(${r},${g},${b},0.8)`
 }
-export default function DocumentByTime({colorForLabel}) {
+export default function DocumentByTime({colorForLabel, colors}) {
     const currentYear = new Date().getFullYear()
     const [filter, setFilter] = useState({
         startDate: dayjs(`${currentYear}-01-01`),
@@ -207,14 +207,15 @@ export default function DocumentByTime({colorForLabel}) {
             const majorLabels = Array.from(allMajors)
 
             // Tạo mảng `datasets` động
-            const datasets_ = majorLabels?.map(majorName => {
+            const datasets_ = majorLabels?.map((majorName, index) => {
                 return {
                     label: majorName,
                     data: apiData?.map(item => {
                         const major = item?.major?.find(majorItem => majorItem.name === majorName)
                         return major ? parseInt(major.count, 10) : 0 // Nếu không tìm thấy, trả về 0
                     }),
-                    backgroundColor: colorForLabel(majorName) // Gán màu ngẫu nhiên
+                    // backgroundColor: colorForLabel(majorName) // Gán màu ngẫu nhiên
+                    backgroundColor: colors[index % colors.length] // Gán màu ngẫu nhiên
                 }
             })
 

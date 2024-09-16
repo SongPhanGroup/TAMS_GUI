@@ -31,22 +31,41 @@ import DocumentByAspects from '../../dashboard/components/DocumentByAspects'
 import DocumentByTime from '../../dashboard/components/DocumentByTime'
 
 const getRandomColor = () => {
-    const r = Math.floor(Math.random() * 255)
-    const g = Math.floor(Math.random() * 255)
-    const b = Math.floor(Math.random() * 255)
-    return `rgb(${r}, ${g}, ${b})`
-  }
+  const r = Math.floor(Math.random() * 255)
+  const g = Math.floor(Math.random() * 255)
+  const b = Math.floor(Math.random() * 255)
+  return `rgb(${r}, ${g}, ${b})`
+}
 
-  const colorMap = {}
+const colorMap = {}
 
-  const getColorForLabel = (label) => {
-    if (!colorMap[label]) {
-      // Nếu nhãn chưa có màu, tạo màu ngẫu nhiên và lưu lại
-      colorMap[label] = getRandomColor()
-    }
-    // Trả về màu đã lưu cho nhãn
-    return colorMap[label]
+const getColorForLabel = (label) => {
+  if (!colorMap[label]) {
+    // Nếu nhãn chưa có màu, tạo màu ngẫu nhiên và lưu lại
+    colorMap[label] = getRandomColor()
   }
+  // Trả về màu đã lưu cho nhãn
+  return colorMap[label]
+}
+
+// Mảng màu
+const rgb_colors = [
+  "rgb(255, 0, 0)",
+  "rgb(0, 255, 0)",
+  "rgb(0, 0, 255)",
+  "rgb(255, 255, 0)",
+  "rgb(255, 0, 255)",
+  "rgb(0, 255, 255)",
+  "rgb(128, 0, 0)",
+  "rgb(128, 128, 0)",
+  "rgb(0, 128, 0)",
+  "rgb(128, 0, 128)",
+  "rgb(0, 128, 128)",
+  "rgb(0, 0, 128)",
+  "rgb(255, 165, 0)",
+  "rgb(192, 192, 192)",
+  "rgb(0, 0, 0)"
+]
 
 const DocumentStatistic = () => {
   // ** Context
@@ -140,15 +159,15 @@ const DocumentStatistic = () => {
     <div id='dashboard-analytics'>
       <Row className='match-height'>
         <Col lg='6' md='12'>
-          <DocumentByCategories colorForLabel={getColorForLabel} />
+          <DocumentByCategories colorForLabel={getColorForLabel} colors={rgb_colors} />
         </Col>
         <Col lg='6' md='12'>
-          <DocumentByAspects />
+          <DocumentByAspects colors={rgb_colors}/>
         </Col>
       </Row>
       <Row className='match-height'>
         <Col lg='12' md='12'>
-          <DocumentByTime colorForLabel={getColorForLabel} />
+          <DocumentByTime colorForLabel={getColorForLabel} colors={rgb_colors} />
         </Col>
       </Row>
     </div>

@@ -8,7 +8,7 @@ import { getDocumentStatisticByMajor } from '../../../api/document_statistic'
 // Đăng ký các thành phần cho biểu đồ
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels)
 
-const DocumentByAspects = () => {
+const DocumentByAspects = ({colors}) => {
     const [data, setData] = useState([])
     const [total, setTotal] = useState()
     const [dataChart, setDataChart] = useState({
@@ -23,19 +23,19 @@ const DocumentByAspects = () => {
 
     const totalCount = data.reduce((sum, item) => sum + parseInt(item.count, 10), 0)
 
-    // Hàm tạo màu ngẫu nhiên
-    const generateRandomColor = () => {
-        const r = Math.floor(Math.random() * 256)
-        const g = Math.floor(Math.random() * 256)
-        const b = Math.floor(Math.random() * 256)
-        return `rgb(${r}, ${g}, ${b})`
-    }
+    // // Hàm tạo màu ngẫu nhiên
+    // const generateRandomColor = () => {
+    //     const r = Math.floor(Math.random() * 256)
+    //     const g = Math.floor(Math.random() * 256)
+    //     const b = Math.floor(Math.random() * 256)
+    //     return `rgb(${r}, ${g}, ${b})`
+    // }
 
     // Màu viền cố định
     const borderColorFixed = 'rgba(255, 255, 255, 1)'
 
-    // Tạo mảng màu nền cho từng phần tử trong data
-    const colors = data.map(() => generateRandomColor())
+    // // Tạo mảng màu nền cho từng phần tử trong data
+    // const colors = data.map(() => generateRandomColor())
 
     const data1 = {
         labels: data.map(item => item.name),

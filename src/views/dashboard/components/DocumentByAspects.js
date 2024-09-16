@@ -8,7 +8,7 @@ import { getDocumentStatisticByMajor } from '../../../api/document_statistic'
 // Đăng ký các thành phần cho biểu đồ
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels)
 
-const DocumentByAspects = ({colors}) => {
+const DocumentByAspects = ({ colors }) => {
     const [data, setData] = useState([])
     const [total, setTotal] = useState()
     const [dataChart, setDataChart] = useState({
@@ -50,6 +50,7 @@ const DocumentByAspects = ({colors}) => {
         ],
     }
 
+
     const options = {
         responsive: true,
         maintainAspectRatio: false,
@@ -64,16 +65,16 @@ const DocumentByAspects = ({colors}) => {
                 color: 'white', // Màu của số liệu
                 formatter: (value, ctx) => {
                     let sum = 0
-                    const dataArr = ctx.chart.data.datasets[0].data
+                    const dataArr = ctx.dataset?.data
                     dataArr.forEach(data => {
-                        sum += data
+                        sum += Number(data)
                     })
                     const percentage = `${(value * 100 / sum).toFixed(2)}%`
                     return percentage // Hiển thị phần trăm
                 },
                 font: {
                     weight: 'bold',
-                    size: 14,
+                    size: 10,
                 },
             },
         },

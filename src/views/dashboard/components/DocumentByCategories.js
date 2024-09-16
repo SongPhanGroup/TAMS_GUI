@@ -100,7 +100,6 @@ const DocumentByCategories = ({ colorForLabel, colors }) => {
                         sum += data
                     })
                     const percentage = `${(value * 100 / sum).toFixed(2)}%`
-                    console.log(value, sum, percentage)
                     return percentage // Hiển thị phần trăm
                 },
                 font: {

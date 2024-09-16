@@ -146,19 +146,38 @@ const AnalyticsDashboard = () => {
     return colorMap[label]
   }
 
+  // Mảng màu
+  const rgb_colors = [
+    "rgb(255, 0, 0)",
+    "rgb(0, 255, 0)",
+    "rgb(0, 0, 255)",
+    "rgb(255, 255, 0)",
+    "rgb(255, 0, 255)",
+    "rgb(0, 255, 255)",
+    "rgb(128, 0, 0)",
+    "rgb(128, 128, 0)",
+    "rgb(0, 128, 0)",
+    "rgb(128, 0, 128)",
+    "rgb(0, 128, 128)",
+    "rgb(0, 0, 128)",
+    "rgb(255, 165, 0)",
+    "rgb(192, 192, 192)",
+    "rgb(0, 0, 0)"
+  ]
+
   return (
     <div id='dashboard-analytics'>
       <Row className='match-height'>
         <Col lg='6' md='12'>
-          <DocumentByCategories colorForLabel={getColorForLabel} />
+          <DocumentByCategories colorForLabel={getColorForLabel} colors={rgb_colors} />
         </Col>
         <Col lg='6' md='12'>
-          <DocumentByAspects />
+          <DocumentByAspects colors={rgb_colors} />
         </Col>
       </Row>
       <Row className='match-height'>
         <Col lg='12' md='12'>
-          <DocumentByTime colorForLabel={getColorForLabel} />
+          <DocumentByTime colorForLabel={getColorForLabel} colors={rgb_colors} />
         </Col>
       </Row>
       <Row className='match-height'>

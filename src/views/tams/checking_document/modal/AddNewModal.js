@@ -117,6 +117,9 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
             description: data.description ?? ""
         }).then(result => {
             if (result.status === 'success') {
+                setSuccessMessage(`Thêm mới ${file.name} thành công!!!`)
+                getData()
+                setTimeout(() => setSuccessMessage(''), 2000)
                 const formData = new FormData()
                 formData.append('file', file)
                 if (data.description) {
@@ -134,8 +137,7 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
                             }
                         })
                     }
-                    setSuccessMessage(`Thêm mới ${file.name} thành công!!!`)
-                    getData()
+                    // getData()
                 })
             } else {
                 Swal.fire({
@@ -248,6 +250,9 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
                         />
                         {errors.file && <FormFeedback>{errors.file.message}</FormFeedback>}
                     </Col>
+                    <span style={{ color: 'red' }}>
+                        {successMessage}
+                    </span>
                     <Col xs={12} className='text-center mt-2 pt-50'>
                         <Button type='submit' name='add' className='me-1' color='primary'>
                             {

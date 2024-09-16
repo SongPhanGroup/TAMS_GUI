@@ -30,7 +30,7 @@ const getTotalDocuments = (data) => {
 }
 
 // Sử dụng hàm tính tổng
-const DocumentByCategories = ({ colorForLabel }) => {
+const DocumentByCategories = ({ colorForLabel, colors }) => {
     const [total, setTotal] = useState()
     const [dataChart, setDataChart] = useState({
         labels: [],
@@ -44,7 +44,8 @@ const DocumentByCategories = ({ colorForLabel }) => {
                 {
                     label: '# tài liệu',
                     data: apiData.map(item => parseInt(item.count)),  // Chuyển đổi count thành số nguyên
-                    backgroundColor: apiData.map((item) => colorForLabel(item.name)),  // Tạo màu ngẫu nhiên cho mỗi phần
+                    // backgroundColor: apiData.map((item) => colorForLabel(item.name)),  // Tạo màu ngẫu nhiên cho mỗi phần
+                    backgroundColor: colors,  // Tạo màu ngẫu nhiên cho mỗi phần
                     borderColor: apiData.map(() => 'rgba(255, 255, 255, 1)'),  // Màu viền luôn là màu trắng
                     borderWidth: 1,
                 },

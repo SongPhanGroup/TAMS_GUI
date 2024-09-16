@@ -120,6 +120,8 @@ const CheckingDocument = () => {
         setListCourseId(courseIds)
     }
 
+    console.log(location?.state)
+
     const getData = (page, limit, search, courseIds, startDate, endDate) => {
         setLoadingData(true)
         if (location?.state) {
@@ -190,8 +192,6 @@ const CheckingDocument = () => {
     useEffect(() => {
         getAllDataPromises()
     }, [])
-
-    console.log('Data đây', data)
 
     const handleModal = () => {
         setIsAdd(false)

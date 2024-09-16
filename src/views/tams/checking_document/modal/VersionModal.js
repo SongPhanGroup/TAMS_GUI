@@ -69,9 +69,7 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
     const [isAdd, setIsAdd] = useState(false)
     const [isEdit, setIsEdit] = useState(false)
     const [checkingDocumentVersionSelected, setCheckingDocumentVersionSelected] = useState()
-    const [showIframe, setShowIframe] = useState(false)
 
-    console.log(checkingDocumentSelected)
     const getData = () => {
         setLoadingData(true)
         detailCheckingDocument(checkingDocumentSelected?.id)

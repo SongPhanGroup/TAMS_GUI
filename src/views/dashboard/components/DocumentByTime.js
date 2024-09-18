@@ -196,6 +196,8 @@ export default function DocumentByTime({colorForLabel, colors}) {
             }
         }).then((res) => {
             const apiData = res?.data ?? []
+            // const apiData = apiData_.sort((a, b) => a.id - b.id)
+
             // Lấy tất cả các loại tài liệu (không trùng lặp)
             const allMajors = new Set()
             apiData?.forEach(item => {

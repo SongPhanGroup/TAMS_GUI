@@ -38,6 +38,7 @@ const DocumentByCategories = ({ colorForLabel, colors }) => {
     })
 
     const convertDataForChart = (apiData) => {
+        // const colorArr = colors?.filter((color, index) => index === )
         return {
             labels: apiData.map(item => item.name),  // Lấy tên các phần (labels)
             datasets: [
@@ -73,7 +74,9 @@ const DocumentByCategories = ({ colorForLabel, colors }) => {
     useEffect(() => {
         statisticByType().then((res) => {
             const apiData = res?.data ?? []
-            const data_ = convertDataForChart(apiData)
+            const apiData_ = apiData.sort((a, b) => a.id - b.id)
+
+            const data_ = convertDataForChart(apiData_)
             setDataChart(data_)
             const totalDocuments = getTotalDocuments(apiData)
             setTotal(totalDocuments)

@@ -68,7 +68,7 @@ const CheckingDocument = () => {
     const [count, setCount] = useState(0)
     const [totalUser, setTotalUser] = useState(0)
     const [currentPage, setCurrentPage] = useState(1)
-    const [rowsPerPage, setRowsPerpage] = useState(100)
+    const [rowsPerPage, setRowsPerpage] = useState(10)
     const [search, setSearch] = useState("")
     const [courseId, setCourseId] = useState()
     const [startDate, setStartDate] = useState()
@@ -403,6 +403,23 @@ const CheckingDocument = () => {
             },
         },
         {
+            title: "Ngày kiểm tra",
+            dataIndex: "createdAt",
+            width: 120,
+            align: "center",
+            render: (text, record, index) => {
+                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) * 100 >= 40 || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) * 100 >= 40) {
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{toDateTimeString(record.createdAt)}</span>
+                    )
+                } else {
+                    return (
+                        <span>{toDateTimeString(record.createdAt)}</span>
+                    )
+                }
+            },
+        },
+        {
             title: "Thao tác",
             width: 100,
             align: "center",
@@ -462,6 +479,13 @@ const CheckingDocument = () => {
             setEndDate(dayjs(`${currentYear}-12-31`))
         }
     }
+
+    // Callback để cập nhật dữ liệu từ con
+    const handleUpdateFromChild = (updatedRecord) => (
+        setData(prevData => (
+            prevData.map(record => (record.key === updatedRecord.key ? updatedRecord : record))
+        ))
+    )
 
     return (
         <Fragment>
@@ -601,20 +625,29 @@ const CheckingDocument = () => {
                             bordered
                             expandable={{
                                 expandedRowRender: (record) => <VersionModal
-                                    checkingDocumentSelected={record} />,
+                                    checkingDocumentSelected={record} onUpdate={handleUpdateFromChild} />,
                                 rowExpandable: (record) => record.name !== 'Not Expandable',
                                 // expandRowByClick: true
                             }}
                             expandedRowKeys={expandedRowKeys}
                             onExpand={onExpand}
                             pagination={{
-                                defaultPageSize: 10,
+                                current: currentPage,
+                                pageSize: rowsPerPage,
+                                defaultPageSize: rowsPerPage,
                                 showSizeChanger: true,
                                 pageSizeOptions: ["10", "20", "30"],
-                                total: { count },
+                                total: count,
                                 locale: { items_per_page: "/ trang" },
                                 showSizeChanger: true,
                                 showTotal: (total, range) => <span>Tổng số: {total}</span>,
+                                onShowSizeChange: (current, pageSize) => {
+                                    setCurrentPage(current)
+                                    setRowsPerpage(pageSize)
+                                },
+                                onChange: (pageNumber) => {
+                                    setCurrentPage(pageNumber)
+                                }
                             }}
                         />}
                         <AddNewModal
@@ -623,6 +656,7 @@ const CheckingDocument = () => {
                             getData={getData}
                             currentPage={currentPage}
                             rowsPerPage={rowsPerPage}
+                            setData={setData}
                         />
                         {
                             <EditModal

@@ -31,7 +31,7 @@ import { getCourse } from "../../../../api/course"
 import classNames from "classnames"
 import { postCheckingDocumentVersion } from "../../../../api/checking_document_version"
 
-const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
+const AddNewCheckingDocument = ({ open, handleModal, getData, setData }) => {
     const AddNewCheckingDocumentSchema = yup.object().shape({
         file: yup.mixed().required("Yêu cầu chọn file").nullable().test(
             "is-not-empty",
@@ -121,7 +121,16 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
             description: data.description ?? ""
         }).then(result => {
             if (result.status === 'success') {
-                getData()
+                setData(prevData => [
+                    ...prevData,
+                    {
+                        id: result.data.id,
+                        title: data.title,
+                        author: data.author,
+                        courseId: data.course.value,
+                        description: data.description ?? ""
+                    }
+                ])                
                 setSuccessMessage(`Thêm mới ${file.name} thành công!!!`)
                 setTimeout(() => setSuccessMessage(''), 2000)
                 const formData = new FormData()

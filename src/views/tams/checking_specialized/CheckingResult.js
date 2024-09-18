@@ -480,7 +480,7 @@ const CheckingResult = () => {
                                 </Button>
                             </Link>
                         }
-                        {/* <Dropdown menu={menuProps}>
+                        <Dropdown menu={menuProps}>
                             <Button color="primary">
                                 <Space>
                                     Báo cáo
@@ -489,7 +489,7 @@ const CheckingResult = () => {
                                     }
                                 </Space>
                             </Button>
-                        </Dropdown> */}
+                        </Dropdown>
                         {/* {ability.can('create', 'PHAN_QUYEN_VAI_TRO') &&
                             <Button
                                 onClick={handleReport}

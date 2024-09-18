@@ -58,7 +58,7 @@ import { deleteCheckingDocumentVersion, downloadTemplateBaoCao, getCheckingDocum
 import { detailCheckingDocument } from "../../../../api/checking_document"
 import EditCheckingDocumentVersion from "./EditVersionModal"
 
-const VersionModal = ({ checkingDocumentSelected, }) => {
+const VersionModal = ({ checkingDocumentSelected, onUpdate }) => {
     const [loadingData, setLoadingData] = useState(false)
     const navigate = useNavigate()
     const MySwal = withReactContent(Swal)
@@ -372,7 +372,7 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
             />}
 
             <AddNewCheckingDocumentVersion open={isAdd} handleModal={handleModal} getData={getData} rowsPerPage={rowsPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} checkingDocumentSelected={checkingDocumentSelected} listSubmit={listSubmit} />
-            {checkingDocumentVersionSelected && <EditCheckingDocumentVersion open={isEdit} handleModal={handleModal} getData={getData} rowsPerPage={rowsPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} infoEditVersion={checkingDocumentVersionSelected} listSubmit={listSubmit} dataCheckingDocument={checkingDocumentSelected} />}
+            {checkingDocumentVersionSelected && <EditCheckingDocumentVersion open={isEdit} handleModal={handleModal} getData={getData} rowsPerPage={rowsPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} infoEditVersion={checkingDocumentVersionSelected} listSubmit={listSubmit} dataCheckingDocument={checkingDocumentSelected} onUpdate={onUpdate} />}
         </Card>
     )
 }

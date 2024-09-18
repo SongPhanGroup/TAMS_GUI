@@ -160,19 +160,20 @@ const Document = () => {
     const handleDelete = (key) => {
         deleteDocument(key)
             .then((res) => {
-                MySwal.fire({
-                    title: "Xóa tài liệu thành công",
-                    icon: "success",
-                    customClass: {
-                        confirmButton: "btn btn-success",
-                    },
-                }).then((result) => {
-                    if (currentPage === 1) {
-                        getData(1, rowsPerPage)
-                    } else {
-                        setCurrentPage(1)
-                    }
-                })
+                // MySwal.fire({
+                //     title: "Xóa tài liệu thành công",
+                //     icon: "success",
+                //     customClass: {
+                //         confirmButton: "btn btn-success",
+                //     },
+                // }).then((result) => {
+                //     if (currentPage === 1) {
+                //         getData(1, rowsPerPage)
+                //     } else {
+                //         setCurrentPage(1)
+                //     }
+                // })
+                getData(1, rowsPerPage)
             })
             .catch((error) => {
                 MySwal.fire({

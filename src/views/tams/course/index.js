@@ -95,19 +95,20 @@ const Course = () => {
     const handleDelete = (key) => {
         deleteCourse(key)
             .then((res) => {
-                MySwal.fire({
-                    title: "Xóa đợt kiểm tra thành công",
-                    icon: "success",
-                    customClass: {
-                        confirmButton: "btn btn-success",
-                    },
-                }).then((result) => {
-                    if (currentPage === 1) {
-                        getData(1, rowsPerPage)
-                    } else {
-                        setCurrentPage(1)
-                    }
-                })
+                // MySwal.fire({
+                //     title: "Xóa đợt kiểm tra thành công",
+                //     icon: "success",
+                //     customClass: {
+                //         confirmButton: "btn btn-success",
+                //     },
+                // }).then((result) => {
+                //     if (currentPage === 1) {
+                //         getData(1, rowsPerPage)
+                //     } else {
+                //         setCurrentPage(1)
+                //     }
+                // })
+                getData(1, rowsPerPage)
             })
             .catch((error) => {
                 MySwal.fire({

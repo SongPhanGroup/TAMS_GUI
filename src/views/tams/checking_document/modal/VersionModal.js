@@ -120,16 +120,17 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate }) => {
     const handleDelete = (record) => {
         deleteCheckingDocumentVersion(record?.id)
             .then((res) => {
-                MySwal.fire({
-                    title: "Xóa thành công",
+                // MySwal.fire({
+                //     title: "Xóa thành công",
 
-                    icon: "success",
-                    customClass: {
-                        confirmButton: "btn btn-success",
-                    },
-                }).then((result) => {
-                    getData()
-                })
+                //     icon: "success",
+                //     customClass: {
+                //         confirmButton: "btn btn-success",
+                //     },
+                // }).then((result) => {
+                //     getData()
+                // })
+                getData()
             })
             .catch((err) => {
                 console.log(err)
@@ -239,12 +240,6 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate }) => {
             render: (record) => {
                 return (
                     <div style={{ display: "flex", justifyContent: "center" }}>
-                        <Tooltip placement="top" title="Chỉnh sửa">
-                            <EditOutlined
-                                style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
-                                onClick={(e) => handleEdit(record)}
-                            />
-                        </Tooltip>
                         <Tooltip placement="top" title="Kết quả kiểm tra">
                             <AppstoreOutlined
                                 style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
@@ -254,15 +249,6 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate }) => {
                                 }}
                             />
                         </Tooltip>
-                        {/* <RightCircleOutlined
-                            id={`tooltip_detail1_${record._id}`}
-                            style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
-                            onClick={() => handleButtonClick(record)}
-                        />
-                        <UncontrolledTooltip placement="top" target={`tooltip_detail1_${record._id}`}
-                        >
-                            Kết quả chi tiết phiên bản 1
-                        </UncontrolledTooltip> */}
                         <Tooltip placement="top" title="Kết quả chi tiết">
 
                             <RightSquareOutlined
@@ -274,6 +260,19 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate }) => {
                                 }}
                             />
                         </Tooltip>
+                        <Tooltip placement="top" title="Xuất báo cáo">
+                            <Dropdown menu={menuProps(record.id)}>
+                                {
+                                    loadingReports[record.id] ? <Spinner color="#fff" style={{ width: '14px', height: '14px' }} /> : <FileDoneOutlined style={{ cursor: 'pointer', color: '#09A863', marginRight: '1rem' }} />
+                                }
+                            </Dropdown>
+                        </Tooltip>
+                        <Tooltip placement="top" title="Chỉnh sửa">
+                            <EditOutlined
+                                style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
+                                onClick={(e) => handleEdit(record)}
+                            />
+                        </Tooltip>
                         <Popconfirm
                             title="Bạn chắc chắn xóa?"
                             onConfirm={() => handleDelete(record)}
@@ -282,17 +281,10 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate }) => {
                         >
                             <Tooltip placement="top" title="Xóa">
                                 <DeleteOutlined
-                                    style={{ color: "red", cursor: "pointer", marginRight: '1rem' }}
+                                    style={{ color: "red", cursor: "pointer"}}
                                 />
                             </Tooltip>
                         </Popconfirm>
-                        <Tooltip placement="top" title="Xuất báo cáo">
-                            <Dropdown menu={menuProps(record.id)}>
-                                {
-                                    loadingReports[record.id] ? <Spinner color="#fff" style={{ width: '14px', height: '14px' }} /> : <FileDoneOutlined style={{ cursor: 'pointer', color: '#09A863' }} />
-                                }
-                            </Dropdown>
-                        </Tooltip>
                     </div>
                 )
             },

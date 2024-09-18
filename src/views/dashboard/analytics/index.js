@@ -168,10 +168,10 @@ const AnalyticsDashboard = () => {
   return (
     <div id='dashboard-analytics'>
       <Row className='match-height'>
-        <Col lg='6' md='12'>
+        <Col lg='5' md='12'>
           <DocumentByCategories colorForLabel={getColorForLabel} colors={rgb_colors} />
         </Col>
-        <Col lg='6' md='12'>
+        <Col lg='7' md='12'>
           <DocumentByAspects colors={rgb_colors} />
         </Col>
       </Row>

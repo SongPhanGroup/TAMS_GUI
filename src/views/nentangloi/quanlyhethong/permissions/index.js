@@ -138,15 +138,7 @@ const ListPermissions = () => {
         <span>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
       ),
     },
-    {
-      title: "Ngày tạo",
-      dataIndex: "createdAt",
-      width: "10%",
-      align: "center",
-      render: (text, record, index) => (
-        <span>{toDateString(record.createdAt)}</span>
-      ),
-    },
+
     {
       title: "Mã quyền",
       dataIndex: "permissionCode",
@@ -166,6 +158,15 @@ const ListPermissions = () => {
       dataIndex: "description",
       align: "left",
       // width: 250,
+    },
+    {
+      title: "Ngày tạo",
+      dataIndex: "createdAt",
+      width: "10%",
+      align: "center",
+      render: (text, record, index) => (
+        <span>{toDateString(record.createdAt)}</span>
+      ),
     },
     {
       title: "Thao tác",

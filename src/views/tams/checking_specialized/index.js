@@ -116,6 +116,10 @@ const CheckingDocument = () => {
                 value: res.id,
                 label: `${res.name}`
             }
+        }).sort((a, b) => {
+            if (a.value === 1) return -1 // Đưa phần tử có id = 1 lên đầu
+            if (b.value === 1) return 1 // Đưa phần tử có id = 1 lên đầu
+            return 0 // Giữ nguyên thứ tự của các phần tử còn lại
         })
         setListCourse(courses)
         setListCourseId(courseIds)
@@ -181,7 +185,7 @@ const CheckingDocument = () => {
                 })
         }
     }
-    
+
     useEffect(() => {
         if ((startDate && endDate) || (!startDate && !endDate)) {
             getData(currentPage, rowsPerPage, search, courseId, startDate, endDate)
@@ -327,23 +331,7 @@ const CheckingDocument = () => {
                 }
             },
         },
-        {
-            title: "Ngày tạo",
-            dataIndex: "createdAt",
-            width: 120,
-            align: "center",
-            render: (text, record, index) => {
-                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) * 100 >= 40 || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) * 100 >= 40) {
-                    return (
-                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{toDateTimeString(record.createdAt)}</span>
-                    )
-                } else {
-                    return (
-                        <span>{toDateTimeString(record.createdAt)}</span>
-                    )
-                }
-            },
-        },
+
         {
             title: "Trùng với TL cùng đợt (%)",
             width: 120,
@@ -389,6 +377,23 @@ const CheckingDocument = () => {
                 } else {
                     return (
                         <span>{record?.description}</span>
+                    )
+                }
+            },
+        },
+        {
+            title: "Ngày tạo",
+            dataIndex: "createdAt",
+            width: 120,
+            align: "center",
+            render: (text, record, index) => {
+                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) * 100 >= 40 || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) * 100 >= 40) {
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{toDateTimeString(record.createdAt)}</span>
+                    )
+                } else {
+                    return (
+                        <span>{toDateTimeString(record.createdAt)}</span>
                     )
                 }
             },
@@ -526,6 +531,7 @@ const CheckingDocument = () => {
                                         options={listCourse}
                                         allowClear
                                         onChange={(value) => handleChangeCourse(value)}
+                                        filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
                                     />
 
                                 </Col>

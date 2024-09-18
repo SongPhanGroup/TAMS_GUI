@@ -202,14 +202,7 @@ const ListAccounts = () => {
         <span>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
       ),
     },
-    {
-      title: "Ngày tạo",
-      dataIndex: "createdAt",
-      align: "center",
-      render: (text, record, index) => (
-        <span>{toDateString(record.createdAt)}</span>
-      ),
-    },
+
     {
       title: "Họ và tên",
       dataIndex: "fullName",
@@ -254,6 +247,14 @@ const ListAccounts = () => {
           return <Tag color="success">Đang hoạt động</Tag>
         } else return <Tag color="error">Bị khóa</Tag>
       },
+    },
+    {
+      title: "Ngày tạo",
+      dataIndex: "createdAt",
+      align: "center",
+      render: (text, record, index) => (
+        <span>{toDateString(record.createdAt)}</span>
+      ),
     },
     {
       title: "Thao tác",

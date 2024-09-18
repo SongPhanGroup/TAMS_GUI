@@ -84,6 +84,10 @@ const EditCheckingDocument = ({ open, handleModal, infoEdit, getData }) => {
                 value: res.id,
                 label: `${res.name}`
             }
+        }).sort((a, b) => {
+            if (a.value === 1) return -1 // Đưa phần tử có id = 1 lên đầu
+            if (b.value === 1) return 1 // Đưa phần tử có id = 1 lên đầu
+            return 0 // Giữ nguyên thứ tự của các phần tử còn lại
         })
         const checkingDocumentVersions = checkingDocumentVersionRes?.data?.checkingDocumentVersion
         setListCheckingDocumentVersion(checkingDocumentVersions)
@@ -177,7 +181,7 @@ const EditCheckingDocument = ({ open, handleModal, infoEdit, getData }) => {
                         </Label>
                         <Controller
                             id='react-select'
-                            defaultValue={ infoEdit?.course && { value: infoEdit?.course?.id, label: infoEdit?.course?.name }}
+                            defaultValue={infoEdit?.course && { value: infoEdit?.course?.id, label: infoEdit?.course?.name }}
                             name='course'
                             control={control}
                             render={({ field }) => (

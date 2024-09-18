@@ -204,12 +204,12 @@ const DetailResult2 = () => {
     }
 
     return (
-        <div style={{height: '100vh', overflow: 'hidden'}}>
+        <div style={{ height: '100vh', overflow: 'hidden' }}>
             <Row gutter={16} style={{ padding: '16px 16px 0 16px' }}>
                 <Col md={18} style={{ display: 'flex', alignItems: 'center', padding: 0, borderBottom: '4px solid #357BBD' }}>
                     <Row style={{ flex: 1 }}>
                         <Col md={12}>
-                            <h4 style={{ textTransform: 'uppercase', marginBottom: 0, color: '#1C5385' }}>Kiểm tra chi tiết</h4>
+                            <h4 style={{ textTransform: 'uppercase', marginBottom: 0, color: '#1C5385' }}>Báo cáo chi tiết</h4>
                         </Col>
                         <Col md={12}>
                             <h4 style={{ marginBottom: 0, color: 'red' }}>{location.state.fileName}</h4>
@@ -256,18 +256,19 @@ const DetailResult2 = () => {
                                         const colors = ['rgba(255, 51, 51, 0.4)', 'rgba(255, 153, 0, 0.4)', '#FF99FF', '#66CC99', 'rgba(102, 153, 255, 0.4)', 'rgba(102, 0, 204, 0.4)', 'rgba(0, 136, 0, 0.4)']
                                         const colorIndex = index % 7
                                         return (
-                                            <Row style={{ width: "100%", border: "0.5px solid #ccc", display: "flex", padding: "0.4rem" }}>
+                                            <Row style={{ width: "100%", border: "0.5px solid #ccc", display: "flex", padding: "0.4rem", alignItems: "center" }}>
                                                 <Col className='p-0' md={2} style={{
-                                                    color: `${colors[colorIndex]}`
+                                                    color: `${colors[colorIndex]}`, display: "flex", justifyContent: "center", alignItems: "center"
                                                 }}>
                                                     <h2 style={{ textAlign: "center", marginRight: "0.3rem", color: `${colors[colorIndex]}` }}>{index + 1}</h2>
                                                 </Col>
-                                                <Col className='p-0' md={17}>
-                                                    <h4 style={{
+                                                <Col className='p-0' md={16} style={{ marginRight: "0.6rem" }}>
+                                                    <h6 style={{
                                                         color: `${colors[colorIndex]}`,
-                                                        paddingBottom: "0"
-                                                    }}>{doc?.document?.title}</h4>
-                                                    <span>{doc?.document?.author}</span>
+                                                        paddingBottom: "0",
+                                                        textAlign: "justify",
+                                                    }}>{doc?.document?.title}</h6>
+                                                    <span style={{ fontSize: "small" }}>{doc?.document?.author}</span>
                                                 </Col>
                                                 <Col className='p-0' md={4}>
                                                     <span style={{ fontWeight: "bold" }}>{doc?.similarity}%</span>

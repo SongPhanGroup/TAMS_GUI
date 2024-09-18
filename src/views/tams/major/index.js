@@ -114,15 +114,7 @@ const Major = () => {
                 <span>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
             ),
         },
-        {
-            title: "Ngày tạo",
-            dataIndex: "createdAt",
-            align: 'center',
-            width: 150,
-            render: (text, record, index) => (
-                <span>{toDateTimeString(record.createdAt)}</span>
-            ),
-        },
+
         {
             title: "Tên lĩnh vực",
             dataIndex: "name",
@@ -140,6 +132,15 @@ const Major = () => {
             width: 200,
             render: (text, record, index) => (
                 <span style={{ whiteSpace: 'break-spaces' }}>{record.description}</span>
+            ),
+        },
+        {
+            title: "Ngày tạo",
+            dataIndex: "createdAt",
+            align: 'center',
+            width: 150,
+            render: (text, record, index) => (
+                <span>{toDateTimeString(record.createdAt)}</span>
             ),
         },
         {

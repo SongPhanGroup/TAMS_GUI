@@ -70,12 +70,12 @@ const SentenceModal = ({ open, sentence, handleModal }) => {
             ),
         },
         {
-            title: "Độ tương đồng",
+            title: "Độ tương đồng (%)",
             dataIndex: "similarity",
             align: "center",
             width: 100,
             render: (text, record, index) => (
-                <span>{(record?.similarity * 100).toFixed(2)}%</span>
+                <span>{(record?.similarity).toFixed(2)}</span>
             ),
         },
         {
@@ -118,7 +118,7 @@ const SentenceModal = ({ open, sentence, handleModal }) => {
                 <div className='text-center mb-1'>
                     <h2 className='mb-1'>Danh sách các câu tương đồng</h2>
                 </div>
-                <h6>Câu kiểm tra: <span style={{color: 'red'}}>{sentence}</span></h6>
+                <h6>Câu kiểm tra: <span style={{ color: 'red' }}>{sentence}</span></h6>
                 <Row tag='table' className='gy-1 pt-75'>
                     {loadingData === true ? <Spin /> : <Table
                         columns={columns}

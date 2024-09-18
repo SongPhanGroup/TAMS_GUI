@@ -130,15 +130,7 @@ const ListOrganizationtypes = () => {
         <span>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
       ),
     },
-    {
-      title: "Ngày tạo",
-      dataIndex: "created_at",
-      align: 'center',
-      width: 150,
-      render: (text, record, index) => (
-        <span>{toDateString(record.created_at)}</span>
-      ),
-    },
+
     {
       title: "Tên loại đơn vị",
       dataIndex: "OrganizationTypeName",
@@ -149,6 +141,15 @@ const ListOrganizationtypes = () => {
       title: "Ghi chú",
       dataIndex: "Description",
       width: "20%",
+    },
+    {
+      title: "Ngày tạo",
+      dataIndex: "created_at",
+      align: 'center',
+      width: 150,
+      render: (text, record, index) => (
+        <span>{toDateString(record.created_at)}</span>
+      ),
     },
     {
       title: "Thao tác",

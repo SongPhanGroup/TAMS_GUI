@@ -164,15 +164,7 @@ const Course = () => {
                 <span>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
             ),
         },
-        {
-            title: "Ngày tạo",
-            dataIndex: "createdAt",
-            align: 'center',
-            width: 150,
-            render: (text, record, index) => (
-                <span>{toDateTimeString(record.createdAt)}</span>
-            ),
-        },
+
         {
             title: "Tên đợt kiểm tra",
             dataIndex: "name",
@@ -210,6 +202,15 @@ const Course = () => {
                     return <Tag color="success">Đang tiến hành</Tag>
                 } else return <Tag color="error">Đã khóa</Tag>
             },
+        },
+        {
+            title: "Ngày tạo",
+            dataIndex: "createdAt",
+            align: 'center',
+            width: 150,
+            render: (text, record, index) => (
+                <span>{toDateTimeString(record.createdAt)}</span>
+            ),
         },
         {
             title: "Thao tác",

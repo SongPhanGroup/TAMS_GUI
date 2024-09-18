@@ -87,6 +87,10 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
                 value: res.id,
                 label: `${res.name}`
             }
+        }).sort((a, b) => {
+            if (a.value === 1) return -1 // Đưa phần tử có id = 1 lên đầu
+            if (b.value === 1) return 1 // Đưa phần tử có id = 1 lên đầu
+            return 0 // Giữ nguyên thứ tự của các phần tử còn lại
         })
         // const courses2 = [{value: 1, label: 'Đợt kiểm tra độc lập'}, ...courses]
         setListCourse(courses)

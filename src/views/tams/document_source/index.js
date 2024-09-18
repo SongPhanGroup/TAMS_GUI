@@ -123,15 +123,7 @@ const DocumentSource = () => {
                 <span style={{ whiteSpace: 'break-spaces' }}>{record.name}</span>
             ),
         },
-        {
-            title: "Thời gian tạo",
-            dataIndex: "createdAt",
-            align: 'center',
-            width: 150,
-            render: (text, record, index) => (
-                <span>{toDateTimeString(record.createdAt)}</span>
-            ),
-        },
+
         {
             title: "Mô tả",
             dataIndex: "description",
@@ -139,6 +131,15 @@ const DocumentSource = () => {
             width: 200,
             render: (text, record, index) => (
                 <span style={{ whiteSpace: 'break-spaces' }}>{record.description}</span>
+            ),
+        },
+        {
+            title: "Ngày tạo",
+            dataIndex: "createdAt",
+            align: 'center',
+            width: 150,
+            render: (text, record, index) => (
+                <span>{toDateTimeString(record.createdAt)}</span>
             ),
         },
         {

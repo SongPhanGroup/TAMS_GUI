@@ -162,12 +162,12 @@ const ContentModal = ({ listSentenceByCheckingResult }) => {
             ),
         },
         {
-            title: "Độ tương đồng",
+            title: "Độ tương đồng (%)",
             dataIndex: "content",
             align: "center",
             width: 100,
             render: (text, record, index) => (
-                <span>{(record?.similarity * 100).toFixed(2)}%</span>
+                <span>{(record?.similarity).toFixed(2)}</span>
             ),
         }
     ]

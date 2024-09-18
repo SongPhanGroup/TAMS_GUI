@@ -27,15 +27,6 @@ export default [
     resource: ['DOT_KIEM_TRA', 'KIEM_TRA_TRUNG_LAP_TUYET_DOI', 'KIEM_TRA_TRUNG_LAP_XAP_XI']
   },
   {
-    id: 'course',
-    title: 'QL đợt kiểm tra',
-    icon: <DiffOutlined size={12} />,
-    navLink: '/tams/course',
-    action: 'read',
-    resource: 'DOT_KIEM_TRA',
-    role: 0
-  },
-  {
     id: 'checking-document',
     title: 'KT trùng lặp tuyệt đối',
     icon: <CheckOutlined size={12} />,
@@ -51,6 +42,15 @@ export default [
     navLink: '/tams/checking-specialized',
     action: 'read',
     resource: 'KIEM_TRA_TRUNG_LAP_XAP_XI',
+    role: 0
+  },
+  {
+    id: 'course',
+    title: 'QL đợt kiểm tra',
+    icon: <DiffOutlined size={12} />,
+    navLink: '/tams/course',
+    action: 'read',
+    resource: 'DOT_KIEM_TRA',
     role: 0
   },
   {

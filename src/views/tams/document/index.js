@@ -275,15 +275,7 @@ const Document = () => {
                 <span style={{ whiteSpace: 'break-spaces' }}>{toDateString(record?.publish_date)}</span>
             ),
         },
-        {
-            title: "Ngày tạo",
-            dataIndex: "created_at",
-            align: 'center',
-            width: 150,
-            render: (text, record, index) => (
-                <span>{toDateTimeString(record.createdAt)}</span>
-            ),
-        },
+
         {
             title: "Mô tả",
             dataIndex: "description",
@@ -291,6 +283,15 @@ const Document = () => {
             width: 200,
             render: (text, record, index) => (
                 <span style={{ whiteSpace: 'break-spaces' }}>{record.description}</span>
+            ),
+        },
+        {
+            title: "Ngày tạo",
+            dataIndex: "created_at",
+            align: 'center',
+            width: 150,
+            render: (text, record, index) => (
+                <span>{toDateTimeString(record.createdAt)}</span>
             ),
         },
         {
@@ -382,6 +383,7 @@ const Document = () => {
                             allowClear
                             mode="multiple"
                             onChange={(value) => handleChangeDocumentType(value)}
+                            filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
                         />
                     </Col>
                     <Col sm="3" className="mr-1" style={{ display: "flex", justifyContent: "flex-end" }}>
@@ -392,6 +394,7 @@ const Document = () => {
                             allowClear
                             mode="multiple"
                             onChange={(value) => handleChangeMajor(value)}
+                            filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
                         />
                     </Col>
                     <Col

@@ -52,7 +52,7 @@ import * as yup from "yup"
 import { useForm, Controller } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import classnames from "classnames"
-import { toDateString, toDateTimeString } from "../../../utility/Utils"
+import { downloadFile, toDateString, toDateTimeString } from "../../../utility/Utils"
 // import {
 //     getRole,
 //     createRole,
@@ -77,7 +77,7 @@ import ContentModal from "./modal/ContentModal"
 import { getCheckingResult, getSimilarDocument, getTop3SimilarDocument } from "../../../api/checking_result"
 import { getCourse } from "../../../api/course"
 import { PAGE_DEFAULT, PER_PAGE_DEFAULT } from "../../../utility/constant"
-import { downloadFileCheckingDocumentVersion, getDuplicateCheckingDocumentVersion, getSimilarityReport } from "../../../api/checking_document_version"
+import { downloadFileCheckingDocumentVersion, downloadTemplateBaoCao, getDuplicateCheckingDocumentVersion, getSimilarityReport } from "../../../api/checking_document_version"
 
 const CheckingResult = () => {
     const [loadingData, setLoadingData] = useState(false)
@@ -406,7 +406,7 @@ const CheckingResult = () => {
                 // <div style={{ display: "flex", justifyContent: "center" }}>
                 <>
                     {
-                        isLoadingDownload === true && loadingId === record.id ? <Spinner color="#fff" style={{width: '14px', height: '14px', backgroundColor: '#fff'}} /> : <Tooltip placement="top" title="Download file">
+                        isLoadingDownload === true && loadingId === record.id ? <Spinner color="#fff" style={{ width: '14px', height: '14px', backgroundColor: '#fff' }} /> : <Tooltip placement="top" title="Download file">
                             <DownloadOutlined
                                 id={`tooltip_download_${record._id}`}
                                 style={{ color: "#09A863", cursor: "pointer" }}
@@ -439,15 +439,11 @@ const CheckingResult = () => {
         getSimilarityReport({
             params: {
                 checkingDocumentVersionId: Number(params.id)
-            }
+            },
+            responseType: 'blob'
         })
             .then(res => {
-                const originalURL = window.URL.createObjectURL(new Blob([res]))
-                const link = document.createElement('a')
-                link.href = originalURL
-                link.setAttribute('download', `DS tài liệu trùng với phiên bản kiểm tra.excel`)
-                document.body.appendChild(link)
-                link.click()
+                downloadTemplateBaoCao(2, res)
             })
             .catch(error => {
                 console.log(error)
@@ -458,14 +454,14 @@ const CheckingResult = () => {
 
     const items = [
         {
-            label: 'Báo cáo DS trùng lặp theo khóa',
-            key: '1',
-            icon: <DownCircleFilled />,
-        },
-        {
             label: 'Báo cáo DS trùng lặp cao',
             key: '2',
             icon: <DownCircleOutlined />,
+        },
+        {
+            label: 'Báo cáo DS trùng lặp theo khóa',
+            key: '1',
+            icon: <DownCircleFilled />,
         }
     ]
 
@@ -493,7 +489,7 @@ const CheckingResult = () => {
                                 <Space>
                                     Báo cáo
                                     {
-                                        isLoadingReport === true ? <Spinner color="#fff" style={{width: '14px', height: '14px'}} /> : <DownOutlined />
+                                        isLoadingReport === true ? <Spinner color="#fff" style={{ width: '14px', height: '14px' }} /> : <DownOutlined />
                                     }
                                 </Space>
                             </Button>

@@ -139,6 +139,7 @@ const CheckingDocument = () => {
                     // const result = res?.data?.map(((item, index) => {
                     //     return { ...item, _id: item.id, key: index }
                     // }))
+                    console.log(res, "res nè")
                     const result = res?.data
                         ?.filter(item => listCourseId.includes(item.courseId)) // Lọc dựa trên courseId
                         .map((item, index) => {

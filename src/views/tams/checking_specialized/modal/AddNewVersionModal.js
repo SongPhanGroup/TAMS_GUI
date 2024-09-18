@@ -74,6 +74,7 @@ const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDoc
                         confirmButton: "btn btn-success"
                     }
                 })
+                getData()
             } else {
                 Swal.fire({
                     title: "Thêm mới phiên bản kiểm tra thất bại",
@@ -84,7 +85,6 @@ const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDoc
                     }
                 })
             }
-            getData()
             handleCloseModal()
         }).catch(error => {
             Swal.fire({

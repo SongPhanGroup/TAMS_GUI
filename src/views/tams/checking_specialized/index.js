@@ -382,7 +382,7 @@ const CheckingDocument = () => {
             },
         },
         {
-            title: "Ngày tạo",
+            title: "Ngày kiểm tra",
             dataIndex: "createdAt",
             width: 120,
             align: "center",

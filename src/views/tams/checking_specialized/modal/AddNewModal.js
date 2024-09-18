@@ -121,6 +121,7 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
             description: data.description ?? ""
         }).then(result => {
             if (result.status === 'success') {
+                getData()
                 setSuccessMessage(`Thêm mới ${file.name} thành công!!!`)
                 setTimeout(() => setSuccessMessage(''), 2000)
                 const formData = new FormData()
@@ -140,7 +141,6 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
                             }
                         })
                     }
-                    getData()
                 })
             } else {
                 Swal.fire({

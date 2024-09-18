@@ -9,7 +9,9 @@ import {
     Collapse,
     Checkbox,
     Spin,
-    Tooltip
+    Tooltip,
+    Dropdown,
+    Space
 } from "antd"
 import React, { useState, Fragment, useEffect, useRef, useContext } from "react"
 import {
@@ -24,6 +26,7 @@ import {
     FormFeedback,
     UncontrolledTooltip,
     CardBody,
+    Spinner,
 } from "reactstrap"
 import { Link, NavLink, useNavigate } from "react-router-dom"
 import { Plus, X } from "react-feather"
@@ -34,7 +37,11 @@ import {
     LockOutlined,
     AppstoreOutlined,
     RightCircleOutlined,
-    RightSquareOutlined
+    RightSquareOutlined,
+    DownOutlined,
+    DownCircleFilled,
+    DownCircleOutlined,
+    FileDoneOutlined
 
 } from "@ant-design/icons"
 import { AbilityContext } from "@src/utility/context/Can"
@@ -49,7 +56,7 @@ import { useForm, Controller } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import classnames from "classnames"
 import AddNewCheckingDocumentVersion from "./AddNewVersionModal"
-import { deleteCheckingDocumentVersion, getCheckingDocumentVersion } from "../../../../api/checking_document_version"
+import { deleteCheckingDocumentVersion, downloadTemplateBaoCao, getCheckingDocumentVersion, getSimilarityReport } from "../../../../api/checking_document_version"
 import { detailCheckingDocument } from "../../../../api/checking_document"
 import EditCheckingDocumentVersion from "./EditVersionModal"
 
@@ -69,7 +76,7 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
     const [isAdd, setIsAdd] = useState(false)
     const [isEdit, setIsEdit] = useState(false)
     const [checkingDocumentVersionSelected, setCheckingDocumentVersionSelected] = useState()
-    const [showIframe, setShowIframe] = useState(false)
+    const [loadingReports, setLoadingReports] = useState({}) // Tracks loading per record
 
     const getData = () => {
         setLoadingData(true)
@@ -140,6 +147,43 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
                 })
             })
     }
+
+    const handleReport = (recordId) => {
+        setLoadingReports((prev) => ({ ...prev, [recordId]: true }))
+        getSimilarityReport({
+            params: {
+                checkingDocumentVersionId: Number(recordId)
+            },
+            responseType: 'blob'
+        })
+            .then(res => {
+                downloadTemplateBaoCao(2, res)
+            })
+            .catch(error => {
+                console.log(error)
+            }).finally(() => {
+                setLoadingReports((prev) => ({ ...prev, [recordId]: false }))
+            })
+    }
+
+    const items = [
+        {
+            label: 'Báo cáo DS trùng lặp cao',
+            key: '2',
+            icon: <DownCircleOutlined />,
+        },
+        {
+            label: 'Báo cáo DS trùng lặp theo khóa',
+            key: '1',
+            icon: <DownCircleFilled />,
+        }
+    ]
+
+    const menuProps = (recordId) => ({
+        items,
+        onClick: () => handleReport(recordId),
+    })
+
     const columns = [
         {
             title: "STT",
@@ -227,7 +271,7 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
                             <RightSquareOutlined
                                 style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
                                 onClick={() => {
-                                    const recordStandard = { ...record, from: 'checking-specialized' }
+                                    const recordStandard = { ...record, from: 'checking-specialized', title: checkingDocumentSelected?.title }
                                     return handleButtonClick2(recordStandard)
                                 }}
                             />
@@ -244,7 +288,13 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
                                 />
                             </Tooltip>
                         </Popconfirm>
-
+                        <Tooltip placement="top" title="Xuất báo cáo">
+                            <Dropdown menu={menuProps(record.id)}>
+                                {
+                                    loadingReports[record.id] ? <Spinner color="#fff" style={{ width: '14px', height: '14px' }} /> : <FileDoneOutlined style={{ cursor: 'pointer', color: '#09A863' }} />
+                                }
+                            </Dropdown>
+                        </Tooltip>
                     </div>
                 )
             },

@@ -212,14 +212,15 @@ const DetailResult2 = () => {
                             <h4 style={{ textTransform: 'uppercase', marginBottom: 0, color: '#1C5385' }}>Báo cáo chi tiết</h4>
                         </Col>
                         <Col md={12}>
-                            <h4 style={{ marginBottom: 0, color: 'red' }}>{location.state.fileName}</h4>
+                            <h4 style={{ marginBottom: 0 }}>Tài liệu kiểm tra: <span style={{ color: 'red' }}>{location.state.title}</span></h4>
                         </Col>
                     </Row>
                 </Col>
                 <Col md={6}>
 
                 </Col>
-            </Row>            <Row gutter={16}>
+            </Row>
+            <Row gutter={16}>
                 {
                     loadingHTML === true ? <Spin style={{
                         padding: '16px'

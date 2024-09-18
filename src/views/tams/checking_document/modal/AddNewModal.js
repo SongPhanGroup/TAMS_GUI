@@ -121,8 +121,8 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
             description: data.description ?? ""
         }).then(result => {
             if (result.status === 'success') {
-                setSuccessMessage(`Thêm mới ${file.name} thành công!!!`)
                 getData()
+                setSuccessMessage(`Thêm mới ${file.name} thành công!!!`)
                 setTimeout(() => setSuccessMessage(''), 2000)
                 const formData = new FormData()
                 formData.append('file', file)

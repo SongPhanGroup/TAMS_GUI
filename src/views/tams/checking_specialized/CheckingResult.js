@@ -462,33 +462,7 @@ const CheckingResult = () => {
             >
 
                 <Row>
-                    <Col md="12" style={{ display: "flex", justifyContent: "flex-end", gap: 16 }}>
-                        <Dropdown menu={menuProps}>
-                            <Button color="primary">
-                                <Space>
-                                    Báo cáo
-                                    {
-                                        isLoadingReport === true ? <Spinner color="#fff" style={{ width: '14px', height: '14px' }} /> : <DownOutlined />
-                                    }
-                                </Space>
-                            </Button>
-                        </Dropdown>
-                        {/* {ability.can('create', 'PHAN_QUYEN_VAI_TRO') &&
-                            <Button
-                                onClick={handleReport}
-                                color="primary"
-                                className=""
-                                style={{
-                                    width: '120px',
-                                    marginBottom: 0,
-                                    padding: '8px 15px'
-                                }}
-                            >
-                                Báo cáo {
-                                    isLoadingReport === true ? <Spin /> : ''
-                                }
-                            </Button>
-                        } */}
+                    <Col md="12" style={{ display: "flex", justifyContent: "space-between", gap: 16 }}>
                         {ability.can('create', 'PHAN_QUYEN_VAI_TRO') &&
                             <Link to="/tams/checking-document">
                                 <Button
@@ -506,6 +480,32 @@ const CheckingResult = () => {
                                 </Button>
                             </Link>
                         }
+                        {/* <Dropdown menu={menuProps}>
+                            <Button color="primary">
+                                <Space>
+                                    Báo cáo
+                                    {
+                                        isLoadingReport === true ? <Spinner color="#fff" style={{ width: '14px', height: '14px' }} /> : <DownOutlined />
+                                    }
+                                </Space>
+                            </Button>
+                        </Dropdown> */}
+                        {/* {ability.can('create', 'PHAN_QUYEN_VAI_TRO') &&
+                            <Button
+                                onClick={handleReport}
+                                color="primary"
+                                className=""
+                                style={{
+                                    width: '120px',
+                                    marginBottom: 0,
+                                    padding: '8px 15px'
+                                }}
+                            >
+                                Báo cáo {
+                                    isLoadingReport === true ? <Spin /> : ''
+                                }
+                            </Button>
+                        } */}
                     </Col>
                     <Col md="12" style={{ textAlign: 'center' }}>
                         <h5>Kết quả trùng lặp so với CSDL mẫu: <span style={{ color: 'red' }}>{location?.state?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}%</span></h5>

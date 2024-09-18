@@ -265,13 +265,6 @@ const ListAccounts = () => {
           {
             ability.can('update', 'TAI_KHOAN') &&
             <>
-              <Tooltip placement="top" title="Chỉnh sửa">
-                <EditOutlined
-                  id={`tooltip_edit_${record._id}`}
-                  style={{ color: "#09A863", cursor: "pointer" }}
-                  onClick={(e) => handleEdit(record)}
-                />
-              </Tooltip>
               <Tooltip placement="top" title="Phân quyền">
                 <AppstoreAddOutlined
                   id={`tooltip_per_${record._id}`}
@@ -328,6 +321,13 @@ const ListAccounts = () => {
               }}
             />
           </Tooltip> */}
+          <Tooltip placement="top" title="Chỉnh sửa">
+            <EditOutlined
+              id={`tooltip_edit_${record._id}`}
+              style={{ color: "#09A863", cursor: "pointer" }}
+              onClick={(e) => handleEdit(record)}
+            />
+          </Tooltip>
           {ability.can('delete', 'TAI_KHOAN') && <Popconfirm
             title="Bạn chắc chắn xóa?"
             onConfirm={() => handleDelete(record._id)}

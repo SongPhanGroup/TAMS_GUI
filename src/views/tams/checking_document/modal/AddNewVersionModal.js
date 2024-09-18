@@ -62,7 +62,7 @@ const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDoc
         setLoadingAdd(true)
         const formData = new FormData()
         formData.append('file', file)
-        formData.append('description', data.description)
+        formData.append('description', data.description ?? "")
         formData.append('checkingDocumentId', checkingDocumentSelected?.id)
         postCheckingDocumentVersion(formData).then(result => {
             if (result.status === 'success') {
@@ -110,7 +110,7 @@ const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDoc
                 <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                     <Col xs={12}>
                         <Label className='form-label' for='checkingDocument'>
-                            phiên bản kiểm tra <span style={{ color: 'red' }}>(*)</span>
+                            Phiên bản kiểm tra <span style={{ color: 'red' }}>(*)</span>
                         </Label>
                         <Controller
                             disabled
@@ -118,7 +118,7 @@ const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDoc
                             name='checkingDocument'
                             control={control}
                             render={({ field }) => (
-                                <Input {...field} id='checkingDocument' placeholder='Nhập phiên bản kiểm tra' invalid={errors.checkingDocument && true} />
+                                <Input {...field} disabled id='checkingDocument' placeholder='Nhập phiên bản kiểm tra' invalid={errors.checkingDocument && true} />
                             )}
                         />
                     </Col>

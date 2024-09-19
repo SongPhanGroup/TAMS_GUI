@@ -386,23 +386,6 @@ const CheckingDocument = () => {
                 }
             },
         },
-
-        {
-            title: "Trùng với TL cùng đợt (%)",
-            width: 120,
-            align: "center",
-            render: (text, record, index) => {
-                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) * 100 >= 40 || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) * 100 >= 40) {
-                    return (
-                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal}</span>
-                    )
-                } else {
-                    return (
-                        <span>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal}</span>
-                    )
-                }
-            },
-        },
         {
             title: "Trùng với DL mẫu (%)",
             width: 120,
@@ -415,6 +398,22 @@ const CheckingDocument = () => {
                 } else {
                     return (
                         <span>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}</span>
+                    )
+                }
+            },
+        },
+        {
+            title: "Trùng với TL cùng đợt (%)",
+            width: 120,
+            align: "center",
+            render: (text, record, index) => {
+                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) * 100 >= 40 || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) * 100 >= 40) {
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal}</span>
+                    )
+                } else {
+                    return (
+                        <span>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal}</span>
                     )
                 }
             },
@@ -455,17 +454,18 @@ const CheckingDocument = () => {
         },
         {
             title: "Ngày kiểm tra",
-            dataIndex: "createdAt",
+            dataIndex: "supervisedAt",
             width: 120,
             align: "center",
             render: (text, record, index) => {
+                const countVersion = (record.checkingDocumentVersion).length
                 if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) * 100 >= 40 || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) * 100 >= 40) {
                     return (
-                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{toDateTimeString(record.createdAt)}</span>
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{toDateTimeString((record?.checkingDocumentVersion)[countVersion - 1]?.createdAt)}</span>
                     )
                 } else {
                     return (
-                        <span>{toDateTimeString(record.createdAt)}</span>
+                        <span>{toDateTimeString((record?.checkingDocumentVersion)[countVersion - 1]?.createdAt)}</span>
                     )
                 }
             },

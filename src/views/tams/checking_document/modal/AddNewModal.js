@@ -31,7 +31,7 @@ import { getCourse } from "../../../../api/course"
 import classNames from "classnames"
 import { postCheckingDocumentVersion } from "../../../../api/checking_document_version"
 
-const AddNewCheckingDocument = ({ open, handleModal, getData, data, onUpdate }) => {
+const AddNewCheckingDocument = ({ open, handleModal, getData, data, onUpdate, setHasVersion }) => {
     const AddNewCheckingDocumentSchema = yup.object().shape({
         file: yup.mixed().required("Yêu cầu chọn file").nullable().test(
             "is-not-empty",
@@ -147,6 +147,7 @@ const AddNewCheckingDocument = ({ open, handleModal, getData, data, onUpdate }) 
                 //     description: data.description ?? ""
                 // }
                 // handlePropertyChange(newRecord)
+                getData()
                 setSuccessMessage(`Thêm mới ${file.name} thành công!!!`)
                 setTimeout(() => setSuccessMessage(''), 2000)
                 const formData = new FormData()
@@ -158,16 +159,16 @@ const AddNewCheckingDocument = ({ open, handleModal, getData, data, onUpdate }) 
                 postCheckingDocumentVersion(formData).then(result => {
                     if (result.status === 'success') {
                         Swal.fire({
-                            title: "Thêm mới kiểm tra tài liệu thành công",
+                            title: "Thêm mới phiên bản kiểm tra thành công",
                             text: "",
                             icon: "success",
                             customClass: {
                                 confirmButton: "btn btn-success"
                             }
                         })
+                        getData()
                     }
                     // getData()
-                    getData()
                 }).catch(error => {
                     console.log(error)
                 })

@@ -322,6 +322,7 @@ const App = () => {
     const [editingKey, setEditingKey] = useState('')
     const [isHidden, setIsHidden] = useState(false)
     const [modalParameter, setModalParameter] = useState(false)
+    const [editableState, setEditableState] = useState(false)
 
     const getData = () => {
         getSystemParameter().then(res => {
@@ -333,16 +334,16 @@ const App = () => {
         getData()
     }, [])
 
-    const isEditing = (record) => record.key === editingKey
+    const isEditing = (record) => record.id === editingKey
     const edit = (record) => {
-        const editValue = form.setFieldsValue({
+        form.setFieldsValue({
             name: record.name,
             code: record.code,
             value: record.value,
             description: record.description,
             ...record
         })
-        setEditingKey(record.key)
+        setEditingKey(record.id)
         setIsHidden(true)
     }
     const cancel = () => {
@@ -365,6 +366,9 @@ const App = () => {
                         confirmButton: "btn btn-success"
                     }
                 })
+                setEditingKey('')
+                setIsHidden(false)
+                getData()
             } else {
                 Swal.fire({
                     title: "Cập nhật tham số thất bại",
@@ -375,7 +379,6 @@ const App = () => {
                     }
                 })
             }
-            getData()
         }).catch(error => {
             Swal.fire({
                 title: "Cập nhật tham số thất bại",

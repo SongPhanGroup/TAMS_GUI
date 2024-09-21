@@ -26,8 +26,9 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import '@styles/react/libs/react-select/_react-select.scss'
 import Swal from 'sweetalert2'
 import { postCheckingDocumentVersion } from "../../../../api/checking_document_version"
+import { toDateTimeString } from "../../../../utility/Utils"
 
-const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDocumentSelected }) => {
+const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDocumentSelected, lastVersionDate, onUpdate }) => {
     const AddNewCheckingDocumentVersionSchema = yup.object().shape({
         file: yup.mixed().required("Yêu cầu nhập file")
     })
@@ -57,6 +58,19 @@ const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDoc
         const file = event.target.files[0]
         setFile(file)
     }
+
+    const [localData, setLocalData] = useState(checkingDocumentSelected)
+
+    const handlePropertyChange = (newPropertyValue) => {
+
+        // Cập nhật local state của modal
+        // setLocalData(updatedRecord)
+
+        // Gọi hàm callback để cập nhật dữ liệu lên cha
+        onUpdate(newPropertyValue)
+    }
+
+    // console.log("Bản ghi", localData)
     
     const onSubmit = (data) => {
         setLoadingAdd(true)
@@ -66,6 +80,7 @@ const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDoc
         formData.append('checkingDocumentId', checkingDocumentSelected?.id)
         postCheckingDocumentVersion(formData).then(result => {
             if (result.status === 'success') {
+                handlePropertyChange(toDateTimeString(result?.data?.createdAt))
                 Swal.fire({
                     title: "Thêm mới phiên bản kiểm tra thành công",
                     text: "",

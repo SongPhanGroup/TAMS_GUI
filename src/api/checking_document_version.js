@@ -43,8 +43,14 @@ export const getSimilarityReport = async (query) => {
   return res
 }
 
-export const getDuplicateCheckingDocumentVersion = async (id) => {
+export const getDuplicateDocumentVersion = async (id) => {
   const uri = `/checking-document-version/${id}/duplicate-document`
+  const res = await API_TAMS.get(uri)
+  return res
+}
+
+export const getDuplicateCheckingDocumentVersion = async (id) => {
+  const uri = `/checking-document-version/${id}/duplicate-checking-document`
   const res = await API_TAMS.get(uri)
   return res
 }

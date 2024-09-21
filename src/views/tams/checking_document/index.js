@@ -96,6 +96,7 @@ const CheckingDocument = () => {
     const [listCourse, setListCourse] = useState([])
     const [listCourseId, setListCourseId] = useState([])
     const [loadingReports, setLoadingReports] = useState({}) // Tracks loading per record
+    const [supervisedAt, setSupervisedAt] = useState(false)
 
     const getAllDataPromises = async () => {
         const coursePromise = getCourse({ params: { page: PAGE_DEFAULT, perPage: PER_PAGE_DEFAULT, search: '' } })
@@ -140,8 +141,8 @@ const CheckingDocument = () => {
         if (location?.state) {
             getCheckingDocument({
                 params: {
-                    page,
-                    limit,
+                    page: currentPage,
+                    limit: rowsPerPage,
                     ...(search && search !== "" && { search }),
                     courseIds: location?.state?.id,
                     ...(startDate && { startDate }),
@@ -178,6 +179,7 @@ const CheckingDocument = () => {
                 }
             })
                 .then((res) => {
+                    // console.log(res)
                     // const result = res?.data?.map(((item, index) => {
                     //     return { ...item, _id: item.id, key: index }
                     // }))
@@ -456,19 +458,35 @@ const CheckingDocument = () => {
         },
         {
             title: "Ngày kiểm tra",
-            dataIndex: "createdAt",
+            dataIndex: "supervisedAt",
             width: 120,
             align: "center",
             render: (text, record, index) => {
                 const countVersion = (record.checkingDocumentVersion).length
-                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) * 100 >= 40 || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) * 100 >= 40) {
-                    return (
-                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{toDateTimeString((record?.checkingDocumentVersion)[countVersion - 1]?.createdAt)}</span>
-                    )
+                if (countVersion > 0) {
+                    const similarityType1 = record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal || 0
+                    const similarityType2 = record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal || 0
+
+                    const createdAt = toDateTimeString(record?.checkingDocumentVersion[countVersion - 1]?.createdAt)
+                    // setSupervisedAt(createdAt)
+
+                    // Check the similarity and decide color style
+                    if (supervisedAt) {
+                        return (
+                            <span style={{ whiteSpace: 'break-spaces', color: (similarityType1 * 100 >= 40 || similarityType2 * 100 >= 40) ? 'red' : 'inherit', fontWeight: (similarityType1 * 100 >= 40 || similarityType2 * 100 >= 40) ? '600' : 'normal' }}>
+                                {supervisedAt}
+                            </span>
+                        )
+                    } else {
+                        return (
+                            <span style={{ whiteSpace: 'break-spaces', color: (similarityType1 * 100 >= 40 || similarityType2 * 100 >= 40) ? 'red' : 'inherit', fontWeight: (similarityType1 * 100 >= 40 || similarityType2 * 100 >= 40) ? '600' : 'normal' }}>
+                                {createdAt}
+                            </span>
+                        )
+                    }
                 } else {
-                    return (
-                        <span>{toDateTimeString((record?.checkingDocumentVersion)[countVersion - 1]?.createdAt)}</span>
-                    )
+                    // Show spinner if no versions are available
+                    return <span style={{color: 'blue'}}>Đang xử lý</span>
                 }
             },
         },
@@ -477,7 +495,7 @@ const CheckingDocument = () => {
             width: 100,
             align: "center",
             render: (record) => {
-                const dataVersion = record.checkingDocumentVersion
+                const dataVersion = record?.checkingDocumentVersion
                 const recordLastVersion = dataVersion[dataVersion.length - 1]
                 return (
                     <div style={{ display: "flex", justifyContent: "center" }}>
@@ -502,9 +520,9 @@ const CheckingDocument = () => {
                             />
                         </Tooltip>
                         <Tooltip placement="top" title="Xuất báo cáo">
-                            <Dropdown menu={menuProps(recordLastVersion.id)}>
+                            <Dropdown menu={menuProps(recordLastVersion?.id)}>
                                 {
-                                    loadingReports[recordLastVersion.id] ? <Spinner color="#fff" style={{ width: '14px', height: '14px' }} /> : <FileDoneOutlined style={{ cursor: 'pointer', color: '#09A863', marginRight: '1rem' }} />
+                                    loadingReports[recordLastVersion?.id] ? <Spinner color="#fff" style={{ width: '14px', height: '14px' }} /> : <FileDoneOutlined style={{ cursor: 'pointer', color: '#09A863', marginRight: '1rem' }} />
                                 }
                             </Dropdown>
                         </Tooltip>
@@ -560,16 +578,15 @@ const CheckingDocument = () => {
     const handleUpdateFromChild = async (updatedRecord) => {
         setLoadingUpdate(true)
         try {
-            setData(prevData => (
-                prevData.map(record => (record.key === updatedRecord.key ? updatedRecord : record))
-            ))
-            getData()
+            setSupervisedAt(updatedRecord)
         } catch (error) {
             console.error("Error updating data", error)
         } finally {
             setLoadingUpdate(false)
         }
     }
+
+    console.log(supervisedAt)
 
     return (
         <Fragment>
@@ -709,7 +726,7 @@ const CheckingDocument = () => {
                             bordered
                             expandable={{
                                 expandedRowRender: (record) => <VersionModal
-                                    checkingDocumentSelected={record} onUpdate={handleUpdateFromChild} />,
+                                    checkingDocumentSelected={record} onUpdate={handleUpdateFromChild} lastVersionDate={supervisedAt} />,
                                 rowExpandable: (record) => record.name !== 'Not Expandable',
                                 // expandRowByClick: true
                             }}

@@ -294,7 +294,7 @@ const DetailResult2 = () => {
                             <Row style={{ justifyContent: 'center', fontSize: '24px', color: 'red', fontWeight: '600' }}>
                                 {location?.state?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}%
                             </Row>
-                            <Row className='p-1' style={{ border: '1px solid #ccc', height: '85vh', overflow: 'auto' }} >
+                            <Row className='p-1' style={{ border: '1px solid #ccc', height: '85vh', overflow: 'auto', flexDirection: 'column', justifyContent: 'flex-start' }} >
                                 {
                                     dataDoc?.map((doc, index) => {
                                         // const colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '8B00FF']

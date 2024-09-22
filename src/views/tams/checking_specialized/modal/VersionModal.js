@@ -59,6 +59,7 @@ import AddNewCheckingDocumentVersion from "./AddNewVersionModal"
 import { deleteCheckingDocumentVersion, downloadTemplateBaoCao, getCheckingDocumentVersion, getSimilarityReport } from "../../../../api/checking_document_version"
 import { detailCheckingDocument } from "../../../../api/checking_document"
 import EditCheckingDocumentVersion from "./EditVersionModal"
+import { toDateTimeString } from "../../../../utility/Utils"
 
 const VersionModal = ({ checkingDocumentSelected, onUpdate }) => {
     const [loadingData, setLoadingData] = useState(false)
@@ -234,6 +235,17 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate }) => {
             dataIndex: "description",
             align: "left",
             width: 200,
+        },
+        {
+            title: "Ngày kiểm tra",
+            dataIndex: "createdAt",
+            align: "center",
+            width: 200,
+            render: (text, record, index) => {
+                return (
+                    <span>{toDateTimeString(record?.createdAt)}</span>
+                )
+            }
         },
         {
             title: "Thao tác",

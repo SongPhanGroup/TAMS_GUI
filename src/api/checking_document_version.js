@@ -1,4 +1,4 @@
-import { API_FormData_CheckingUpload } from "./API_FormData_CheckingUpload"
+import { API_FormData_CheckingUpload_TD } from "./API_FormData_CheckingUpload_TD"
 import { API_TAMS } from "./API_TAMS"
 
 export const getCheckingDocumentVersion = async (query) => {
@@ -9,7 +9,7 @@ export const getCheckingDocumentVersion = async (query) => {
 
 export const postCheckingDocumentVersion = async (body) => {
   const uri = `/checking-document-version`
-  const res = await API_FormData_CheckingUpload.post(uri, body)
+  const res = await API_FormData_CheckingUpload_TD.post(uri, body)
   return res
 }
 

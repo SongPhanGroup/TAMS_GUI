@@ -6,8 +6,8 @@ function getAuthToken() {
     return window.localStorage.getItem("accessToken") ?? ""
 }
 
-const API_TAMS_CheckingUpload = axios.create({
-    baseURL: `${process.env.REACT_APP_API_URL_TAMS_CHECKING_UPLOAD}/`,
+const API_TAMS_CheckingUpload_TD = axios.create({
+    baseURL: `${process.env.REACT_APP_API_URL_TAMS_CHECKING_UPLOAD_TD}/`,
     headers: {
         // 'content-type':'multipart/form-data'
         'content-type': 'application/json'
@@ -15,7 +15,7 @@ const API_TAMS_CheckingUpload = axios.create({
     paramsSerializer: params => queryString.stringify(params)
 })
 
-API_TAMS_CheckingUpload.interceptors.request.use(async (config) => {
+API_TAMS_CheckingUpload_TD.interceptors.request.use(async (config) => {
     //hanlde tooken...
     config.headers = {
         ...(config.headers ?? {}),
@@ -24,7 +24,7 @@ API_TAMS_CheckingUpload.interceptors.request.use(async (config) => {
     return { ...config }
 })
 
-API_TAMS_CheckingUpload.interceptors.response.use((response) => {
+API_TAMS_CheckingUpload_TD.interceptors.response.use((response) => {
     if (response && response.data) {
         return response.data
     }
@@ -37,7 +37,7 @@ API_TAMS_CheckingUpload.interceptors.response.use((response) => {
     if (status === 401) {
         return Auth.refreshToken().then(res => {
             error.config.headers['Authorization'] = `Bearer ${getAuthToken()}`
-            return API_TAMS_CheckingUpload(error.config)
+            return API_TAMS_CheckingUpload_TD(error.config)
         })
     }
     if (status === 408) {
@@ -47,4 +47,4 @@ API_TAMS_CheckingUpload.interceptors.response.use((response) => {
     return Promise.reject(error)
 })
 
-export { API_TAMS_CheckingUpload }
+export { API_TAMS_CheckingUpload_TD }

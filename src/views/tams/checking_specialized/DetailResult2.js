@@ -10,7 +10,7 @@ import {
 import mqtt from 'mqtt'
 import { Breadcrumb, Layout, Menu, theme, Row, Col, Card, Badge, Tag, Progress, Spin } from 'antd'
 import { useLocation, useParams } from 'react-router-dom'
-import { getCheckingResultHTML, getCheckingResultHTML2, getSimilarDocument } from '../../../api/checking_result'
+import { getCheckingResultHTML, getCheckingResultHTML2, getSimilarDocument, getSimilarDocumentWithoutThreshHold } from '../../../api/checking_result'
 import { getListDocFromSetenceId } from '../../../api/checking_sentence'
 import './hightlight.css'
 import { X } from 'react-feather'
@@ -66,7 +66,7 @@ const DetailResult2 = () => {
 
     const getDocHasTheSameSentence = () => {
         setLoadingDataDoc(true)
-        getSimilarDocument(Number(params?.id)).then(res => {
+        getSimilarDocumentWithoutThreshHold(Number(params?.id)).then(res => {
             setDataDoc(res?.data)
             setCount(res?.total)
         }).catch(error => {
@@ -263,11 +263,11 @@ const DetailResult2 = () => {
             </Row>
             <Row gutter={16}>
                 {
-                    loadingHTML === true ? <div style={{display: 'flex', alignItems: 'center'}}>
+                    loadingHTML === true ? <div style={{ display: 'flex', alignItems: 'center' }}>
                         <Spin style={{
                             padding: '16px'
                         }} />
-                        <h5 style={{margin: 0}}>Vui lòng đợi hệ thống khởi tạo lần đầu Báo cáo chi tiết trùng lặp. Thời gian dự kiến 10-30 giây </h5>
+                        <h5 style={{ margin: 0 }}>Vui lòng đợi hệ thống khởi tạo lần đầu Báo cáo chi tiết trùng lặp. Thời gian dự kiến 10-30 giây </h5>
                     </div> : (
                         <Col md={18} style={{ height: '100vh', overflow: 'auto' }}>
                             <Row gutter={16} style={{ padding: '16px', width: '100%', overflow: 'auto' }}>

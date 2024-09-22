@@ -10,7 +10,7 @@ import {
 import mqtt from 'mqtt'
 import { Breadcrumb, Layout, Menu, theme, Row, Col, Card, Badge, Tag, Progress, Spin } from 'antd'
 import { useLocation, useParams } from 'react-router-dom'
-import { getCheckingResultHTML, getCheckingResultHTML2, getSimilarDocument } from '../../../api/checking_result'
+import { getCheckingResultHTML, getCheckingResultHTML2, getSimilarDocument, getSimilarDocumentWithoutThreshHold } from '../../../api/checking_result'
 import { getListDocFromSetenceId } from '../../../api/checking_sentence'
 import './hightlight.css'
 import { X } from 'react-feather'
@@ -62,7 +62,7 @@ const DetailResult2 = () => {
 
     const getDocHasTheSameSentence = () => {
         setLoadingDataDoc(true)
-        getSimilarDocument(Number(params?.id)).then(res => {
+        getSimilarDocumentWithoutThreshHold(Number(params?.id)).then(res => {
             setDataDoc(res?.data)
             setCount(res?.total)
         }).catch(error => {

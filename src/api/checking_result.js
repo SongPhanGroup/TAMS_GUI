@@ -1,10 +1,18 @@
 import { API_TAMS } from "./API_TAMS"
 
+// có ngưỡng
 export const getSimilarDocument = async (id, query) => {
   const uri = `/getResult/${id}`
   const res = await API_TAMS.get(uri, query)
   return res
 }
+// không có ngưỡng
+export const getSimilarDocumentWithoutThreshHold = async (id, query) => {
+  const uri = `/getResultWithOutThreshHold/${id}`
+  const res = await API_TAMS.get(uri, query)
+  return res
+}
+
 
 export const getTop3SimilarDocument = async (id) => {
   const uri = `/getTop3Result/${id}`

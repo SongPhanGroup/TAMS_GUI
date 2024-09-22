@@ -140,8 +140,8 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
                                 confirmButton: "btn btn-success"
                             }
                         })
+                        getData()
                     }
-                    getData()
                 }).catch(error => {
                     console.log(error)
                 })

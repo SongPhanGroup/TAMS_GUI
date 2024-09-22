@@ -311,7 +311,7 @@ const CheckingDocument = () => {
             icon: <DownCircleOutlined />,
         },
         {
-            label: 'Báo cáo DS trùng lặp theo khóa',
+            label: 'Báo cáo DS trùng lặp theo đợt',
             key: '1',
             icon: <DownCircleFilled />,
         }
@@ -487,7 +487,7 @@ const CheckingDocument = () => {
                     }
                 } else {
                     // Show spinner if no versions are available
-                    return <span style={{color: 'blue'}}>Đang xử lý</span>
+                    return <span style={{ color: 'blue' }}>Đang xử lý</span>
                 }
             },
         },

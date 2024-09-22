@@ -172,7 +172,7 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate, lastVersionDate }) =
             icon: <DownCircleOutlined />,
         },
         {
-            label: 'Báo cáo DS trùng lặp theo khóa',
+            label: 'Báo cáo DS trùng lặp theo đợt',
             key: '1',
             icon: <DownCircleFilled />,
         }
@@ -281,7 +281,7 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate, lastVersionDate }) =
                         >
                             <Tooltip placement="top" title="Xóa">
                                 <DeleteOutlined
-                                    style={{ color: "red", cursor: "pointer"}}
+                                    style={{ color: "red", cursor: "pointer" }}
                                 />
                             </Tooltip>
                         </Popconfirm>

@@ -174,7 +174,7 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate }) => {
             icon: <DownCircleOutlined />,
         },
         {
-            label: 'Báo cáo DS trùng lặp theo khóa',
+            label: 'Báo cáo DS trùng lặp theo đợt',
             key: '1',
             icon: <DownCircleFilled />,
         }
@@ -287,7 +287,7 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate }) => {
                                 />
                             </Tooltip>
                         </Popconfirm>
-                        
+
                     </div>
                 )
             },

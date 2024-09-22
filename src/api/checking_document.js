@@ -1,4 +1,5 @@
 import { API_TAMS } from "./API_TAMS"
+import { API_TAMS_CheckingUpload } from "./API_TAMS_CheckingUpload"
 
 export const getCheckingDocument = async (query) => {
   const uri = `/checking-document`
@@ -8,7 +9,7 @@ export const getCheckingDocument = async (query) => {
 
 export const postCheckingDocument = async (body) => {
   const uri = `/checking-document`
-  const res = await API_TAMS.post(uri, body)
+  const res = await API_TAMS_CheckingUpload.post(uri, body)
   return res
 }
 

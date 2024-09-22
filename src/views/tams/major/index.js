@@ -79,23 +79,24 @@ const Major = () => {
     const handleDelete = (key) => {
         deleteMajor(key)
             .then((res) => {
-                MySwal.fire({
-                    title: "Xóa đợt kiểm tra thành công",
-                    icon: "success",
-                    customClass: {
-                        confirmButton: "btn btn-success",
-                    },
-                }).then((result) => {
-                    if (currentPage === 1) {
-                        getData(1, rowsPerPage)
-                    } else {
-                        setCurrentPage(1)
-                    }
-                })
+                // MySwal.fire({
+                //     title: "Xóa đợt kiểm tra thành công",
+                //     icon: "success",
+                //     customClass: {
+                //         confirmButton: "btn btn-success",
+                //     },
+                // }).then((result) => {
+                //     if (currentPage === 1) {
+                //         getData(1, rowsPerPage)
+                //     } else {
+                //         setCurrentPage(1)
+                //     }
+                // })
+                getData(1, rowsPerPage)
             })
             .catch((error) => {
                 MySwal.fire({
-                    title: "Xóa đợt kiểm tra thất bại",
+                    title: "Xóa lĩnh vực thất bại",
                     icon: "error",
                     customClass: {
                         confirmButton: "btn btn-danger",

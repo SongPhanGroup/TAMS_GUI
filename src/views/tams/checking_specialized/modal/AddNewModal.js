@@ -141,6 +141,8 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
                         })
                     }
                     getData()
+                }).catch(error => {
+                    console.log(error)
                 })
             } else {
                 Swal.fire({

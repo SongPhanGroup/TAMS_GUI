@@ -28,7 +28,7 @@ import { editCheckingDocumentVersion } from "../../../../api/checking_document_v
 import { detailCheckingDocument, editCheckingDocument } from "../../../../api/checking_document"
 import { useEffect, useState } from "react"
 
-const EditCheckingDocumentVersion = ({ open, handleModal, infoEditVersion, getData, dataCheckingDocument }) => {
+const EditCheckingDocumentVersion = ({ open, handleModal, infoEditVersion, getData, dataCheckingDocument, onUpdate }) => {
     if (!infoEditVersion) return
     useEffect(() => {
 
@@ -86,6 +86,21 @@ const EditCheckingDocumentVersion = ({ open, handleModal, infoEditVersion, getDa
         getAllDataPromises()
     }, [dataCheckingDocument?.id])
 
+    const [localData, setLocalData] = useState(dataCheckingDocument)
+
+    const handlePropertyChange = (newPropertyValue) => {
+        const updatedRecord = {
+            ...localData,
+            description: newPropertyValue, // Thay đổi thuộc tính nào đó
+        }
+
+        // Cập nhật local state của modal
+        setLocalData(updatedRecord)
+
+        // Gọi hàm callback để cập nhật dữ liệu lên cha
+        onUpdate(updatedRecord)
+    }
+
     const onSubmit = (data) => {
         setLoadingEdit(true)
         const formData = new FormData()
@@ -93,8 +108,9 @@ const EditCheckingDocumentVersion = ({ open, handleModal, infoEditVersion, getDa
         formData.append('checkingDocumentId', dataCheckingDocument?.id)
         editCheckingDocumentVersion(infoEditVersion?.id, formData).then(result => {
             if (result.status === 'success') {
-                const id = listCheckingDocumentVersion[0]?.id
+                const id = listCheckingDocumentVersion[listCheckingDocumentVersion.length - 1]?.id
                 if (id === infoEditVersion?.id) {
+                    handlePropertyChange(data.description)
                     editCheckingDocument(dataCheckingDocument?.id, {
                         title: dataCheckingDocument?.title,
                         author: dataCheckingDocument?.author,

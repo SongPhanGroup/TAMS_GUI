@@ -26,6 +26,7 @@ import { AbilityContext } from '@src/utility/context/Can'
 import { deleteCourse, getCourse, toggleActiveCourse } from "../../../api/course"
 import { toDateString, toDateTimeString } from "../../../utility/Utils"
 import { useNavigate } from "react-router-dom"
+import { supervisedCheckingDocument } from "../../../api/checking_document"
 const LIST_STATUS = [
     {
         value: 1,
@@ -89,25 +90,55 @@ const Course = () => {
     }
 
     const handleSupervisor = (record) => {
-        navigate(`/tams/checking-document`, { state: record })
+        // navigate(`/tams/checking-document`, {    state: record })
+        supervisedCheckingDocument({
+            courseId: record.id,
+        }).then((res) => {
+            if (res.status === 'success') {
+                MySwal.fire({
+                    title: "Kiểm tra cùng khóa thành công",
+                    icon: "success",
+                    customClass: {
+                        confirmButton: "btn btn-success",
+                    },
+                })
+            } else {
+                MySwal.fire({
+                    title: "Kiểm tra cùng khóa thất bại",
+                    icon: "error",
+                    customClass: {
+                        confirmButton: "btn btn-danger",
+                    },
+                })
+            }
+        }).catch(error => {
+            MySwal.fire({
+                title: `${error}`,
+                icon: "error",
+                customClass: {
+                    confirmButton: "btn btn-danger",
+                },
+            })
+        })
     }
 
     const handleDelete = (key) => {
         deleteCourse(key)
             .then((res) => {
-                MySwal.fire({
-                    title: "Xóa đợt kiểm tra thành công",
-                    icon: "success",
-                    customClass: {
-                        confirmButton: "btn btn-success",
-                    },
-                }).then((result) => {
-                    if (currentPage === 1) {
-                        getData(1, rowsPerPage)
-                    } else {
-                        setCurrentPage(1)
-                    }
-                })
+                // MySwal.fire({
+                //     title: "Xóa đợt kiểm tra thành công",
+                //     icon: "success",
+                //     customClass: {
+                //         confirmButton: "btn btn-success",
+                //     },
+                // }).then((result) => {
+                //     if (currentPage === 1) {
+                //         getData(1, rowsPerPage)
+                //     } else {
+                //         setCurrentPage(1)
+                //     }
+                // })
+                getData(1, rowsPerPage)
             })
             .catch((error) => {
                 MySwal.fire({

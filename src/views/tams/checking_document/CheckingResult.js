@@ -77,7 +77,7 @@ import ContentModal from "./modal/ContentModal"
 import { getCheckingResult, getSimilarDocument, getTop3SimilarDocument } from "../../../api/checking_result"
 import { getCourse } from "../../../api/course"
 import { PAGE_DEFAULT, PER_PAGE_DEFAULT } from "../../../utility/constant"
-import { downloadFileCheckingDocumentVersion, downloadTemplateBaoCao, getDuplicateCheckingDocumentVersion, getSimilarityReport } from "../../../api/checking_document_version"
+import { downloadFileCheckingDocumentVersion, downloadTemplateBaoCao, getDuplicateCheckingDocumentVersion, getDuplicateDocumentVersion, getSimilarityReport } from "../../../api/checking_document_version"
 
 const CheckingResult = () => {
     const [loadingData, setLoadingData] = useState(false)
@@ -147,7 +147,7 @@ const CheckingResult = () => {
     const params = useParams()
     const getData = () => {
         setLoadingData(true)
-        getDuplicateCheckingDocumentVersion(Number(params?.id))
+        getDuplicateDocumentVersion(Number(params?.id))
             .then((res) => {
                 const result = res?.data?.map(((item, index) => {
                     return { ...item, _id: item.id, key: index }
@@ -162,13 +162,9 @@ const CheckingResult = () => {
             })
     }
 
-    const getDataSameCourse = (courseId) => {
+    const getDataSameCourse = () => {
         setLoadingData2(true)
-        getSimilarDocument(Number(params?.id), {
-            params: {
-                courseId
-            }
-        })
+        getDuplicateCheckingDocumentVersion(Number(params?.id))
             .then((res) => {
                 const result = res?.data?.map(((item, index) => {
                     return { ...item, _id: item.id, key: index }
@@ -185,8 +181,8 @@ const CheckingResult = () => {
     }
 
     useEffect(() => {
-        getDataSameCourse(courseId)
-    }, [params?.id, courseId])
+        getDataSameCourse()
+    }, [params?.id])
 
     useEffect(() => {
         getAllDataPromises()
@@ -483,34 +479,7 @@ const CheckingResult = () => {
             >
 
                 <Row>
-                    <Col md="12" style={{ display: "flex", justifyContent: "flex-end", gap: 16 }}>
-                        <Dropdown menu={menuProps}>
-                            <Button color="primary">
-                                <Space>
-                                    Báo cáo
-                                    {
-                                        isLoadingReport === true ? <Spinner color="#fff" style={{ width: '14px', height: '14px' }} /> : <DownOutlined />
-                                    }
-                                </Space>
-                            </Button>
-                        </Dropdown>
-                        {/* {ability.can('create', 'PHAN_QUYEN_VAI_TRO') &&
-                            <Button
-                                onClick={handleReport}
-                                color="primary"
-                                className=""
-                                style={{
-                                    width: '120px',
-                                    marginBottom: 0,
-                                    padding: '8px 15px'
-                                }}
-                        
-                            >
-                                Báo cáo {
-                                    isLoadingReport === true ? <Spin /> : ''
-                                }
-                            </Button>
-                        } */}
+                    <Col md="12" style={{ display: "flex", justifyContent: "space-between", gap: 16 }}>
                         {ability.can('create', 'PHAN_QUYEN_VAI_TRO') &&
                             <Link to="/tams/checking-document">
                                 <Button
@@ -528,6 +497,16 @@ const CheckingResult = () => {
                                 </Button>
                             </Link>
                         }
+                        {/* <Dropdown menu={menuProps}>
+                            <Button color="primary">
+                                <Space>
+                                    Báo cáo
+                                    {
+                                        isLoadingReport === true ? <Spinner color="#fff" style={{ width: '14px', height: '14px' }} /> : <DownOutlined />
+                                    }
+                                </Space>
+                            </Button>
+                        </Dropdown> */}
                     </Col>
                     <Col md="12" style={{ textAlign: 'center' }}>
                         <h5>Kết quả trùng lặp so với CSDL mẫu: <span style={{ color: 'red' }}>{location?.state?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}%</span></h5>
@@ -566,9 +545,9 @@ const CheckingResult = () => {
                                 />
                             </Col>
                         </Row>
-                        {loadingData2 === true ? <Spin style={{ position: 'relative', left: '50%' }} /> : <Table
+                        {loadingData === true ? <Spin style={{ position: 'relative', left: '50%' }} /> : <Table
                             columns={columns}
-                            dataSource={data2}
+                            dataSource={data}
                             bordered
                             expandable={{
                                 expandedRowRender: (record) => <ContentModal
@@ -579,10 +558,10 @@ const CheckingResult = () => {
                             expandedRowKeys={expandedRowKeys}
                             onExpand={onExpand}
                             pagination={{
-                                defaultPageSize: 30,
+                                defaultPageSize: 10,
                                 showSizeChanger: true,
                                 pageSizeOptions: ["10", "20", "30"],
-                                total: { count2 },
+                                total: { count },
                                 locale: { items_per_page: "/ trang" },
                                 showSizeChanger: true,
                                 showTotal: (total, range) => <span>Tổng số: {total}</span>,
@@ -591,12 +570,12 @@ const CheckingResult = () => {
                         />}
                     </Col>
                     {
-                        data && selectedCourse !== 1 ? <Col md="12">
+                        data2 && selectedCourse !== 1 ? <Col md="12">
                             <h6 style={{ textTransform: 'uppercase' }}>2. Kết quả trùng lặp với các tài liệu cùng đợt kiểm tra</h6>
                             {/* <Select options={listCourse} placeholder="Chọn đợt kiểm tra" className="mb-1" style={{ float: 'right', width: '200px' }} allowClear onChange={(value) => handleChangeCourse(value)} /> */}
-                            {loadingData === true ? <Spin style={{ position: 'relative', left: '50%' }} /> : <Table
+                            {loadingData2 === true ? <Spin style={{ position: 'relative', left: '50%' }} /> : <Table
                                 columns={columns}
-                                dataSource={data}
+                                dataSource={data2}
                                 bordered
                                 expandable={{
                                     expandedRowRender: (record) => <ContentModal
@@ -607,10 +586,10 @@ const CheckingResult = () => {
                                 expandedRowKeys={expandedRowKeys}
                                 onExpand={onExpand}
                                 pagination={{
-                                    defaultPageSize: 10,
+                                    defaultPageSize: 30,
                                     showSizeChanger: true,
                                     pageSizeOptions: ["10", "20", "30"],
-                                    total: { count },
+                                    total: { count2 },
                                     locale: { items_per_page: "/ trang" },
                                     showSizeChanger: true,
                                     showTotal: (total, range) => <span>Tổng số: {total}</span>,

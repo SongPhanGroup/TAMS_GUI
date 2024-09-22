@@ -10,7 +10,8 @@ import {
     Select,
     Spin,
     Tooltip,
-    DatePicker
+    DatePicker,
+    Dropdown
 } from "antd"
 import React, { useState, Fragment, useEffect, useRef, useContext } from "react"
 import {
@@ -25,14 +26,20 @@ import {
     FormFeedback,
     UncontrolledTooltip,
     CardBody,
+    Spinner,
 } from "reactstrap"
-import { Link, useLocation } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import { Plus, X } from "react-feather"
 import {
     AppstoreAddOutlined,
+    AppstoreOutlined,
     DeleteOutlined,
+    DownCircleFilled,
+    DownCircleOutlined,
     EditOutlined,
+    FileDoneOutlined,
     LockOutlined,
+    RightSquareOutlined,
 } from "@ant-design/icons"
 import { AbilityContext } from '@src/utility/context/Can'
 // import style from "../../../../assets/scss/index.module.scss"
@@ -54,12 +61,14 @@ import VersionModal from "./modal/VersionModal"
 import { PAGE_DEFAULT, PER_PAGE_DEFAULT } from "../../../utility/constant"
 import { getCourse } from "../../../api/course"
 import dayjs from "dayjs"
+import { downloadTemplateBaoCao, getSimilarityReport } from "../../../api/checking_document_version"
 const { RangePicker } = DatePicker
 
 const oneWeekAgo = new Date()
 oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
 
 const CheckingDocument = () => {
+    const navigate = useNavigate()
     const location = useLocation()
     const [loadingData, setLoadingData] = useState(false)
     const ability = useContext(AbilityContext)
@@ -69,7 +78,7 @@ const CheckingDocument = () => {
     const [count, setCount] = useState(0)
     const [totalUser, setTotalUser] = useState(0)
     const [currentPage, setCurrentPage] = useState(1)
-    const [rowsPerPage, setRowsPerpage] = useState(100)
+    const [rowsPerPage, setRowsPerpage] = useState(10)
     const [search, setSearch] = useState("")
     const [courseId, setCourseId] = useState()
     const [startDate, setStartDate] = useState()
@@ -87,6 +96,7 @@ const CheckingDocument = () => {
 
     const [listCourse, setListCourse] = useState([])
     const [listCourseId, setListCourseId] = useState([])
+    const [loadingReports, setLoadingReports] = useState({}) // Tracks loading per record
 
     const getAllDataPromises = async () => {
         const coursePromise = getCourse({ params: { page: PAGE_DEFAULT, perPage: PER_PAGE_DEFAULT, search: '' } })
@@ -235,20 +245,21 @@ const CheckingDocument = () => {
     const handleDelete = (key) => {
         deleteCheckingDocument(key)
             .then((res) => {
-                MySwal.fire({
-                    title: "Xóa kiểm tra tài liệu thành công",
-                    icon: "success",
-                    customClass: {
-                        confirmButton: "btn btn-success",
-                    },
-                }).then((result) => {
-                    if (currentPage === 1) {
-                        getData(1, rowsPerPage)
-                    } else {
-                        setCurrentPage(1)
-                    }
-                    handleModal()
-                })
+                // MySwal.fire({
+                //     title: "Xóa kiểm tra tài liệu thành công",
+                //     icon: "success",
+                //     customClass: {
+                //         confirmButton: "btn btn-success",
+                //     },
+                // }).then((result) => {
+                //     if (currentPage === 1) {
+                //         getData(1, rowsPerPage)
+                //     } else {
+                //         setCurrentPage(1)
+                //     }
+                //     handleModal()
+                // })
+                getData(1, rowsPerPage)
             })
             .catch((error) => {
                 MySwal.fire({
@@ -261,6 +272,50 @@ const CheckingDocument = () => {
                 console.log(error)
             })
     }
+
+    const handleResult = (record) => {
+        navigate(`/tams/checking-document-result/${record?.id}`, { state: record })
+    }
+
+    const handleButtonClick2 = (record) => {
+        navigate(`/tams/detail-result2/${record?.id}`, { state: record })
+    }
+
+    const handleReport = (recordId) => {
+        setLoadingReports((prev) => ({ ...prev, [recordId]: true }))
+        getSimilarityReport({
+            params: {
+                checkingDocumentVersionId: Number(recordId)
+            },
+            responseType: 'blob'
+        })
+            .then(res => {
+                downloadTemplateBaoCao(2, res)
+            })
+            .catch(error => {
+                console.log(error)
+            }).finally(() => {
+                setLoadingReports((prev) => ({ ...prev, [recordId]: false }))
+            })
+    }
+
+    const items = [
+        {
+            label: 'Báo cáo DS trùng lặp cao',
+            key: '2',
+            icon: <DownCircleOutlined />,
+        },
+        {
+            label: 'Báo cáo DS trùng lặp theo khóa',
+            key: '1',
+            icon: <DownCircleFilled />,
+        }
+    ]
+
+    const menuProps = (recordId) => ({
+        items,
+        onClick: () => handleReport(recordId),
+    })
 
     const columns = [
         {
@@ -331,23 +386,6 @@ const CheckingDocument = () => {
                 }
             },
         },
-
-        {
-            title: "Trùng với TL cùng đợt (%)",
-            width: 120,
-            align: "center",
-            render: (text, record, index) => {
-                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) * 100 >= 40 || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) * 100 >= 40) {
-                    return (
-                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal}</span>
-                    )
-                } else {
-                    return (
-                        <span>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal}</span>
-                    )
-                }
-            },
-        },
         {
             title: "Trùng với DL mẫu (%)",
             width: 120,
@@ -360,6 +398,22 @@ const CheckingDocument = () => {
                 } else {
                     return (
                         <span>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}</span>
+                    )
+                }
+            },
+        },
+        {
+            title: "Trùng với TL cùng đợt (%)",
+            width: 120,
+            align: "center",
+            render: (text, record, index) => {
+                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) * 100 >= 40 || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) * 100 >= 40) {
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal}</span>
+                    )
+                } else {
+                    return (
+                        <span>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal}</span>
                     )
                 }
             },
@@ -382,7 +436,7 @@ const CheckingDocument = () => {
             },
         },
         {
-            title: "Ngày tạo",
+            title: "Ngày tạo",
             dataIndex: "createdAt",
             width: 120,
             align: "center",
@@ -399,47 +453,85 @@ const CheckingDocument = () => {
             },
         },
         {
+            title: "Ngày kiểm tra",
+            dataIndex: "supervisedAt",
+            width: 120,
+            align: "center",
+            render: (text, record, index) => {
+                const countVersion = (record.checkingDocumentVersion).length
+                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) * 100 >= 40 || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) * 100 >= 40) {
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{toDateTimeString((record?.checkingDocumentVersion)[countVersion - 1]?.createdAt)}</span>
+                    )
+                } else {
+                    return (
+                        <span>{toDateTimeString((record?.checkingDocumentVersion)[countVersion - 1]?.createdAt)}</span>
+                    )
+                }
+            },
+        },
+        {
             title: "Thao tác",
             width: 100,
             align: "center",
-            render: (record) => (
-                <div style={{ display: "flex", justifyContent: "center" }}>
-                    {ability.can('update', 'KIEM_TRA_TRUNG_LAP_XAP_XI') &&
-                        <>
-                            <Tooltip placement="top" title="Chỉnh sửa" >
-                                <EditOutlined
-                                    style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
-                                    onClick={(e) => handleEdit(record)}
-                                />
-                            </Tooltip>
-                        </>}
-                    {/* { ability.can('update', 'KIEM_TRA_TRUNG_LAP_XAP_XI') && 
-                              <>
-              <AppstoreAddOutlined
-                id={`tooltip_per_${record._id}`}
-                style={{ color: "#09A863", cursor: "pointer" }}
-                onClick={(e) => handlePer(record)}
-              />
-              <UncontrolledTooltip placement="top" target={`tooltip_per_${record._id}`}>
-                Phân quyền
-              </UncontrolledTooltip></>} */}
-                    {ability.can('delete', 'KIEM_TRA_TRUNG_LAP_XAP_XI') &&
-                        <Popconfirm
-                            title="Bạn chắc chắn xóa?"
-                            onConfirm={() => handleDelete(record._id)}
-                            cancelText="Hủy"
-                            okText="Đồng ý"
-                        >
-                            <Tooltip placement="top" title="Xóa" >
-                                <DeleteOutlined
-                                    style={{ color: "red", cursor: "pointer" }}
-                                    id={`tooltip_delete_${record._id}`}
-                                />
-                            </Tooltip>
-                        </Popconfirm>}
-                </div>
-            ),
-        },
+            render: (record) => {
+                const dataVersion = record.checkingDocumentVersion
+                const recordLastVersion = dataVersion[dataVersion.length - 1]
+                return (
+                    <div style={{ display: "flex", justifyContent: "center" }}>
+                        <Tooltip placement="top" title="Kết quả kiểm tra">
+                            <AppstoreOutlined
+                                id={`tooltip_result_${record._id}`}
+                                style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
+                                onClick={() => {
+                                    const recordStandard = { ...recordLastVersion, from: 'checking-specialized' }
+                                    return handleResult(recordStandard)
+                                }}
+                            />
+                        </Tooltip>
+                        <Tooltip placement="top" title="Kết quả chi tiết">
+                            <RightSquareOutlined
+                                style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
+                                onClick={() => {
+                                    const recordStandard = { ...recordLastVersion, from: 'checking-specialized', title: checkingDocumentSelected?.title }
+                                    return handleButtonClick2(recordStandard)
+                                }}
+                            />
+                        </Tooltip>
+                        <Tooltip placement="top" title="Xuất báo cáo">
+                            <Dropdown menu={menuProps(recordLastVersion.id)}>
+                                {
+                                    loadingReports[recordLastVersion.id] ? <Spinner color="#fff" style={{ width: '14px', height: '14px' }} /> : <FileDoneOutlined style={{ cursor: 'pointer', color: '#09A863', marginRight: '1rem' }} />
+                                }
+                            </Dropdown>
+                        </Tooltip>
+                        {ability.can('update', 'KIEM_TRA_TRUNG_LAP_XAP_XI') &&
+                            <>
+                                <Tooltip placement="top" title="Chỉnh sửa" >
+                                    <EditOutlined
+                                        style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
+                                        onClick={(e) => handleEdit(record)}
+                                    />
+                                </Tooltip>
+                            </>}
+                        {ability.can('delete', 'KIEM_TRA_TRUNG_LAP_XAP_XI') &&
+                            <Popconfirm
+                                title="Bạn chắc chắn xóa?"
+                                onConfirm={() => handleDelete(record._id)}
+                                cancelText="Hủy"
+                                okText="Đồng ý"
+                            >
+                                <Tooltip placement="top" title="Xóa" >
+                                    <DeleteOutlined
+                                        style={{ color: "red", cursor: "pointer" }}
+                                        id={`tooltip_delete_${record._id}`}
+                                    />
+                                </Tooltip>
+                            </Popconfirm>}
+                    </div>
+                )
+            },
+        }
     ]
 
     const [expandedRowKeys, setExpandedRowKeys] = useState([])
@@ -459,6 +551,13 @@ const CheckingDocument = () => {
             setEndDate(dayjs(`${currentYear}-12-31`))
         }
     }
+
+    // Callback để cập nhật dữ liệu từ con
+    const handleUpdateFromChild = (updatedRecord) => (
+        setData(prevData => (
+            prevData.map(record => (record.key === updatedRecord.key ? updatedRecord : record))
+        ))
+    )
 
     return (
         <Fragment>
@@ -598,20 +697,29 @@ const CheckingDocument = () => {
                             bordered
                             expandable={{
                                 expandedRowRender: (record) => <VersionModal
-                                    checkingDocumentSelected={record} />,
+                                    checkingDocumentSelected={record} onUpdate={handleUpdateFromChild} />,
                                 rowExpandable: (record) => record.name !== 'Not Expandable',
                                 // expandRowByClick: true
                             }}
                             expandedRowKeys={expandedRowKeys}
                             onExpand={onExpand}
                             pagination={{
-                                defaultPageSize: 10,
+                                current: currentPage,
+                                pageSize: rowsPerPage,
+                                defaultPageSize: rowsPerPage,
                                 showSizeChanger: true,
                                 pageSizeOptions: ["10", "20", "30"],
-                                total: { count },
+                                total: count,
                                 locale: { items_per_page: "/ trang" },
                                 showSizeChanger: true,
                                 showTotal: (total, range) => <span>Tổng số: {total}</span>,
+                                onShowSizeChange: (current, pageSize) => {
+                                    setCurrentPage(current)
+                                    setRowsPerpage(pageSize)
+                                },
+                                onChange: (pageNumber) => {
+                                    setCurrentPage(pageNumber)
+                                }
                             }}
                         />}
                         <AddNewModal

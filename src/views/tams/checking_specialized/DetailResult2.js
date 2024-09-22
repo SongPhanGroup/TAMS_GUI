@@ -36,6 +36,7 @@ const DetailResult2 = () => {
     const [modalContent, setModalContent] = useState(false)
     const [modalSentence, setModalSentence] = useState(false)
     const [selectedDocId, setSelectedDocId] = useState()
+    const [infoDoc, setInfoDoc] = useState({})
     const [selectedSentence, setSelectedSentence] = useState()
 
     const getData = () => {
@@ -229,9 +230,13 @@ const DetailResult2 = () => {
         }
     ]
 
-    const handleGetSentences = (docId) => {
+    const handleGetSentences = (doc) => {
         setModalContent(true)
-        setSelectedDocId(docId)
+        setSelectedDocId(doc?.documentId)
+        setInfoDoc({
+            author: doc?.document?.author,
+            title: doc?.document?.title
+        })
     }
 
     const handleModal = () => {
@@ -248,7 +253,7 @@ const DetailResult2 = () => {
                             <h4 style={{ textTransform: 'uppercase', marginBottom: 0, color: '#1C5385' }}>Báo cáo chi tiết</h4>
                         </Col>
                         <Col md={12}>
-                            <h4 style={{ marginBottom: 0, color: 'red' }}>{location.state.fileName}</h4>
+                            <h4 style={{ marginBottom: 0 }}>Tài liệu kiểm tra: <span style={{ color: 'red' }}>{location.state.title}</span></h4>
                         </Col>
                     </Row>
                 </Col>
@@ -258,9 +263,12 @@ const DetailResult2 = () => {
             </Row>
             <Row gutter={16}>
                 {
-                    loadingHTML === true ? <Spin style={{
-                        padding: '16px'
-                    }} /> : (
+                    loadingHTML === true ? <div style={{display: 'flex', alignItems: 'center'}}>
+                        <Spin style={{
+                            padding: '16px'
+                        }} />
+                        <h5 style={{margin: 0}}>Vui lòng đợi hệ thống khởi tạo lần đầu Báo cáo chi tiết trùng lặp. Thời gian dự kiến 10-30 giây </h5>
+                    </div> : (
                         <Col md={18} style={{ height: '100vh', overflow: 'auto' }}>
                             <Row gutter={16} style={{ padding: '16px', width: '100%', overflow: 'auto' }}>
                                 {/* <h4>
@@ -313,7 +321,7 @@ const DetailResult2 = () => {
                                                     <span style={{ fontWeight: "bold" }}>{doc?.similarity}%</span>
                                                 </Col>
                                                 <Col className='p-0' md={1} style={{ justifySelf: 'right' }}>
-                                                    <RightOutlined style={{ cursor: 'pointer' }} onClick={() => handleGetSentences(doc?.documentId)} />
+                                                    <RightOutlined style={{ cursor: 'pointer' }} onClick={() => handleGetSentences(doc)} />
                                                 </Col>
                                             </Row>
                                         )
@@ -324,7 +332,7 @@ const DetailResult2 = () => {
                     )
                 }
             </Row>
-            <ContentModalFromHTML open={modalContent} docId={selectedDocId} handleModal={handleModal} />
+            <ContentModalFromHTML open={modalContent} docId={selectedDocId} handleModal={handleModal} infoDoc={infoDoc} />
             <SentenceModal open={modalSentence} sentence={selectedSentence} handleModal={handleModal} />
         </div >
     )

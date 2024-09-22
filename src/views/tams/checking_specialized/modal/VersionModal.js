@@ -9,7 +9,9 @@ import {
     Collapse,
     Checkbox,
     Spin,
-    Tooltip
+    Tooltip,
+    Dropdown,
+    Space
 } from "antd"
 import React, { useState, Fragment, useEffect, useRef, useContext } from "react"
 import {
@@ -24,6 +26,7 @@ import {
     FormFeedback,
     UncontrolledTooltip,
     CardBody,
+    Spinner,
 } from "reactstrap"
 import { Link, NavLink, useNavigate } from "react-router-dom"
 import { Plus, X } from "react-feather"
@@ -34,7 +37,11 @@ import {
     LockOutlined,
     AppstoreOutlined,
     RightCircleOutlined,
-    RightSquareOutlined
+    RightSquareOutlined,
+    DownOutlined,
+    DownCircleFilled,
+    DownCircleOutlined,
+    FileDoneOutlined
 
 } from "@ant-design/icons"
 import { AbilityContext } from "@src/utility/context/Can"
@@ -49,11 +56,11 @@ import { useForm, Controller } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import classnames from "classnames"
 import AddNewCheckingDocumentVersion from "./AddNewVersionModal"
-import { deleteCheckingDocumentVersion, getCheckingDocumentVersion } from "../../../../api/checking_document_version"
+import { deleteCheckingDocumentVersion, downloadTemplateBaoCao, getCheckingDocumentVersion, getSimilarityReport } from "../../../../api/checking_document_version"
 import { detailCheckingDocument } from "../../../../api/checking_document"
 import EditCheckingDocumentVersion from "./EditVersionModal"
 
-const VersionModal = ({ checkingDocumentSelected, }) => {
+const VersionModal = ({ checkingDocumentSelected, onUpdate }) => {
     const [loadingData, setLoadingData] = useState(false)
     const navigate = useNavigate()
     const MySwal = withReactContent(Swal)
@@ -69,7 +76,7 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
     const [isAdd, setIsAdd] = useState(false)
     const [isEdit, setIsEdit] = useState(false)
     const [checkingDocumentVersionSelected, setCheckingDocumentVersionSelected] = useState()
-    const [showIframe, setShowIframe] = useState(false)
+    const [loadingReports, setLoadingReports] = useState({}) // Tracks loading per record
 
     const getData = () => {
         setLoadingData(true)
@@ -115,16 +122,17 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
     const handleDelete = (record) => {
         deleteCheckingDocumentVersion(record?.id)
             .then((res) => {
-                MySwal.fire({
-                    title: "Xóa thành công",
+                // MySwal.fire({
+                //     title: "Xóa thành công",
 
-                    icon: "success",
-                    customClass: {
-                        confirmButton: "btn btn-success",
-                    },
-                }).then((result) => {
-                    getData()
-                })
+                //     icon: "success",
+                //     customClass: {
+                //         confirmButton: "btn btn-success",
+                //     },
+                // }).then((result) => {
+                //     getData()
+                // })
+                getData()
             })
             .catch((err) => {
                 console.log(err)
@@ -140,6 +148,43 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
                 })
             })
     }
+
+    const handleReport = (recordId) => {
+        setLoadingReports((prev) => ({ ...prev, [recordId]: true }))
+        getSimilarityReport({
+            params: {
+                checkingDocumentVersionId: Number(recordId)
+            },
+            responseType: 'blob'
+        })
+            .then(res => {
+                downloadTemplateBaoCao(2, res)
+            })
+            .catch(error => {
+                console.log(error)
+            }).finally(() => {
+                setLoadingReports((prev) => ({ ...prev, [recordId]: false }))
+            })
+    }
+
+    const items = [
+        {
+            label: 'Báo cáo DS trùng lặp cao',
+            key: '2',
+            icon: <DownCircleOutlined />,
+        },
+        {
+            label: 'Báo cáo DS trùng lặp theo khóa',
+            key: '1',
+            icon: <DownCircleFilled />,
+        }
+    ]
+
+    const menuProps = (recordId) => ({
+        items,
+        onClick: () => handleReport(recordId),
+    })
+
     const columns = [
         {
             title: "STT",
@@ -197,13 +242,6 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
             render: (record) => {
                 return (
                     <div style={{ display: "flex", justifyContent: "center" }}>
-                        <Tooltip placement="top" title="Chỉnh sửa">
-                            <EditOutlined
-                                id={`tooltip_edit_${record._id}`}
-                                style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
-                                onClick={(e) => handleEdit(record)}
-                            />
-                        </Tooltip>
                         <Tooltip placement="top" title="Kết quả kiểm tra">
                             <AppstoreOutlined
                                 id={`tooltip_result_${record._id}`}
@@ -214,22 +252,27 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
                                 }}
                             />
                         </Tooltip>
-                        {/* <RightCircleOutlined
-                            id={`tooltip_detail1_${record._id}`}
-                            style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
-                            onClick={() => handleButtonClick(record)}
-                        />
-                        <UncontrolledTooltip placement="top" target={`tooltip_detail1_${record._id}`}
-                        >
-                            Kết quả chi tiết phiên bản 1
-                        </UncontrolledTooltip> */}
                         <Tooltip placement="top" title="Kết quả chi tiết">
                             <RightSquareOutlined
                                 style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
                                 onClick={() => {
-                                    const recordStandard = { ...record, from: 'checking-specialized' }
+                                    const recordStandard = { ...record, from: 'checking-specialized', title: checkingDocumentSelected?.title }
                                     return handleButtonClick2(recordStandard)
                                 }}
+                            />
+                        </Tooltip>
+                        <Tooltip placement="top" title="Xuất báo cáo">
+                            <Dropdown menu={menuProps(record.id)}>
+                                {
+                                    loadingReports[record.id] ? <Spinner color="#fff" style={{ width: '14px', height: '14px' }} /> : <FileDoneOutlined style={{ cursor: 'pointer', color: '#09A863', marginRight: '1rem' }} />
+                                }
+                            </Dropdown>
+                        </Tooltip>
+                        <Tooltip placement="top" title="Chỉnh sửa">
+                            <EditOutlined
+                                id={`tooltip_edit_${record._id}`}
+                                style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
+                                onClick={(e) => handleEdit(record)}
                             />
                         </Tooltip>
                         <Popconfirm
@@ -240,11 +283,11 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
                         >
                             <Tooltip placement="top" title="Xóa">
                                 <DeleteOutlined
-                                    style={{ color: "red", cursor: "pointer", marginRight: '1rem' }}
+                                    style={{ color: "red", cursor: "pointer" }}
                                 />
                             </Tooltip>
                         </Popconfirm>
-
+                        
                     </div>
                 )
             },
@@ -324,7 +367,7 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
             />}
 
             <AddNewCheckingDocumentVersion open={isAdd} handleModal={handleModal} getData={getData} rowsPerPage={rowsPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} checkingDocumentSelected={checkingDocumentSelected} listSubmit={listSubmit} />
-            {checkingDocumentVersionSelected && <EditCheckingDocumentVersion open={isEdit} handleModal={handleModal} getData={getData} rowsPerPage={rowsPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} infoEditVersion={checkingDocumentVersionSelected} listSubmit={listSubmit} dataCheckingDocument={checkingDocumentSelected} />}
+            {checkingDocumentVersionSelected && <EditCheckingDocumentVersion open={isEdit} handleModal={handleModal} getData={getData} rowsPerPage={rowsPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} infoEditVersion={checkingDocumentVersionSelected} listSubmit={listSubmit} dataCheckingDocument={checkingDocumentSelected} onUpdate={onUpdate} />}
         </Card>
     )
 }

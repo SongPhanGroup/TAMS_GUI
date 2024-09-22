@@ -12,6 +12,12 @@ export const postCheckingDocument = async (body) => {
   return res
 }
 
+export const supervisedCheckingDocument = async (body) => {
+  const uri = `/checking-document/result-last-version`
+  const res = await API_TAMS.post(uri, body)
+  return res
+}
+
 export const editCheckingDocument = async (id, body) => {
   const uri = `/checking-document/${id}`
   const res = await API_TAMS.put(uri, body)

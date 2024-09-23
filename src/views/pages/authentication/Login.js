@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom'
 // ** Custom Hooks
 import { useSkin } from '@hooks/useSkin'
 import useJwt from '@src/auth/jwt/useJwt'
-import logo from '@src/assets/images/logo/logo.png'
+import logo from '@src/assets/images/hvlq/logo_hvlq_1280X1280.PNG'
 import navigation from '@src/navigation/vertical'
 
 // ** Third Party Components
@@ -80,7 +80,7 @@ const Login = () => {
     clearErrors,
     formState: { errors }
   } = useForm()
-  const illustration = skin === 'dark' ? 'login_cover.jpg' : 'login_cover.jpg'
+  const illustration = skin === 'dark' ? 'login-v2-dark.svg' : 'login-v2.svg'
   const source = require(`@src/assets/images/pages/${illustration}`).default
 
   selected.current = []
@@ -244,7 +244,7 @@ const Login = () => {
           <Col className='px-xl-2 mx-auto' sm='8' md='6' lg='12'>
             <img className='fallback-logo d-flex m-auto' src={logo} alt='logo' style={{ width: "12rem" }} />
             <CardTitle tag='h1' className='fw-bold mb-1' style={{ textAlign: 'center', marginBottom: '4rem', marginTop: '1rem' }}>
-              Học viện Chính trị
+              Học viện Lục Quân
             </CardTitle>
             <CardTitle tag='h2' className='fw-bold mb-1' style={{ textAlign: 'center', marginTop: '2rem' }}>
               Phần mềm phát hiện đạo văn

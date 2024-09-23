@@ -35,15 +35,15 @@ export default [
     resource: 'KIEM_TRA_TRUNG_LAP_TUYET_DOI',
     role: 0
   },
-  {
-    id: 'checking-specialized',
-    title: 'KT trùng lặp xấp xỉ',
-    icon: <CheckOutlined size={12} />,
-    navLink: '/tams/checking-specialized',
-    action: 'read',
-    resource: 'KIEM_TRA_TRUNG_LAP_XAP_XI',
-    role: 0
-  },
+  // {
+  //   id: 'checking-specialized',
+  //   title: 'KT trùng lặp xấp xỉ',
+  //   icon: <CheckOutlined size={12} />,
+  //   navLink: '/tams/checking-specialized',
+  //   action: 'read',
+  //   resource: 'KIEM_TRA_TRUNG_LAP_XAP_XI',
+  //   role: 0
+  // },
   {
     id: 'course',
     title: 'QL đợt kiểm tra',

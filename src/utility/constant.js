@@ -67,15 +67,15 @@ export const LIST_ROLE = [
         action: "read",
         resource: 'KIEM_TRA_TRUNG_LAP_TUYET_DOI'
     },
-    {
-        id: 'training',
-        title: 'Kiểm tra trùng lặp xấp xỉ',
-        icon: "BookOpen",
-        role: 0,
-        description: '/tams/checking-specialized',
-        action: 'read',
-        resource: 'KIEM_TRA_TRUNG_LAP_XAP_XI'
-    },
+    // {
+    //     id: 'training',
+    //     title: 'Kiểm tra trùng lặp xấp xỉ',
+    //     icon: "BookOpen",
+    //     role: 0,
+    //     description: '/tams/checking-specialized',
+    //     action: 'read',
+    //     resource: 'KIEM_TRA_TRUNG_LAP_XAP_XI'
+    // },
     {
         id: 'facilities',
         title: 'QL kho tài liệu mẫu',

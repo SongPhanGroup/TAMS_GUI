@@ -104,9 +104,9 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate }) => {
         setIsEdit(true)
     }
 
-    const handleResult = (record) => {
-        navigate(`/tams/checking-specialized-result/${record?.id}`, { state: record })
-    }
+    // const handleResult = (record) => {
+    //     navigate(`/tams/checking-specialized-result/${record?.id}`, { state: record })
+    // }
 
     const handleButtonClick = (record) => {
         navigate(`/tams/detail-result/${record?.id}`, { state: record })

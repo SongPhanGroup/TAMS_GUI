@@ -28,10 +28,10 @@ const TamsRoutes = [
         path: '/tams/checking-document',
         element: <CheckingDocument />
     },
-    {
-        path: '/tams/checking-specialized',
-        element: <CheckingSpecialized />
-    },
+    // {
+    //     path: '/tams/checking-specialized',
+    //     element: <CheckingSpecialized />
+    // },
     {
         path: '/tams/checking-document-result/:id',
         element: <CheckingDocumentResult />

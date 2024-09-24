@@ -29,7 +29,6 @@ const SimilarityDocInDetailContentModal = ({ open, docId, handleModal, infoDoc }
     const [rowsPerPage, setRowsPerpage] = useState(10)
     const [count, setCount] = useState()
 
-
     const getData = () => {
         setLoadingData(true)
         getListSentenceByCheckingResult({

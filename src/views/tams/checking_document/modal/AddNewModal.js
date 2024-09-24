@@ -30,6 +30,7 @@ import { postCheckingDocument } from "../../../../api/checking_document"
 import { getCourse } from "../../../../api/course"
 import classNames from "classnames"
 import { postCheckingDocumentVersion } from "../../../../api/checking_document_version"
+import toast from "react-hot-toast"
 
 const AddNewCheckingDocument = ({ open, handleModal, getData, data, onUpdate, setHasVersion }) => {
     const AddNewCheckingDocumentSchema = yup.object().shape({
@@ -147,7 +148,6 @@ const AddNewCheckingDocument = ({ open, handleModal, getData, data, onUpdate, se
                 //     description: data.description ?? ""
                 // }
                 // handlePropertyChange(newRecord)
-                getData()
                 setSuccessMessage(`Thêm mới ${file.name} thành công!!!`)
                 setTimeout(() => setSuccessMessage(''), 2000)
                 const formData = new FormData()
@@ -158,15 +158,18 @@ const AddNewCheckingDocument = ({ open, handleModal, getData, data, onUpdate, se
                 formData.append('checkingDocumentId', result?.data?.id)
                 postCheckingDocumentVersion(formData).then(result => {
                     if (result.status === 'success') {
-                        Swal.fire({
-                            title: "Thêm mới phiên bản kiểm tra thành công",
-                            text: "",
-                            icon: "success",
-                            customClass: {
-                                confirmButton: "btn btn-success"
-                            }
-                        })
+                        // Swal.fire({
+                        //     title: "Thêm mới phiên bản kiểm tra thành công",
+                        //     text: "",
+                        //     icon: "success",
+                        //     customClass: {
+                        //         confirmButton: "btn btn-success"
+                        //     }
+                        // })
+                        toast.success('Thêm mới tài liệu kiểm tra thành công')
                         getData()
+                    } else {
+                        toast.error('Thêm mới tài liệu kiểm tra thất bại')
                     }
                     // getData()
                 }).catch(error => {

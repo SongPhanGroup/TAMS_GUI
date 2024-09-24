@@ -59,7 +59,7 @@ import { detailCheckingDocument } from "../../../../api/checking_document"
 import EditCheckingDocumentVersion from "./EditVersionModal"
 import { toDateTimeString } from "../../../../utility/Utils"
 
-const VersionModal = ({ checkingDocumentSelected, onUpdate, lastVersionDate }) => {
+const VersionModal = ({ checkingDocumentSelected, onUpdate }) => {
     const [loadingData, setLoadingData] = useState(false)
     const navigate = useNavigate()
     const MySwal = withReactContent(Swal)
@@ -106,12 +106,8 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate, lastVersionDate }) =
         navigate(`/tams/checking-document-result/${record?.id}`, { state: record })
     }
 
-    const handleButtonClick = (record) => {
-        navigate(`/tams/detail-result/${record?.id}`, { state: record })
-    }
-
     const handleButtonClick2 = (record) => {
-        navigate(`/tams/detail-result2/${record?.id}`, { state: record })
+        navigate(`/tams/detailTD-checking-version-result/${record?.id}`, { state: record })
     }
 
     useEffect(() => {
@@ -172,11 +168,11 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate, lastVersionDate }) =
             key: '2',
             icon: <DownCircleOutlined />,
         },
-        {
-            label: 'Báo cáo DS trùng lặp theo đợt',
-            key: '1',
-            icon: <DownCircleFilled />,
-        }
+        // {
+        //     label: 'Báo cáo DS trùng lặp theo đợt',
+        //     key: '1',
+        //     icon: <DownCircleFilled />,
+        // }
     ]
 
     const menuProps = (recordId) => ({
@@ -375,7 +371,7 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate, lastVersionDate }) =
                 }}
             />}
 
-            <AddNewCheckingDocumentVersion open={isAdd} handleModal={handleModal} getData={getData} rowsPerPage={rowsPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} checkingDocumentSelected={checkingDocumentSelected} listSubmit={listSubmit} lastVersionDate={lastVersionDate} onUpdate={onUpdate} />
+            <AddNewCheckingDocumentVersion open={isAdd} handleModal={handleModal} getData={getData} rowsPerPage={rowsPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} checkingDocumentSelected={checkingDocumentSelected} listSubmit={listSubmit} onUpdate={onUpdate} />
             {checkingDocumentVersionSelected && <EditCheckingDocumentVersion open={isEdit} handleModal={handleModal} getData={getData} rowsPerPage={rowsPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} infoEditVersion={checkingDocumentVersionSelected} listSubmit={listSubmit} dataCheckingDocument={checkingDocumentSelected} onUpdate={onUpdate} />}
         </Card>
     )

@@ -49,7 +49,7 @@ import { deleteCheckingDocumentVersion, getCheckingDocumentVersion } from "../..
 import { detailCheckingDocument } from "../../../../api/checking_document"
 import { getListSentenceByCheckingResult } from "../../../../api/checking_result_by_word"
 
-const ContentModal = ({ listSentenceByCheckingResult }) => {
+const SimilarityDocContentModal = ({ listSentenceByCheckingResult }) => {
     const params = useParams()
     const [loadingData, setLoadingData] = useState(false)
     const navigate = useNavigate()
@@ -167,7 +167,7 @@ const ContentModal = ({ listSentenceByCheckingResult }) => {
             align: "center",
             width: 100,
             render: (text, record, index) => (
-                <span>{(record?.similarity).toFixed(2)}</span>
+                <span>{(record?.similarity).toFixed(2) * 100}</span>
             ),
         }
     ]
@@ -202,5 +202,5 @@ const ContentModal = ({ listSentenceByCheckingResult }) => {
         </Card>
     )
 }
-export default ContentModal
+export default SimilarityDocContentModal
 

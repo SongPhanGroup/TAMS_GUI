@@ -22,8 +22,8 @@ import { AbilityContext } from '@src/utility/context/Can'
 const Error = lazy(() => import('../views/pages/misc/Error'))
 const Login = lazy(() => import('../views/pages/authentication/Login'))
 const NotAuthorized = lazy(() => import('../views/pages/misc/NotAuthorized'))
-const DetailCheckingDocumentResult = lazy(() => import('../views/tams/checking_document/DetailResult'))
-const DetailCheckingDocumentResult2 = lazy(() => import('../views/tams/checking_specialized/DetailResult2'))
+const DetailCheckingDocumentVersionResultTD = lazy(() => import('../views/tams/checking_document/DetailCheckingVersionResult'))
+const DetailCheckingDocumentVersionResultXX = lazy(() => import('../views/tams/checking_specialized/DetailCheckingVersionResult'))
 
 const _handlePermission = (memberInfo) => {
   const permissionArr = memberInfo.permission ? JSON.parse(memberInfo.permission) : []
@@ -76,14 +76,14 @@ const Router = () => {
       children: [{ path: '/auth/not-auth', element: <NotAuthorized /> }]
     },
     {
-      path: '/tams/detail-result/:id',
+      path: '/tams/detailTD-checking-version-result/:id',
       element: <BlankLayout />,
-      children: [{ path: '/tams/detail-result/:id', element: <DetailCheckingDocumentResult /> }]
+      children: [{ path: '/tams/detailTD-checking-version-result/:id', element: <DetailCheckingDocumentVersionResultTD /> }]
     },
     {
-      path: '/tams/detail-result2/:id',
+      path: '/tams/detailXX-checking-version-result/:id',
       element: <BlankLayout />,
-      children: [{ path: '/tams/detail-result2/:id', element: <DetailCheckingDocumentResult2 /> }]
+      children: [{ path: '/tams/detailXX-checking-version-result/:id', element: <DetailCheckingDocumentVersionResultXX /> }]
     },
     {
       path: '*',

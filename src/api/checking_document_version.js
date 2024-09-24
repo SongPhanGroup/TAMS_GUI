@@ -61,6 +61,12 @@ export const getDuplicateSentenceDocument = async (query, id) => {
   return res
 }
 
+export const getDuplicateSentenceCheckingDocument = async (query, id) => {
+  const uri = `/checking-document-version/${id}/duplicate-sentence-checking-document`
+  const res = await API_TAMS.get(uri, query)
+  return res
+}
+
 export const downloadTemplateBaoCao = async (id, body_) => {
   const uri = `http://api.khoanhkhac.vn:3003/templater/xlsx/${id}/file`
 

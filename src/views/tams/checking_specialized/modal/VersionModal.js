@@ -108,12 +108,8 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate }) => {
         navigate(`/tams/checking-specialized-result/${record?.id}`, { state: record })
     }
 
-    const handleButtonClick = (record) => {
-        navigate(`/tams/detail-result/${record?.id}`, { state: record })
-    }
-
     const handleButtonClick2 = (record) => {
-        navigate(`/tams/detail-result2/${record?.id}`, { state: record })
+        navigate(`/tams/detailXX-checking-version-result/${record?.id}`, { state: record })
     }
 
     useEffect(() => {
@@ -174,11 +170,11 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate }) => {
             key: '2',
             icon: <DownCircleOutlined />,
         },
-        {
-            label: 'Báo cáo DS trùng lặp theo đợt',
-            key: '1',
-            icon: <DownCircleFilled />,
-        }
+        // {
+        //     label: 'Báo cáo DS trùng lặp theo đợt',
+        //     key: '1',
+        //     icon: <DownCircleFilled />,
+        // }
     ]
 
     const menuProps = (recordId) => ({

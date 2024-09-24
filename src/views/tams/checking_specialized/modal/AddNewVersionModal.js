@@ -26,6 +26,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import '@styles/react/libs/react-select/_react-select.scss'
 import Swal from 'sweetalert2'
 import { postCheckingDocumentVersion } from "../../../../api/checking_document_version_by_word"
+import toast from "react-hot-toast"
 
 const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDocumentSelected }) => {
     const AddNewCheckingDocumentVersionSchema = yup.object().shape({
@@ -62,28 +63,30 @@ const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDoc
         setLoadingAdd(true)
         const formData = new FormData()
         formData.append('file', file)
-        formData.append('description', data.description ?? "    ")
+        formData.append('description', data.description ?? "")
         formData.append('checkingDocumentId', checkingDocumentSelected?.id)
         postCheckingDocumentVersion(formData).then(result => {
             if (result.status === 'success') {
-                Swal.fire({
-                    title: "Thêm mới phiên bản kiểm tra thành công",
-                    text: "",
-                    icon: "success",
-                    customClass: {
-                        confirmButton: "btn btn-success"
-                    }
-                })
+                // Swal.fire({
+                //     title: "Thêm mới phiên bản kiểm tra thành công",
+                //     text: "",
+                //     icon: "success",
+                //     customClass: {
+                //         confirmButton: "btn btn-success"
+                //     }
+                // })
+                toast.success('Thêm mới phiên bản kiểm tra thành công!')
                 getData()
             } else {
-                Swal.fire({
-                    title: "Thêm mới phiên bản kiểm tra thất bại",
-                    text: "Không thể thêm phiên bản mới do đợt kiểm tra đã bị khóa!",
-                    icon: "error",
-                    customClass: {
-                        confirmButton: "btn btn-danger"
-                    }
-                })
+                // Swal.fire({
+                //     title: "Thêm mới phiên bản kiểm tra thất bại",
+                //     text: "Không thể thêm phiên bản mới do đợt kiểm tra đã bị khóa!",
+                //     icon: "error",
+                //     customClass: {
+                //         confirmButton: "btn btn-danger"
+                //     }
+                // })
+                toast.error('Thêm mới phiên bản kiểm tra thất bại!')
             }
             handleCloseModal()
         }).catch(error => {

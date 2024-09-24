@@ -557,9 +557,6 @@ const CheckingDocument = () => {
                             </span>
                         )
                     }
-                } else {
-                    // Show spinner if no versions are available
-                    return <span style={{ color: 'blue' }}>Đang xử lý</span>
                 }
             },
         },

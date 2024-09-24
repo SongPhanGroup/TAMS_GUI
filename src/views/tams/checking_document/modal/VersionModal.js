@@ -208,9 +208,13 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate }) => {
             align: "center",
             width: 100,
             render: (text, record, index) => {
-                return (
-                    <span>{record?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}</span>
-                )
+                if (record?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) {
+                    return (
+                        <span>{record?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}</span>
+                    )
+                } else {
+                    return <span style={{ color: 'blue', fontWeight: '600' }}>Đang xử lý</span>
+                }
             }
         },
         {

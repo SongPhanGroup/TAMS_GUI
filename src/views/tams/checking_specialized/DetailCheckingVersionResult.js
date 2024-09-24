@@ -10,7 +10,7 @@ import {
 import mqtt from 'mqtt'
 import { Breadcrumb, Layout, Menu, theme, Row, Col, Card, Badge, Tag, Progress, Spin } from 'antd'
 import { useLocation, useParams } from 'react-router-dom'
-import { getCheckingResultHTML, getCheckingResultHTML2, getSimilarDocument, getSimilarDocumentWithoutThreshHold } from '../../../api/checking_result'
+import { getCheckingResultHTML, getSimilarDocument, getSimilarDocumentWithoutThreshHold } from '../../../api/checking_result'
 import { getListDocFromSetenceId } from '../../../api/checking_sentence'
 import './hightlight.css'
 import { X } from 'react-feather'
@@ -41,7 +41,7 @@ const DetailCheckingDocumentVersionResult = () => {
 
     const getData = () => {
         setLoadingHTML(true)
-        getCheckingResultHTML2({
+        getCheckingResultHTML({
             params: {
                 id: location?.state?.id,
                 type: 1

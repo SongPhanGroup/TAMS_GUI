@@ -33,12 +33,6 @@ export const getCheckingResult = async (query) => {
 }
 
 export const getCheckingResultHTML = async (query) => {
-  const uri = `/getHtmlResult`
-  const res = await API_TAMS.get(uri, query)
-  return res
-}
-
-export const getCheckingResultHTML2 = async (query) => {
   const uri = `/getHtmlResult2`
   const res = await API_TAMS.get(uri, query)
   return res

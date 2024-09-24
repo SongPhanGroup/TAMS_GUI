@@ -97,6 +97,9 @@ const CheckingDocument = () => {
     const [listCourse, setListCourse] = useState([])
     const [listCourseId, setListCourseId] = useState([])
     const [loadingReports, setLoadingReports] = useState({}) // Tracks loading per record
+    const [lastVersionCheckingDoc, setLastVersionCheckingDoc] = useState({
+        // supervisedAt: '', similarityDoc: '', description: ''
+    })
 
     const getAllDataPromises = async () => {
         const coursePromise = getCourse({ params: { page: PAGE_DEFAULT, perPage: PER_PAGE_DEFAULT, search: '' } })
@@ -465,14 +468,27 @@ const CheckingDocument = () => {
             align: "center",
             render: (text, record, index) => {
                 const countVersion = (record.checkingDocumentVersion).length
-                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= 30 || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= 30) {
-                    return (
-                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{toDateTimeString((record?.checkingDocumentVersion)[countVersion - 1]?.createdAt)}</span>
-                    )
-                } else {
-                    return (
-                        <span>{toDateTimeString((record?.checkingDocumentVersion)[countVersion - 1]?.createdAt)}</span>
-                    )
+                if (countVersion > 0) {
+                    const similarityType1 = record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal || 0
+                    const similarityType2 = record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal || 0
+
+                    const createdAt = toDateTimeString(record?.checkingDocumentVersion[countVersion - 1]?.createdAt)
+                    // setSupervisedAt(createdAt)
+
+                    // Check the similarity and decide color style
+                    if (lastVersionCheckingDoc.supervisedAt) {
+                        return (
+                            <span style={{ whiteSpace: 'break-spaces', color: (similarityType1 >= 30 || similarityType2 >= 30) ? 'red' : 'inherit', fontWeight: (similarityType1 >= 30 || similarityType2 >= 30) ? '600' : 'normal' }}>
+                                {lastVersionCheckingDoc.supervisedAt}
+                            </span>
+                        )
+                    } else {
+                        return (
+                            <span style={{ whiteSpace: 'break-spaces', color: (similarityType1 >= 30 || similarityType2 >= 30) ? 'red' : 'inherit', fontWeight: (similarityType1 >= 30 || similarityType2 >= 30) ? '600' : 'normal' }}>
+                                {createdAt}
+                            </span>
+                        )
+                    }
                 }
             },
         },
@@ -558,12 +574,19 @@ const CheckingDocument = () => {
         }
     }
 
+    const [loadingUpdate, setLoadingUpdate] = useState(false)
+
     // Callback để cập nhật dữ liệu từ con
-    const handleUpdateFromChild = (updatedRecord) => (
-        setData(prevData => (
-            prevData.map(record => (record.key === updatedRecord.key ? updatedRecord : record))
-        ))
-    )
+    const handleUpdateFromChild = async (updatedRecord) => {
+        setLoadingUpdate(true)
+        try {
+            setLastVersionCheckingDoc(updatedRecord)
+        } catch (error) {
+            console.error("Error updating data", error)
+        } finally {
+            setLoadingUpdate(false)
+        }
+    }
 
     return (
         <Fragment>
@@ -656,20 +679,6 @@ const CheckingDocument = () => {
                                     >
                                         Ngày kiểm tra
                                     </Label>
-                                    {/* <Flatpickr
-                                        style={{ padding: '0.35rem 1rem' }}
-                                        className="form-control invoice-edit-input date-picker mb-50"
-                                        options={{
-                                            mode: "range",
-                                            dateFormat: "d-m-Y", // format ngày giờ
-                                            locale: {
-                                                ...Vietnamese
-                                            },
-                                            defaultDate: [oneWeekAgo, new Date()]
-                                        }}
-                                        placeholder="dd/mm/yyyy"
-                                        onChange={(value => handleChangeDate(value))}
-                                    /> */}
                                     <RangePicker
                                         style={{
                                             width: "100%",
@@ -705,7 +714,6 @@ const CheckingDocument = () => {
                                 expandedRowRender: (record) => <VersionModal
                                     checkingDocumentSelected={record} onUpdate={handleUpdateFromChild} />,
                                 rowExpandable: (record) => record.name !== 'Not Expandable',
-                                // expandRowByClick: true
                             }}
                             expandedRowKeys={expandedRowKeys}
                             onExpand={onExpand}

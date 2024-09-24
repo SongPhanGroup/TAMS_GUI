@@ -44,9 +44,7 @@ const DetailCheckingDocumentVersionResult = () => {
                 type: 1
             }
         }).then(result => {
-            if (result.status === 'success') {
-                setHTMLResult(result)
-            } 
+            setHTMLResult(result)
         }).catch(error => {
             console.log(error)
 
@@ -77,13 +75,7 @@ const DetailCheckingDocumentVersionResult = () => {
     }
 
     useEffect(() => {
-        const fetchData = async () => {
-            getData()
-            if (htmlResult === undefined) {
-                getData()
-            }
-        }
-        fetchData()
+        getData()
     }, [])
 
     useEffect(() => {
@@ -242,7 +234,7 @@ const DetailCheckingDocumentVersionResult = () => {
                     loadingHTML === true ? <Spin style={{
                         padding: '16px'
                     }} /> : (
-                        htmlResult !== undefined && <Col md={18} style={{ height: '100vh', overflow: 'auto' }}>
+                        <Col md={18} style={{ height: '100vh', overflow: 'auto' }}>
                             <Row gutter={16} style={{ padding: '16px', width: '100%', overflow: 'auto' }}>
                                 {/* <h4>
                                 {location?.state?.fileName}

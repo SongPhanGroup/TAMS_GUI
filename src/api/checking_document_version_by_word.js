@@ -10,6 +10,7 @@ export const getCheckingDocumentVersion = async (query) => {
 
 export const postCheckingDocumentVersion = async (body) => {
     const uri = `/checking-document-version-by-word`
-    const res = await API_FormData_CheckingUpload_XX.post(uri, body)
+    const res = await API_FormData.post(uri, body)
+    // const res = await API_FormData_CheckingUpload_XX.post(uri, body)
     return res
 }

@@ -30,6 +30,7 @@ import { getCourse } from "../../../../api/course"
 import classNames from "classnames"
 import { postCheckingDocumentVersion } from "../../../../api/checking_document_version_by_word"
 import toast from "react-hot-toast"
+import { postCheckingDocument } from "../../../../api/checking_document"
 
 const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
     const AddNewCheckingDocumentSchema = yup.object().shape({
@@ -126,9 +127,9 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
                 setTimeout(() => setSuccessMessage(''), 2000)
                 const formData = new FormData()
                 formData.append('file', file)
-                if (data.description) {
-                    formData.append('description', data.description)
-                }
+                // if (data.description) {
+                //     formData.append('description', data.description)
+                // }
                 formData.append('checkingDocumentId', result?.data?.id)
                 postCheckingDocumentVersion(formData).then(result => {
                     if (result.status === 'success') {

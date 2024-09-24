@@ -135,67 +135,99 @@ const CheckingDocument = () => {
         setListCourseId(courseIds)
     }
 
+    // const getData = (page, limit, search, courseIds, startDate, endDate) => {
+    //     setLoadingData(true)
+    //     if (location?.state) {
+    //         getCheckingDocument({
+    //             params: {
+    //                 page: currentPage,
+    //                 limit: rowsPerPage,
+    //                 ...(search && search !== "" && { search }),
+    //                 courseIds: location?.state?.id,
+    //                 ...(startDate && { startDate }),
+    //                 ...(endDate && { endDate })
+    //             }
+    //         })
+    //             .then((res) => {
+    //                 // const result = res?.data?.map(((item, index) => {
+    //                 //     return { ...item, _id: item.id, key: index }
+    //                 // }))
+    //                 const result = res?.data
+    //                     ?.filter(item => listCourseId.includes(item.courseId)) // Lọc dựa trên courseId
+    //                     .map((item, index) => {
+    //                         return { ...item, _id: item.id, key: index }
+    //                     })
+    //                 setData(result)
+    //                 setCount(res?.pagination?.totalRecords)
+    //             })
+    //             .catch((err) => {
+    //                 console.log(err)
+    //             }).finally(() => {
+    //                 setLoadingData(false)
+    //             })
+    //     } else {
+    //         getCheckingDocument({
+    //             params: {
+    //                 page,
+    //                 limit,
+    //                 ...(search && search !== "" && { search }),
+    //                 ...(courseIds && { courseIds }),
+    //                 ...(startDate && { startDate }),
+    //                 ...(endDate && { endDate })
+    //             }
+    //         })
+    //             .then((res) => {
+    //                 // console.log(res)
+    //                 // const result = res?.data?.map(((item, index) => {
+    //                 //     return { ...item, _id: item.id, key: index }
+    //                 // }))
+    //                 const result = res?.data
+    //                     ?.filter(item => listCourseId.includes(item.courseId)) // Lọc dựa trên courseId
+    //                     .map((item, index) => {
+    //                         return { ...item, _id: item.id, key: index }
+    //                     })
+    //                 setData(result)
+    //                 setCount(res?.pagination?.totalRecords)
+    //             })
+    //             .catch((err) => {
+    //                 console.log(err)
+    //             }).finally(() => {
+    //                 setLoadingData(false)
+    //             })
+    //     }
+    // }
+
     const getData = (page, limit, search, courseIds, startDate, endDate) => {
         setLoadingData(true)
-        if (location?.state) {
-            getCheckingDocument({
-                params: {
-                    page: currentPage,
-                    limit: rowsPerPage,
-                    ...(search && search !== "" && { search }),
-                    courseIds: location?.state?.id,
-                    ...(startDate && { startDate }),
-                    ...(endDate && { endDate })
-                }
-            })
-                .then((res) => {
-                    // const result = res?.data?.map(((item, index) => {
-                    //     return { ...item, _id: item.id, key: index }
-                    // }))
-                    const result = res?.data
-                        ?.filter(item => listCourseId.includes(item.courseId)) // Lọc dựa trên courseId
-                        .map((item, index) => {
-                            return { ...item, _id: item.id, key: index }
-                        })
-                    setData(result)
-                    setCount(res?.pagination?.totalRecords)
-                })
-                .catch((err) => {
-                    console.log(err)
-                }).finally(() => {
-                    setLoadingData(false)
-                })
-        } else {
-            getCheckingDocument({
-                params: {
-                    page,
-                    limit,
-                    ...(search && search !== "" && { search }),
-                    ...(courseIds && { courseIds }),
-                    ...(startDate && { startDate }),
-                    ...(endDate && { endDate })
-                }
-            })
-                .then((res) => {
-                    // console.log(res)
-                    // const result = res?.data?.map(((item, index) => {
-                    //     return { ...item, _id: item.id, key: index }
-                    // }))
-                    const result = res?.data
-                        ?.filter(item => listCourseId.includes(item.courseId)) // Lọc dựa trên courseId
-                        .map((item, index) => {
-                            return { ...item, _id: item.id, key: index }
-                        })
-                    setData(result)
-                    setCount(res?.pagination?.totalRecords)
-                })
-                .catch((err) => {
-                    console.log(err)
-                }).finally(() => {
-                    setLoadingData(false)
-                })
+
+        // Prepare the parameters for the API call
+        const params = {
+            page,
+            limit,
+            ...(search && search !== "" && { search }),
+            ...((courseIds || location?.state?.id) && { courseIds: courseIds || location.state.id }),
+            ...(startDate && { startDate }),
+            ...(endDate && { endDate })
         }
+
+        getCheckingDocument({ params })
+            .then((res) => {
+                const result = res?.data
+                    ?.filter(item => listCourseId.includes(item.courseId)) // Filter based on courseId
+                    .map((item, index) => {
+                        return { ...item, _id: item.id, key: index }
+                    })
+                setData(result)
+                setCount(res?.pagination?.totalRecords)
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+            .finally(() => {
+                setLoadingData(false)
+            })
     }
+
 
     useEffect(() => {
         if ((startDate && endDate) || (!startDate && !endDate)) {
@@ -402,7 +434,7 @@ const CheckingDocument = () => {
                 //     )
                 // }
                 const countVersion = (record.checkingDocumentVersion).length
-                if (countVersion > 0) {
+                if (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) {
                     const similarityType1 = record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal || 0
                     const similarityType2 = record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal || 0
 
@@ -424,7 +456,7 @@ const CheckingDocument = () => {
                     }
                 } else {
                     // Show spinner if no versions are available
-                    return <span style={{ color: 'blue' }}>Đang xử lý</span>
+                    return <span style={{ color: 'blue', fontWeight: '600' }}>Đang xử lý</span>
                 }
             },
         },
@@ -783,6 +815,7 @@ const CheckingDocument = () => {
                             rowsPerPage={rowsPerPage}
                             onUpdate={handleUpdateFromChild}
                             data={data}
+                            setData={setData}
                         />
                         {
                             <EditModal

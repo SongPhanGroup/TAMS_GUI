@@ -70,8 +70,6 @@ const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDoc
         // Gọi hàm callback để cập nhật dữ liệu lên cha
         onUpdate(newPropertyValue)
     }
-
-    // console.log("Bản ghi", localData)
     
     const onSubmit = (data) => {
         setLoadingAdd(true)
@@ -87,24 +85,8 @@ const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDoc
                     description: result?.data?.description,
                     id: checkingDocumentSelected?.id
                 })
-                // Swal.fire({
-                //     title: "Thêm mới phiên bản kiểm tra thành công",
-                //     text: "",
-                //     icon: "success",
-                //     customClass: {
-                //         confirmButton: "btn btn-success"
-                //     }
-                // })
                 toast.success('Thêm mới phiên bản kiểm tra thành công!')
             } else {
-                // Swal.fire({
-                //     title: "Thêm mới phiên bản kiểm tra thất bại",
-                //     text: "Không thể thêm phiên bản mới do đợt kiểm tra đã bị khóa!",
-                //     icon: "error",
-                //     customClass: {
-                //         confirmButton: "btn btn-danger"
-                //     }
-                // })
                 toast.error('Thêm mới phiên bản kiểm tra thất bại!')
             }
             getData()

@@ -210,9 +210,13 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate }) => {
             align: "center",
             width: 100,
             render: (text, record, index) => {
-                return (
-                    <span>{record?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}</span>
-                )
+                if (record?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) {
+                    return (
+                        <span>{record?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}</span>
+                    )
+                } else {
+                    return <span style={{ color: 'blue', fontWeight: '600' }}>Đang xử lý</span>
+                }
             }
         },
         {
@@ -374,7 +378,7 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate }) => {
                 }}
             />}
 
-            <AddNewCheckingDocumentVersion open={isAdd} handleModal={handleModal} getData={getData} rowsPerPage={rowsPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} checkingDocumentSelected={checkingDocumentSelected} listSubmit={listSubmit} />
+            <AddNewCheckingDocumentVersion open={isAdd} handleModal={handleModal} getData={getData} rowsPerPage={rowsPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} checkingDocumentSelected={checkingDocumentSelected} listSubmit={listSubmit} onUpdate={onUpdate} />
             {checkingDocumentVersionSelected && <EditCheckingDocumentVersion open={isEdit} handleModal={handleModal} getData={getData} rowsPerPage={rowsPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} infoEditVersion={checkingDocumentVersionSelected} listSubmit={listSubmit} dataCheckingDocument={checkingDocumentSelected} onUpdate={onUpdate} />}
         </Card>
     )

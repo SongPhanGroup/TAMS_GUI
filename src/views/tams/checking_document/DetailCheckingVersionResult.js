@@ -10,7 +10,7 @@ import {
 import mqtt from 'mqtt'
 import { Breadcrumb, Layout, Menu, theme, Row, Col, Card, Badge, Tag, Progress, Spin } from 'antd'
 import { useLocation, useParams } from 'react-router-dom'
-import { getCheckingResultHTML2, getSimilarDocumentWithoutThreshHold } from '../../../api/checking_result'
+import { getCheckingResultHTML, getSimilarDocumentWithoutThreshHold } from '../../../api/checking_result'
 import { getListDocFromSetenceId } from '../../../api/checking_sentence'
 import './hightlight.css'
 import { X } from 'react-feather'
@@ -38,7 +38,7 @@ const DetailCheckingDocumentVersionResult = () => {
 
     const getData = () => {
         setLoadingHTML(true)
-        getCheckingResultHTML2({
+        getCheckingResultHTML({
             params: {
                 id: location?.state?.id,
                 type: 1
@@ -231,9 +231,12 @@ const DetailCheckingDocumentVersionResult = () => {
             </Row>
             <Row gutter={16}>
                 {
-                    loadingHTML === true ? <Spin style={{
-                        padding: '16px'
-                    }} /> : (
+                    loadingHTML === true ? <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <Spin style={{
+                            padding: '16px'
+                        }} />
+                        <h5 style={{ margin: 0 }}>Vui lòng đợi hệ thống khởi tạo lần đầu Báo cáo chi tiết trùng lặp. Thời gian dự kiến 10-30 giây </h5>
+                    </div> : (
                         <Col md={18} style={{ height: '100vh', overflow: 'auto' }}>
                             <Row gutter={16} style={{ padding: '16px', width: '100%', overflow: 'auto' }}>
                                 {/* <h4>
@@ -284,7 +287,7 @@ const DetailCheckingDocumentVersionResult = () => {
                                                     <span style={{ fontWeight: "bold" }}>{doc?.similarity}%</span>
                                                 </Col>
                                                 <Col className='p-0' md={1} style={{ justifySelf: 'right' }}>
-                                                    <RightOutlined style={{ cursor: 'pointer' }} onClick={() => handleGetSentences(doc?.documentId)} />
+                                                    <RightOutlined style={{ cursor: 'pointer' }} onClick={() => handleGetSentences(doc)} />
                                                 </Col>
                                             </Row>
                                         )

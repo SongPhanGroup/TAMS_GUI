@@ -17,8 +17,8 @@ import {
     Table,
     Spin
 } from "antd"
-import { getListSentenceByCheckingResult } from "../../../../api/checking_result_by_word"
 import { useEffect, useState } from "react"
+import { getListSentenceByCheckingResult } from "../../../../api/checking_result"
 
 const SimilarityDocInDetailContentModal = ({ open, docId, handleModal, infoDoc }) => {
     const params = useParams()
@@ -28,7 +28,6 @@ const SimilarityDocInDetailContentModal = ({ open, docId, handleModal, infoDoc }
     const [currentPage, setCurrentPage] = useState(1)
     const [rowsPerPage, setRowsPerpage] = useState(10)
     const [count, setCount] = useState()
-
 
     const getData = () => {
         setLoadingData(true)

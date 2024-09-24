@@ -55,7 +55,7 @@ const SentenceModal = ({ open, sentence, handleModal }) => {
         {
             title: "STT",
             dataIndex: "stt",
-            width: 30,
+            width: '10%',
             align: "center",
             render: (text, record, index) => (
                 <span>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
@@ -64,7 +64,7 @@ const SentenceModal = ({ open, sentence, handleModal }) => {
         {
             title: "Câu trong các tài liệu mẫu",
             dataIndex: "text",
-            width: 500,
+            width: '50%',
             render: (text, record, index) => (
                 <span style={{ whiteSpace: 'break-spaces' }}>{record?.text}</span>
             ),
@@ -73,7 +73,7 @@ const SentenceModal = ({ open, sentence, handleModal }) => {
             title: "Độ tương đồng (%)",
             dataIndex: "similarity",
             align: "center",
-            width: 100,
+            width: '5%',
             render: (text, record, index) => (
                 <span>{(record?.similarity).toFixed(2) * 100}</span>
             ),
@@ -81,7 +81,7 @@ const SentenceModal = ({ open, sentence, handleModal }) => {
         {
             title: "Tên tài liệu mẫu",
             dataIndex: "title",
-            width: 200,
+            width: '40%',
             render: (text, record, index) => (
                 <span style={{ whiteSpace: 'break-spaces' }}>{record?.title}</span>
             ),
@@ -89,7 +89,7 @@ const SentenceModal = ({ open, sentence, handleModal }) => {
         {
             title: "Loại tài liệu",
             dataIndex: "title",
-            width: 200,
+            width: '10%',
             render: (text, record, index) => (
                 <span style={{ whiteSpace: 'break-spaces' }}>{record?.document_type}</span>
             ),
@@ -97,7 +97,7 @@ const SentenceModal = ({ open, sentence, handleModal }) => {
         {
             title: "Tác giả",
             dataIndex: "title",
-            width: 200,
+            width: '10%',
             render: (text, record, index) => (
                 <span style={{ whiteSpace: 'break-spaces' }}>{record?.author}</span>
             ),
@@ -105,7 +105,7 @@ const SentenceModal = ({ open, sentence, handleModal }) => {
         {
             title: "Thời gian công bố",
             dataIndex: "title",
-            width: 100,
+            width: '10%',
             render: (text, record, index) => (
                 <span style={{ whiteSpace: 'break-spaces' }}>{toDateString(record?.publishYear)}</span>
             ),

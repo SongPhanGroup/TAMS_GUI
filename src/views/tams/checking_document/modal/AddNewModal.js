@@ -32,7 +32,7 @@ import classNames from "classnames"
 import { postCheckingDocumentVersion } from "../../../../api/checking_document_version"
 import toast from "react-hot-toast"
 
-const AddNewCheckingDocument = ({ open, handleModal, getData, data, onUpdate, setHasVersion }) => {
+const AddNewCheckingDocument = ({ open, handleModal, getData, data, onUpdate, setData }) => {
     const AddNewCheckingDocumentSchema = yup.object().shape({
         file: yup.mixed().required("Yêu cầu chọn file").nullable().test(
             "is-not-empty",
@@ -140,14 +140,6 @@ const AddNewCheckingDocument = ({ open, handleModal, getData, data, onUpdate, se
             description: data.description ?? ""
         }).then(result => {
             if (result.status === 'success') {
-                // const newRecord = {
-                //     id: result.data.id,
-                //     title: data.title,
-                //     author: data.author,
-                //     courseId: data.course.value,
-                //     description: data.description ?? ""
-                // }
-                // handlePropertyChange(newRecord)
                 setSuccessMessage(`Thêm mới ${file.name} thành công!!!`)
                 setTimeout(() => setSuccessMessage(''), 2000)
                 const formData = new FormData()
@@ -158,32 +150,25 @@ const AddNewCheckingDocument = ({ open, handleModal, getData, data, onUpdate, se
                 formData.append('checkingDocumentId', result?.data?.id)
                 postCheckingDocumentVersion(formData).then(result => {
                     if (result.status === 'success') {
-                        // Swal.fire({
-                        //     title: "Thêm mới phiên bản kiểm tra thành công",
-                        //     text: "",
-                        //     icon: "success",
-                        //     customClass: {
-                        //         confirmButton: "btn btn-success"
-                        //     }
-                        // })
                         toast.success('Thêm mới tài liệu kiểm tra thành công')
                         getData()
                     } else {
                         toast.error('Thêm mới tài liệu kiểm tra thất bại')
                     }
-                    // getData()
                 }).catch(error => {
                     console.log(error)
                 })
+                getData()
             } else {
-                Swal.fire({
-                    title: "Thêm mới kiểm tra tài liệu thất bại",
-                    text: "Vui lòng thử lại sau!",
-                    icon: "error",
-                    customClass: {
-                        confirmButton: "btn btn-danger"
-                    }
-                })
+                // Swal.fire({
+                //     title: "Thêm mới kiểm tra tài liệu thất bại",
+                //     text: "Vui lòng thử lại sau!",
+                //     icon: "error",
+                //     customClass: {
+                //         confirmButton: "btn btn-danger"
+                //     }
+                // })
+                toast.error('Thêm mới tài liệu kiểm tra thất bại!')
             }
             setValue('title', '')
             setValue('author', '')

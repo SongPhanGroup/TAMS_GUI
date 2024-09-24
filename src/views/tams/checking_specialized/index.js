@@ -274,11 +274,11 @@ const CheckingDocument = () => {
     }
 
     const handleResult = (record) => {
-        navigate(`/tams/checking-document-result/${record?.id}`, { state: record })
+        navigate(`/tams/checking-specialized-result/${record?.id}`, { state: record })
     }
 
     const handleButtonClick2 = (record) => {
-        navigate(`/tams/detail-result2/${record?.id}`, { state: record })
+        navigate(`/tams/detailXX-checking-version-result/${record?.id}`, { state: record })
     }
 
     const handleReport = (recordId) => {
@@ -305,11 +305,11 @@ const CheckingDocument = () => {
             key: '2',
             icon: <DownCircleOutlined />,
         },
-        {
-            label: 'Báo cáo DS trùng lặp theo đợt',
-            key: '1',
-            icon: <DownCircleFilled />,
-        }
+        // {
+        //     label: 'Báo cáo DS trùng lặp theo đợt',
+        //     key: '1',
+        //     icon: <DownCircleFilled />,
+        // }
     ]
 
     const menuProps = (recordId) => ({
@@ -493,7 +493,7 @@ const CheckingDocument = () => {
                             <RightSquareOutlined
                                 style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
                                 onClick={() => {
-                                    const recordStandard = { ...recordLastVersion, from: 'checking-specialized', title: checkingDocumentSelected?.title }
+                                    const recordStandard = { ...recordLastVersion, from: 'checking-specialized', title: record?.title }
                                     return handleButtonClick2(recordStandard)
                                 }}
                             />
@@ -739,13 +739,6 @@ const CheckingDocument = () => {
                                 rowsPerPage={rowsPerPage}
                             />
                         }
-                        {/* {
-                            <ListUsersModal
-                                open={isView}
-                                setIsView={setIsView}
-                                roleSelected={roleSelected}
-                            />
-                        } */}
                     </Col>
                 </Row>
             </Card>
@@ -754,5 +747,4 @@ const CheckingDocument = () => {
 }
 const AddNewModal = React.lazy(() => import("./modal/AddNewModal"))
 const EditModal = React.lazy(() => import("./modal/EditModal"))
-// const ListUsersModal = React.lazy(() => import("./modal/ListUsersModal"))
 export default CheckingDocument

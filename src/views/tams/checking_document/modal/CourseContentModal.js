@@ -45,11 +45,11 @@ import * as yup from "yup"
 import { useForm, Controller } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import classnames from "classnames"
-import { deleteCheckingDocumentVersion, getCheckingDocumentVersion } from "../../../../api/checking_document_version"
+import { deleteCheckingDocumentVersion, getCheckingDocumentVersion, getDuplicateSentenceCheckingDocument } from "../../../../api/checking_document_version"
 import { detailCheckingDocument } from "../../../../api/checking_document"
-import { getListSentenceByCheckingResult } from "../../../../api/checking_result_by_word"
+import { getListSentenceByCheckingResult } from "../../../../api/checking_result"
 
-const ContentModal = ({ listSentenceByCheckingResult }) => {
+const SimilarityCourseContentModal = ({ listSentenceByCheckingResult }) => {
     const params = useParams()
     const [loadingData, setLoadingData] = useState(false)
     const navigate = useNavigate()
@@ -67,15 +67,15 @@ const ContentModal = ({ listSentenceByCheckingResult }) => {
     const [isEdit, setIsEdit] = useState(false)
     const [checkingDocumentVersionSelected, setCheckingDocumentVersionSelected] = useState()
 
+    console.log(listSentenceByCheckingResult)
+
     const getData = () => {
         setLoadingData(true)
-        getListSentenceByCheckingResult({
+        getDuplicateSentenceCheckingDocument({
             params: {
-                idDoc: listSentenceByCheckingResult?.documentId,
-                idCheckDoc: params?.id,
-                type: 1
+                checkingDocumentVersionId: params?.id
             }
-        })
+        }, listSentenceByCheckingResult?.cdv?.id)
             .then((res) => {
                 setData(res.data)
                 setCount(res?.total)
@@ -153,12 +153,12 @@ const ContentModal = ({ listSentenceByCheckingResult }) => {
             ),
         },
         {
-            title: "Các câu trong tài liệu mẫu",
+            title: "Các câu trong tài liệu cùng đợt",
             dataIndex: "sentenceOrCheckingDocumentSentence_sententce",
             align: "left",
             width: 500,
             render: (text, record, index) => (
-                <span>{record?.sentenceOrCheckingDocumentSentence_sententce?.content}</span>
+                <span>{record?.cds?.content}</span>
             ),
         },
         {
@@ -167,7 +167,7 @@ const ContentModal = ({ listSentenceByCheckingResult }) => {
             align: "center",
             width: 100,
             render: (text, record, index) => (
-                <span>{(record?.similarity).toFixed(2) * 100}</span>
+                <span>{(record?.similarity).toFixed(2)}</span>
             ),
         }
     ]
@@ -202,5 +202,5 @@ const ContentModal = ({ listSentenceByCheckingResult }) => {
         </Card>
     )
 }
-export default ContentModal
+export default SimilarityCourseContentModal
 

@@ -26,10 +26,10 @@ import { yupResolver } from '@hookform/resolvers/yup'
 // ** Styles
 import '@styles/react/libs/react-select/_react-select.scss'
 import Swal from 'sweetalert2'
-import { postCheckingDocument } from "../../../../api/checking_document"
 import { getCourse } from "../../../../api/course"
 import classNames from "classnames"
 import { postCheckingDocumentVersion } from "../../../../api/checking_document_version_by_word"
+import toast from "react-hot-toast"
 
 const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
     const AddNewCheckingDocumentSchema = yup.object().shape({
@@ -77,12 +77,13 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
         }, [])
 
         const courseRes = responseData[0]
+        const resCourse = courseRes?.data?.filter(item => item.isActive === 1)
         results.map((res) => {
             if (res.status !== 'fulfilled') {
                 setListCourse(null)
             }
         })
-        const courses = courseRes?.data?.map((res) => {
+        const courses = resCourse?.map((res) => {
             return {
                 value: res.id,
                 label: `${res.name}`
@@ -121,7 +122,6 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
             description: data.description ?? ""
         }).then(result => {
             if (result.status === 'success') {
-                getData()
                 setSuccessMessage(`Thêm mới ${file.name} thành công!!!`)
                 setTimeout(() => setSuccessMessage(''), 2000)
                 const formData = new FormData()
@@ -132,15 +132,18 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
                 formData.append('checkingDocumentId', result?.data?.id)
                 postCheckingDocumentVersion(formData).then(result => {
                     if (result.status === 'success') {
-                        Swal.fire({
-                            title: "Thêm mới kiểm tra tài liệu thành công",
-                            text: "",
-                            icon: "success",
-                            customClass: {
-                                confirmButton: "btn btn-success"
-                            }
-                        })
+                        // Swal.fire({
+                        //     title: "Thêm mới kiểm tra tài liệu thành công",
+                        //     text: "",
+                        //     icon: "success",
+                        //     customClass: {
+                        //         confirmButton: "btn btn-success"
+                        //     }
+                        // })
+                        toast.success('Thêm mới tài liệu kiểm tra thành công')
                         getData()
+                    } else {
+                        toast.error('Thêm mới tài liệu kiểm tra thất bạị')
                     }
                 }).catch(error => {
                     console.log(error)

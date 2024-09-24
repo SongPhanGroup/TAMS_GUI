@@ -17,10 +17,10 @@ import {
     Table,
     Spin
 } from "antd"
-import { getListSentenceByCheckingResult } from "../../../../api/checking_result_by_word"
 import { useEffect, useState } from "react"
+import { getListSentenceByCheckingResult } from "../../../../api/checking_result_by_word"
 
-const ContentModalFromHTML = ({ open, docId, handleModal }) => {
+const SimilarityDocInDetailContentModal = ({ open, docId, handleModal, infoDoc }) => {
     const params = useParams()
     const navigate = useNavigate()
     const [loadingData, setLoadingData] = useState(false)
@@ -54,7 +54,7 @@ const ContentModalFromHTML = ({ open, docId, handleModal }) => {
         if (open) {
             getData()
         }
-    }, [docId, params?.id, open])
+    }, [open, docId, params?.id])
 
     const columns = [
         {
@@ -100,6 +100,7 @@ const ContentModalFromHTML = ({ open, docId, handleModal }) => {
             <ModalBody className='px-sm-3 mx-50 pb-2' style={{ paddingTop: 0 }}>
                 <div className='text-center mb-1'>
                     <h2 className='mb-1'>Danh sách các câu trùng với tài liệu</h2>
+                    <h4><span>"{infoDoc.title}"</span>, tác giả <span>{infoDoc.author}</span></h4>
                 </div>
                 <Row tag='table' className='gy-1 pt-75'>
                     {loadingData === true ? <Spin /> : <Table
@@ -130,4 +131,4 @@ const ContentModalFromHTML = ({ open, docId, handleModal }) => {
     )
 }
 
-export default ContentModalFromHTML
+export default SimilarityDocInDetailContentModal

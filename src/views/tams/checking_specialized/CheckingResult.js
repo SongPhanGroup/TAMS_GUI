@@ -54,11 +54,12 @@ import { yupResolver } from "@hookform/resolvers/yup"
 import classnames from "classnames"
 import { downloadFile, toDateString, toDateTimeString } from "../../../utility/Utils"
 import { deleteCheckingDocument, getCheckingDocument } from "../../../api/checking_document"
-import ContentModal from "./modal/ContentModal"
 import { getCheckingResult, getSimilarDocument, getTop3SimilarDocument } from "../../../api/checking_result"
 import { getCourse } from "../../../api/course"
 import { PAGE_DEFAULT, PER_PAGE_DEFAULT } from "../../../utility/constant"
 import { downloadFileCheckingDocumentVersion, downloadTemplateBaoCao, getDuplicateCheckingDocumentVersion, getDuplicateDocumentVersion, getSimilarityReport } from "../../../api/checking_document_version"
+import SimilarityCourseContentModal from "./modal/CourseContentModal"
+import SimilarityDocContentModal from "./modal/DocContentModal"
 
 const CheckingResult = () => {
     const [loadingData, setLoadingData] = useState(false)
@@ -149,7 +150,7 @@ const CheckingResult = () => {
                     return { ...item, _id: item.id, key: index }
                 }))
                 setData2(result)
-                setSelectedCourse(result[0].document.course.id)
+                setSelectedCourse(result[0].cdv.courseId)
                 setCount2(res?.total)
             })
             .catch((err) => {
@@ -395,6 +396,113 @@ const CheckingResult = () => {
         },
     ]
 
+    const columns2 = [
+        {
+            title: "STT",
+            dataIndex: "stt",
+            width: 30,
+            align: "center",
+            render: (text, record, index) => {
+                console.log(record)
+                if (record?.similarity >= 50) {
+                    return (
+                        <span style={{ color: 'red', fontWeight: '600' }}>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
+                    )
+                } else if (record?.similarity >= 30 && record?.similarity < 50) {
+                    return (
+                        <span style={{ color: 'yellowgreen', fontWeight: '600' }}>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
+                    )
+                } else {
+                    return (
+                        <span>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
+                    )
+                }
+            }
+        },
+        {
+            title: "Tên tài liệu mẫu",
+            dataIndex: "title",
+            width: 500,
+            align: "left",
+            render: (text, record, index) => {
+                if (record?.cdv?.checkingDocument?.similarityTotal >= 50) {
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.cdv?.checkingDocument?.title}</span>
+                    )
+                } else if (record?.cdv?.checkingDocument?.similarityTotal >= 30 && record?.cdv?.checkingDocument?.similarityTotal < 50) {
+                    return (
+                        <span style={{ color: 'yellowgreen', fontWeight: '600' }}>{record?.cdv?.checkingDocument?.title}</span>
+                    )
+                } else {
+                    return (
+                        <span>{record?.cdv?.checkingDocument?.title}</span>
+                    )
+                }
+            }
+        },
+        {
+            title: "Tác giả",
+            dataIndex: "author",
+            width: 180,
+            align: "left",
+            render: (text, record, index) => {
+                if (record?.cdv?.checkingDocument?.similarityTotal >= 50) {
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.cdv?.checkingDocument?.author}</span>
+                    )
+                } else if (record?.cdv?.checkingDocument?.similarityTotal >= 30 && record?.cdv?.checkingDocument?.similarityTotal < 50) {
+                    return (
+                        <span style={{ color: 'yellowgreen', fontWeight: '600' }}>{record?.cdv?.checkingDocument?.author}</span>
+                    )
+                } else {
+                    return (
+                        <span>{record?.cdv?.checkingDocument?.author}</span>
+                    )
+                }
+            }
+        },
+        {
+            title: "Độ trùng lặp (%)",
+            width: 120,
+            align: "center",
+            render: (text, record, index) => {
+                if (record?.cdv?.checkingDocument?.similarityTotal >= 50) {
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.cdv?.checkingDocument?.similarityTotal}</span>
+                    )
+                } else if (record?.cdv?.checkingDocument?.similarityTotal >= 30 && record?.cdv?.checkingDocument?.similarityTotal < 50) {
+                    return (
+                        <span style={{ color: 'yellowgreen', fontWeight: '600' }}>{record?.cdv?.checkingDocument?.similarityTotal}</span>
+                    )
+                } else {
+                    return (
+                        <span>{record?.cdv?.checkingDocument?.similarityTotal}</span>
+                    )
+                }
+            }
+        },
+        {
+            title: "Thao tác",
+            width: 100,
+            align: "center",
+            render: (record) => (
+                // <div style={{ display: "flex", justifyContent: "center" }}>
+                <>
+                    {
+                        isLoadingDownload === true && loadingId === record.id ? <Spinner color="#fff" style={{ width: '14px', height: '14px', backgroundColor: '#fff' }} /> : <Tooltip placement="top" title="Download file">
+                            <DownloadOutlined
+                                id={`tooltip_download_${record._id}`}
+                                style={{ color: "#09A863", cursor: "pointer" }}
+                                onClick={() => handleDownloadFile(record.id)}
+                            />
+                        </Tooltip>
+                    }
+                </>
+                // </div>
+            ),
+        },
+    ]
+
     const handleChangeCourse = (value) => {
         if (value) {
             setCourseId(value)
@@ -404,9 +512,14 @@ const CheckingResult = () => {
     }
 
     const [expandedRowKeys, setExpandedRowKeys] = useState([])
+    const [expandedRowKeys2, setExpandedRowKeys2] = useState([])
 
     const onExpand = (expanded, record) => {
         setExpandedRowKeys(expanded ? [record.key] : [])
+    }
+
+    const onExpand2 = (expanded, record) => {
+        setExpandedRowKeys2(expanded ? [record.key] : [])
     }
 
     const handleReport = () => {
@@ -544,7 +657,7 @@ const CheckingResult = () => {
                                 dataSource={data}
                                 bordered
                                 expandable={{
-                                    expandedRowRender: (record) => <ContentModal
+                                    expandedRowRender: (record) => <SimilarityDocContentModal
                                         listSentenceByCheckingResult={record} />,
                                     rowExpandable: (record) => record.name !== 'Not Expandable',
                                     // expandRowByClick: true
@@ -569,17 +682,17 @@ const CheckingResult = () => {
                             {/* <Select options={listCourse} placeholder="Chọn đợt kiểm tra" className="mb-1" style={{ float: 'right', width: '200px' }} allowClear onChange={(value) => handleChangeCourse(value)} /> */}
 
                             {loadingData2 === true ? <Spin style={{ position: 'relative', left: '50%' }} /> : <Table
-                                columns={columns}
+                                columns={columns2}
                                 dataSource={data2}
                                 bordered
                                 expandable={{
-                                    expandedRowRender: (record) => <ContentModal
+                                    expandedRowRender: (record) => <SimilarityCourseContentModal
                                         listSentenceByCheckingResult={record} />,
                                     rowExpandable: (record) => record.name !== 'Not Expandable',
                                     // expandRowByClick: true
                                 }}
-                                expandedRowKeys={expandedRowKeys}
-                                onExpand={onExpand}
+                                expandedRowKeys={expandedRowKeys2}
+                                onExpand={onExpand2}
                                 pagination={{
                                     defaultPageSize: 30,
                                     showSizeChanger: true,

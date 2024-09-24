@@ -46,15 +46,12 @@ import { AbilityContext } from '@src/utility/context/Can'
 import Swal from "sweetalert2"
 import withReactContent from "sweetalert2-react-content"
 import AvatarGroup from "@components/avatar-group"
-// import Select from 'react-select'
-import Flatpickr from "react-flatpickr"
-import { Vietnamese } from "flatpickr/dist/l10n/vn.js"
 import "@styles/react/libs/flatpickr/flatpickr.scss"
 import * as yup from "yup"
 import { useForm, Controller } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import classnames from "classnames"
-import { toDateString, toDateStringv2, toDateTimeString } from "../../../utility/Utils"
+import { toDateStringv2, toDateTimeString } from "../../../utility/Utils"
 import { deleteCheckingDocument, getCheckingDocument } from "../../../api/checking_document"
 import VersionModal from "./modal/VersionModal"
 import { PAGE_DEFAULT, PER_PAGE_DEFAULT } from "../../../utility/constant"
@@ -96,7 +93,9 @@ const CheckingDocument = () => {
     const [listCourse, setListCourse] = useState([])
     const [listCourseId, setListCourseId] = useState([])
     const [loadingReports, setLoadingReports] = useState({}) // Tracks loading per record
-    const [supervisedAt, setSupervisedAt] = useState(false)
+    const [lastVersionCheckingDoc, setLastVersionCheckingDoc] = useState({
+        // supervisedAt: '', similarityDoc: '', description: ''
+    })
 
     const getAllDataPromises = async () => {
         const coursePromise = getCourse({ params: { page: PAGE_DEFAULT, perPage: PER_PAGE_DEFAULT, search: '' } })
@@ -153,7 +152,6 @@ const CheckingDocument = () => {
                     // const result = res?.data?.map(((item, index) => {
                     //     return { ...item, _id: item.id, key: index }
                     // }))
-                    console.log(res, "res nè")
                     const result = res?.data
                         ?.filter(item => listCourseId.includes(item.courseId)) // Lọc dựa trên courseId
                         .map((item, index) => {
@@ -183,7 +181,6 @@ const CheckingDocument = () => {
                     // const result = res?.data?.map(((item, index) => {
                     //     return { ...item, _id: item.id, key: index }
                     // }))
-                    console.log(res)
                     const result = res?.data
                         ?.filter(item => listCourseId.includes(item.courseId)) // Lọc dựa trên courseId
                         .map((item, index) => {
@@ -225,7 +222,6 @@ const CheckingDocument = () => {
         setIsEdit(true)
     }
     const handleChangeCourse = (value) => {
-        console.log(value)
         if (value) {
             setCourseId(value.join(','))
             setCurrentPage(1)
@@ -283,7 +279,7 @@ const CheckingDocument = () => {
     }
 
     const handleButtonClick2 = (record) => {
-        navigate(`/tams/detail-result2/${record?.id}`, { state: record })
+        navigate(`/tams/detailTD-checking-version-result/${record?.id}`, { state: record })
     }
 
     const handleReport = (recordId) => {
@@ -310,11 +306,11 @@ const CheckingDocument = () => {
             key: '2',
             icon: <DownCircleOutlined />,
         },
-        {
-            label: 'Báo cáo DS trùng lặp theo đợt',
-            key: '1',
-            icon: <DownCircleFilled />,
-        }
+        // {
+        //     label: 'Báo cáo DS trùng lặp theo đợt',
+        //     key: '1',
+        //     icon: <DownCircleFilled />,
+        // }
     ]
 
     const menuProps = (recordId) => ({
@@ -396,14 +392,39 @@ const CheckingDocument = () => {
             width: 120,
             align: "center",
             render: (text, record, index) => {
-                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= 30 || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= 30) {
-                    return (
-                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}</span>
-                    )
+                // if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= 30 || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= 30) {
+                //     return (
+                //         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}</span>
+                //     )
+                // } else {
+                //     return (
+                //         <span>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}</span>
+                //     )
+                // }
+                const countVersion = (record.checkingDocumentVersion).length
+                if (countVersion > 0) {
+                    const similarityType1 = record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal || 0
+                    const similarityType2 = record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal || 0
+
+                    // setSupervisedAt(createdAt)
+
+                    // Check the similarity and decide color style
+                    if (lastVersionCheckingDoc.similarityDoc) {
+                        return (
+                            <span style={{ whiteSpace: 'break-spaces', color: (similarityType1 >= 30 || similarityType2 >= 30) ? 'red' : 'inherit', fontWeight: (similarityType1 >= 30 || similarityType2 >= 30) ? '600' : 'normal' }}>
+                                {lastVersionCheckingDoc.similarityDoc}
+                            </span>
+                        )
+                    } else {
+                        return (
+                            <span style={{ whiteSpace: 'break-spaces', color: (similarityType1 >= 30 || similarityType2 >= 30) ? 'red' : 'inherit', fontWeight: (similarityType1 >= 30 || similarityType2 >= 30) ? '600' : 'normal' }}>
+                                {similarityType1}
+                            </span>
+                        )
+                    }
                 } else {
-                    return (
-                        <span>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}</span>
-                    )
+                    // Show spinner if no versions are available
+                    return <span style={{ color: 'blue' }}>Đang xử lý</span>
                 }
             },
         },
@@ -429,13 +450,32 @@ const CheckingDocument = () => {
             align: 'left',
             width: 200,
             render: (text, record, index) => {
-                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= 30 || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= 30) {
+                // if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= 30 || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= 30) {
+                //     return (
+                //         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.description}</span>
+                //     )
+                // } else {
+                //     return (
+                //         <span>{record?.description}</span>
+                //     )
+                // }
+                const similarityType1 = record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal || 0
+                const similarityType2 = record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal || 0
+
+                // setSupervisedAt(createdAt)
+
+                // Check the similarity and decide color style
+                if (lastVersionCheckingDoc.description) {
                     return (
-                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.description}</span>
+                        <span style={{ whiteSpace: 'break-spaces', color: (similarityType1 >= 30 || similarityType2 >= 30) ? 'red' : 'inherit', fontWeight: (similarityType1 >= 30 || similarityType2 >= 30) ? '600' : 'normal' }}>
+                            {record.description}
+                        </span>
                     )
                 } else {
                     return (
-                        <span>{record?.description}</span>
+                        <span style={{ whiteSpace: 'break-spaces', color: (similarityType1 >= 30 || similarityType2 >= 30) ? 'red' : 'inherit', fontWeight: (similarityType1 >= 30 || similarityType2 >= 30) ? '600' : 'normal' }}>
+                            {record?.description}
+                        </span>
                     )
                 }
             },
@@ -446,7 +486,7 @@ const CheckingDocument = () => {
             width: 120,
             align: "center",
             render: (text, record, index) => {
-                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal)  >= 30 || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal)  >= 30) {
+                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= 30 || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= 30) {
                     return (
                         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{toDateTimeString(record.createdAt)}</span>
                     )
@@ -472,15 +512,15 @@ const CheckingDocument = () => {
                     // setSupervisedAt(createdAt)
 
                     // Check the similarity and decide color style
-                    if (supervisedAt) {
+                    if (lastVersionCheckingDoc.supervisedAt) {
                         return (
-                            <span style={{ whiteSpace: 'break-spaces', color: (similarityType1  >= 30 || similarityType2  >= 30) ? 'red' : 'inherit', fontWeight: (similarityType1  >= 30 || similarityType2  >= 30) ? '600' : 'normal' }}>
-                                {supervisedAt}
+                            <span style={{ whiteSpace: 'break-spaces', color: (similarityType1 >= 30 || similarityType2 >= 30) ? 'red' : 'inherit', fontWeight: (similarityType1 >= 30 || similarityType2 >= 30) ? '600' : 'normal' }}>
+                                {lastVersionCheckingDoc.supervisedAt}
                             </span>
                         )
                     } else {
                         return (
-                            <span style={{ whiteSpace: 'break-spaces', color: (similarityType1  >= 30 || similarityType2  >= 30) ? 'red' : 'inherit', fontWeight: (similarityType1  >= 30 || similarityType2  >= 30) ? '600' : 'normal' }}>
+                            <span style={{ whiteSpace: 'break-spaces', color: (similarityType1 >= 30 || similarityType2 >= 30) ? 'red' : 'inherit', fontWeight: (similarityType1 >= 30 || similarityType2 >= 30) ? '600' : 'normal' }}>
                                 {createdAt}
                             </span>
                         )
@@ -515,7 +555,7 @@ const CheckingDocument = () => {
                                 id={`tooltip_detail2_${record._id}`}
                                 style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
                                 onClick={() => {
-                                    const recordStandard = { ...recordLastVersion, from: 'checking-document', title: checkingDocumentSelected?.title }
+                                    const recordStandard = { ...recordLastVersion, from: 'checking-document', title: record?.title }
                                     return handleButtonClick2(recordStandard)
                                 }}
                             />
@@ -579,15 +619,13 @@ const CheckingDocument = () => {
     const handleUpdateFromChild = async (updatedRecord) => {
         setLoadingUpdate(true)
         try {
-            setSupervisedAt(updatedRecord)
+            setLastVersionCheckingDoc(updatedRecord)
         } catch (error) {
             console.error("Error updating data", error)
         } finally {
             setLoadingUpdate(false)
         }
     }
-
-    console.log(supervisedAt)
 
     return (
         <Fragment>
@@ -680,20 +718,6 @@ const CheckingDocument = () => {
                                     >
                                         Ngày kiểm tra
                                     </Label>
-                                    {/* <Flatpickr
-                                        style={{ padding: '0.35rem 1rem' }}
-                                        className="form-control invoice-edit-input date-picker mb-50"
-                                        options={{
-                                            mode: "range",
-                                            dateFormat: "d-m-Y", // format ngày giờ
-                                            locale: {
-                                                ...Vietnamese
-                                            },
-                                            defaultDate: [oneWeekAgo, new Date()]
-                                        }}
-                                        placeholder="dd/mm/yyyy"
-                                        onChange={(value => handleChangeDate(value))}
-                                    /> */}
                                     <RangePicker
                                         style={{
                                             width: "100%",
@@ -727,9 +751,8 @@ const CheckingDocument = () => {
                             bordered
                             expandable={{
                                 expandedRowRender: (record) => <VersionModal
-                                    checkingDocumentSelected={record} onUpdate={handleUpdateFromChild} lastVersionDate={supervisedAt} />,
+                                    checkingDocumentSelected={record} onUpdate={handleUpdateFromChild} />,
                                 rowExpandable: (record) => record.name !== 'Not Expandable',
-                                // expandRowByClick: true
                             }}
                             expandedRowKeys={expandedRowKeys}
                             onExpand={onExpand}
@@ -771,13 +794,6 @@ const CheckingDocument = () => {
                                 rowsPerPage={rowsPerPage}
                             />
                         }
-                        {/* {
-                            <ListUsersModal
-                                open={isView}
-                                setIsView={setIsView}
-                                roleSelected={roleSelected}
-                            />
-                        } */}
                     </Col>
                 </Row>
             </Card>
@@ -786,5 +802,4 @@ const CheckingDocument = () => {
 }
 const AddNewModal = React.lazy(() => import("./modal/AddNewModal"))
 const EditModal = React.lazy(() => import("./modal/EditModal"))
-// const ListUsersModal = React.lazy(() => import("./modal/ListUsersModal"))
 export default CheckingDocument

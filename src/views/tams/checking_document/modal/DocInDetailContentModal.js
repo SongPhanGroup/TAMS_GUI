@@ -17,10 +17,10 @@ import {
     Table,
     Spin
 } from "antd"
-import { useEffect, useState } from "react"
 import { getListSentenceByCheckingResult } from "../../../../api/checking_result_by_word"
+import { useEffect, useState } from "react"
 
-const ContentModalFromHTML = ({ open, docId, handleModal, infoDoc }) => {
+const SimilarityDocInDetailContentModal = ({ open, docId, handleModal, infoDoc }) => {
     const params = useParams()
     const navigate = useNavigate()
     const [loadingData, setLoadingData] = useState(false)
@@ -54,7 +54,7 @@ const ContentModalFromHTML = ({ open, docId, handleModal, infoDoc }) => {
         if (open) {
             getData()
         }
-    }, [open, docId, params?.id])
+    }, [docId, params?.id, open])
 
     const columns = [
         {
@@ -90,7 +90,7 @@ const ContentModalFromHTML = ({ open, docId, handleModal, infoDoc }) => {
             align: "center",
             width: 100,
             render: (text, record, index) => (
-                <span>{(record?.similarity).toFixed(2) * 100}</span>
+                <span>{(record?.similarity).toFixed(2)}</span>
             ),
         }
     ]
@@ -131,4 +131,4 @@ const ContentModalFromHTML = ({ open, docId, handleModal, infoDoc }) => {
     )
 }
 
-export default ContentModalFromHTML
+export default SimilarityDocInDetailContentModal

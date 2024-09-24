@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import {
     DesktopOutlined,
     FileOutlined,
@@ -15,10 +15,11 @@ import { getListDocFromSetenceId } from '../../../api/checking_sentence'
 import './hightlight.css'
 import { X } from 'react-feather'
 import styled from 'styled-components'
-import ContentModalFromHTML from './modal/ContentModal2'
+import SentenceModal from './modal/SentenceModal'
+import SimilarityDocInDetailContentModal from './modal/DocInDetailContentModal'
 // import HTMLContent from './modal/HTMLContent'
 const { Header, Content, Footer, Sider } = Layout
-const DetailResult2 = () => {
+const DetailCheckingDocumentVersionResult = () => {
     const location = useLocation()
     const params = useParams()
     const [loadingData, setLoadingData] = useState(false)
@@ -33,7 +34,10 @@ const DetailResult2 = () => {
     const [loadingHTML, setLoadingHTML] = useState(false)
     const [loadingDataDoc, setLoadingDataDoc] = useState(false)
     const [modalContent, setModalContent] = useState(false)
+    const [modalSentence, setModalSentence] = useState(false)
     const [selectedDocId, setSelectedDocId] = useState()
+    const [infoDoc, setInfoDoc] = useState({})
+    const [selectedSentence, setSelectedSentence] = useState()
 
     const getData = () => {
         setLoadingHTML(true)
@@ -147,12 +151,44 @@ const DetailResult2 = () => {
     //     return doc.body.innerHTML
     // }
 
+    console.log(location.state)
+    const containerRef = useRef(null)
+
+    useEffect(() => {
+        const container = containerRef.current
+        // Tạo một đối tượng DOM từ chuỗi HTML
+        if (container && location.state.from === 'checking-specialized') {
+            const parser = new DOMParser()
+            const doc = parser.parseFromString(htmlResult, 'text/html')
+
+            // Chèn nội dung đã được phân tích cú pháp vào container
+            container.innerHTML = doc.body.innerHTML
+
+            // Tìm tất cả các thẻ <span> có class 'custom-tooltip' trong DOM thực tế
+            const tooltips = container.querySelectorAll('span.custom-tooltip')
+
+            // Thêm sự kiện click cho từng thẻ <span>
+            tooltips.forEach((tooltip, index) => {
+                tooltip.addEventListener('click', function () {
+                    const text = tooltip.textContent
+
+                    // Tách câu và giữ dấu câu kết thúc câu
+                    const sentenceMatch = text.match(/.*?[.!?]/)
+                    const sentence = sentenceMatch ? sentenceMatch[0] : text // Lấy câu đầu tiên hoặc toàn bộ văn bản nếu không tìm thấy dấu câu
+
+                    setSelectedSentence(sentence)
+                    setModalSentence(true)
+                })
+            })
+        }
+    })
+
     const CustomStyle = styled.div`
         .tooltip {
-            opacity: 1 !important /* Bỏ opacity: 0 */
+            opacity: 1 !important; /* Bỏ opacity: 0 */
         }
         .tooltiptext {
-            color: #000 !important
+            color: #000 !important;
         }
     `
     const dataTest = [
@@ -194,13 +230,18 @@ const DetailResult2 = () => {
         }
     ]
 
-    const handleGetSentences = (docId) => {
+    const handleGetSentences = (doc) => {
         setModalContent(true)
-        setSelectedDocId(docId)
+        setSelectedDocId(doc?.documentId)
+        setInfoDoc({
+            author: doc?.document?.author,
+            title: doc?.document?.title
+        })
     }
 
     const handleModal = () => {
         setModalContent(false)
+        setModalSentence(false)
     }
 
     return (
@@ -222,9 +263,12 @@ const DetailResult2 = () => {
             </Row>
             <Row gutter={16}>
                 {
-                    loadingHTML === true ? <Spin style={{
-                        padding: '16px'
-                    }} /> : (
+                    loadingHTML === true ? <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <Spin style={{
+                            padding: '16px'
+                        }} />
+                        <h5 style={{ margin: 0 }}>Vui lòng đợi hệ thống khởi tạo lần đầu Báo cáo chi tiết trùng lặp. Thời gian dự kiến 10-30 giây </h5>
+                    </div> : (
                         <Col md={18} style={{ height: '100vh', overflow: 'auto' }}>
                             <Row gutter={16} style={{ padding: '16px', width: '100%', overflow: 'auto' }}>
                                 {/* <h4>
@@ -232,7 +276,7 @@ const DetailResult2 = () => {
                                 </h4> */}
                                 {/* <HTMLContent htmlResult={htmlResult} orders={listSentence} indexs={highlightIndexs} /> */}
                                 <CustomStyle>
-                                    <Content dangerouslySetInnerHTML={{ __html: (htmlResult) }} />
+                                    <Content ref={containerRef} dangerouslySetInnerHTML={{ __html: (htmlResult) }} />
                                 </CustomStyle>
                             </Row>
                         </Col>
@@ -267,7 +311,9 @@ const DetailResult2 = () => {
                                                     <h6 style={{
                                                         color: `${colors[colorIndex]}`,
                                                         paddingBottom: "0",
-                                                        textAlign: "justify",
+                                                        whiteSpace: 'normal', // Cho phép ngắt dòng
+                                                        wordWrap: 'break-word', // Ngắt dòng khi từ quá dài,
+                                                        textAlign: "justify"
                                                     }}>{doc?.document?.title}</h6>
                                                     <span style={{ fontSize: "small" }}>{doc?.document?.author}</span>
                                                 </Col>
@@ -275,7 +321,7 @@ const DetailResult2 = () => {
                                                     <span style={{ fontWeight: "bold" }}>{doc?.similarity}%</span>
                                                 </Col>
                                                 <Col className='p-0' md={1} style={{ justifySelf: 'right' }}>
-                                                    <RightOutlined style={{ cursor: 'pointer' }} onClick={() => handleGetSentences(doc?.documentId)} />
+                                                    <RightOutlined style={{ cursor: 'pointer' }} onClick={() => handleGetSentences(doc)} />
                                                 </Col>
                                             </Row>
                                         )
@@ -286,8 +332,9 @@ const DetailResult2 = () => {
                     )
                 }
             </Row>
-            <ContentModalFromHTML open={modalContent} docId={selectedDocId} handleModal={handleModal} />
-        </div>
+            <SimilarityDocInDetailContentModal open={modalContent} docId={selectedDocId} handleModal={handleModal} infoDoc={infoDoc} />
+            <SentenceModal open={modalSentence} sentence={selectedSentence} handleModal={handleModal} />
+        </div >
     )
 }
-export default DetailResult2
+export default DetailCheckingDocumentVersionResult

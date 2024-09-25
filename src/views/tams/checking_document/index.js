@@ -811,7 +811,7 @@ const CheckingDocument = () => {
                             currentPage={currentPage}
                             rowsPerPage={rowsPerPage}
                             onUpdate={handleUpdateFromChild}
-                            data={data}
+                            dataTable={data}
                             setData={setData}
                         />
                         {

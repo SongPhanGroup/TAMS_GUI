@@ -31,8 +31,9 @@ import { getCourse } from "../../../../api/course"
 import classNames from "classnames"
 import { postCheckingDocumentVersion } from "../../../../api/checking_document_version"
 import toast from "react-hot-toast"
+import { useNavigate } from "react-router-dom"
 
-const AddNewCheckingDocument = ({ open, handleModal, getData, data, onUpdate, setData }) => {
+const AddNewCheckingDocument = ({ open, handleModal, getData, dataTable, onUpdate, setData }) => {
     const AddNewCheckingDocumentSchema = yup.object().shape({
         file: yup.mixed().required("Yêu cầu chọn file").nullable().test(
             "is-not-empty",
@@ -58,6 +59,7 @@ const AddNewCheckingDocument = ({ open, handleModal, getData, data, onUpdate, se
     })
 
     // ** State
+    const navigate = useNavigate()
     const [file, setFile] = useState()
     const [listCourse, setListCourse] = useState([])
     const [loadingAdd, setLoadingAdd] = useState(false)
@@ -132,14 +134,16 @@ const AddNewCheckingDocument = ({ open, handleModal, getData, data, onUpdate, se
     // console.log("Bản ghi", localData)
 
     const onSubmit = (data) => {
-        setLoadingAdd(true)
-        postCheckingDocument({
+        const newRecord = {
             title: data.title,
             author: data.author,
             courseId: data.course.value,
             description: data.description ?? ""
-        }).then(result => {
+        }
+        setLoadingAdd(true)
+        postCheckingDocument(newRecord).then(result => {
             if (result.status === 'success') {
+                navigate('/tams/checking-document')
                 setSuccessMessage(`Thêm mới ${file.name} thành công!!!`)
                 setTimeout(() => setSuccessMessage(''), 2000)
                 const formData = new FormData()
@@ -151,14 +155,12 @@ const AddNewCheckingDocument = ({ open, handleModal, getData, data, onUpdate, se
                 postCheckingDocumentVersion(formData).then(result => {
                     if (result.status === 'success') {
                         toast.success('Thêm mới tài liệu kiểm tra thành công')
-                        getData()
                     } else {
                         toast.error('Thêm mới tài liệu kiểm tra thất bại')
                     }
                 }).catch(error => {
                     console.log(error)
                 })
-                getData()
             } else {
                 // Swal.fire({
                 //     title: "Thêm mới kiểm tra tài liệu thất bại",

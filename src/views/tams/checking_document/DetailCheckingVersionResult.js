@@ -9,7 +9,7 @@ import {
 } from '@ant-design/icons'
 import mqtt from 'mqtt'
 import { Breadcrumb, Layout, Menu, theme, Row, Col, Card, Badge, Tag, Progress, Spin } from 'antd'
-import { useLocation, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { getCheckingResultHTML, getSimilarDocumentWithoutThreshHold } from '../../../api/checking_result'
 import { getListDocFromSetenceId } from '../../../api/checking_sentence'
 import './hightlight.css'
@@ -20,6 +20,7 @@ import SimilarityDocInDetailContentModal from './modal/DocInDetailContentModal'
 const { Header, Content, Footer, Sider } = Layout
 const DetailCheckingDocumentVersionResult = () => {
     const location = useLocation()
+    const navigate = useNavigate()
     const params = useParams()
     const [loadingData, setLoadingData] = useState(false)
     const [dataDoc, setDataDoc] = useState([])
@@ -36,21 +37,45 @@ const DetailCheckingDocumentVersionResult = () => {
     const [selectedDocId, setSelectedDocId] = useState()
     const [infoDoc, setInfoDoc] = useState({})
 
-    const getData = () => {
-        setLoadingHTML(true)
-        getCheckingResultHTML({
-            params: {
-                id: location?.state?.id,
-                type: 1
-            }
-        }).then(result => {
-            setHTMLResult(result)
-        }).catch(error => {
-            console.log(error)
+    useEffect(() => {
+        return () => {
+            // Xóa trạng thái khi điều hướng đi trang khác
+            localStorage.removeItem('hasReloaded')
+        }
+    }, [])
 
-        }).finally(() => {
-            setLoadingHTML(false)
-        })
+    const getData = () => {
+        try {
+            setLoadingHTML(true) // Bắt đầu quá trình tải
+
+            // Kiểm tra xem đã reload chưa
+            const hasReloaded = localStorage.getItem('hasReloaded')
+
+            getCheckingResultHTML({
+                params: {
+                    id: params?.id,
+                    type: 1
+                }
+            })
+                .then(result => {
+                    setHTMLResult(result) // Cập nhật kết quả nhận được
+                    localStorage.removeItem('hasReloaded') // Xóa trạng thái reload nếu thành công
+                })
+                .catch(error => {
+                    console.log(error)
+
+                    // Nếu gặp lỗi và chưa reload
+                    if (!hasReloaded) {
+                        localStorage.setItem('hasReloaded', 'true') // Đánh dấu đã reload
+                        window.location.reload() // Reload lại trang
+                    }
+                })
+                .finally(() => {
+                    setLoadingHTML(false) // Kết thúc quá trình tải
+                })
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     const getDetailData = () => {
@@ -76,7 +101,7 @@ const DetailCheckingDocumentVersionResult = () => {
 
     useEffect(() => {
         getData()
-    }, [])
+    }, [params?.id, location?.state?.id])
 
     useEffect(() => {
         getDocHasTheSameSentence()

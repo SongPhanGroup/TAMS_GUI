@@ -9,7 +9,7 @@ import {
 } from '@ant-design/icons'
 import mqtt from 'mqtt'
 import { Breadcrumb, Layout, Menu, theme, Row, Col, Card, Badge, Tag, Progress, Spin } from 'antd'
-import { useLocation, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { getCheckingResultHTML, getSimilarDocument, getSimilarDocumentWithoutThreshHold } from '../../../api/checking_result'
 import { getListDocFromSetenceId } from '../../../api/checking_sentence'
 import './hightlight.css'
@@ -21,6 +21,7 @@ import SimilarityDocInDetailContentModal from './modal/DocInDetailContentModal'
 const { Header, Content, Footer, Sider } = Layout
 const DetailCheckingDocumentVersionResult = () => {
     const location = useLocation()
+    const navigate = useNavigate()
     const params = useParams()
     const [loadingData, setLoadingData] = useState(false)
     const [dataDoc, setDataDoc] = useState([])
@@ -39,20 +40,45 @@ const DetailCheckingDocumentVersionResult = () => {
     const [infoDoc, setInfoDoc] = useState({})
     const [selectedSentence, setSelectedSentence] = useState()
 
+    useEffect(() => {
+        return () => {
+            // Xóa trạng thái khi điều hướng đi trang khác
+            localStorage.removeItem('hasReloaded')
+        }
+    }, [])
+
     const getData = () => {
-        setLoadingHTML(true)
-        getCheckingResultHTML({
-            params: {
-                id: location?.state?.id,
-                type: 1
-            }
-        }).then(result => {
-            setHTMLResult(result)
-        }).catch(error => {
+        try {
+            setLoadingHTML(true) // Bắt đầu quá trình tải
+
+            // Kiểm tra xem đã reload chưa
+            const hasReloaded = localStorage.getItem('hasReloaded')
+
+            getCheckingResultHTML({
+                params: {
+                    id: params?.id,
+                    type: 1
+                }
+            })
+                .then(result => {
+                    setHTMLResult(result) // Cập nhật kết quả nhận được
+                    localStorage.removeItem('hasReloaded') // Xóa trạng thái reload nếu thành công
+                })
+                .catch(error => {
+                    console.log(error)
+
+                    // Nếu gặp lỗi và chưa reload
+                    if (!hasReloaded) {
+                        localStorage.setItem('hasReloaded', 'true') // Đánh dấu đã reload
+                        window.location.reload() // Reload lại trang
+                    }
+                })
+                .finally(() => {
+                    setLoadingHTML(false) // Kết thúc quá trình tải
+                })
+        } catch (error) {
             console.log(error)
-        }).finally(() => {
-            setLoadingHTML(false)
-        })
+        }
     }
 
     const getDetailData = () => {
@@ -78,6 +104,9 @@ const DetailCheckingDocumentVersionResult = () => {
 
     useEffect(() => {
         getData()
+    }, [])
+
+    useEffect(() => {
         getDocHasTheSameSentence()
     }, [])
 
@@ -157,7 +186,7 @@ const DetailCheckingDocumentVersionResult = () => {
     useEffect(() => {
         const container = containerRef.current
         // Tạo một đối tượng DOM từ chuỗi HTML
-        if (container && location.state.from === 'checking-specialized') {
+        if (container && location?.state?.from === 'checking-specialized') {
             const parser = new DOMParser()
             const doc = parser.parseFromString(htmlResult, 'text/html')
 
@@ -185,10 +214,10 @@ const DetailCheckingDocumentVersionResult = () => {
 
     const CustomStyle = styled.div`
         .tooltip {
-            opacity: 1 !important; /* Bỏ opacity: 0 */
+            opacity: 1 !important /* Bỏ opacity: 0 */
         }
         .tooltiptext {
-            color: #000 !important;
+            color: #000 !important
         }
     `
     const dataTest = [
@@ -253,7 +282,7 @@ const DetailCheckingDocumentVersionResult = () => {
                             <h4 style={{ textTransform: 'uppercase', marginBottom: 0, color: '#1C5385' }}>Báo cáo chi tiết</h4>
                         </Col>
                         <Col md={12}>
-                            <h4 style={{ marginBottom: 0 }}>Tài liệu kiểm tra: <span style={{ color: 'red' }}>{location.state.title}</span></h4>
+                            <h4 style={{ marginBottom: 0 }}>Tài liệu kiểm tra: <span style={{ color: 'red' }}>{location?.state?.title}</span></h4>
                         </Col>
                     </Row>
                 </Col>

@@ -378,7 +378,7 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate }) => {
                 }}
             />}
 
-            <AddNewCheckingDocumentVersion open={isAdd} handleModal={handleModal} getData={getData} rowsPerPage={rowsPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} checkingDocumentSelected={checkingDocumentSelected} listSubmit={listSubmit} onUpdate={onUpdate} />
+            <AddNewCheckingDocumentVersion open={isAdd} handleModal={handleModal} getData={getData} setData={setData} checkingDocumentSelected={checkingDocumentSelected} listSubmit={listSubmit} onUpdate={onUpdate} />
             {checkingDocumentVersionSelected && <EditCheckingDocumentVersion open={isEdit} handleModal={handleModal} getData={getData} rowsPerPage={rowsPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} infoEditVersion={checkingDocumentVersionSelected} listSubmit={listSubmit} dataCheckingDocument={checkingDocumentSelected} onUpdate={onUpdate} />}
         </Card>
     )

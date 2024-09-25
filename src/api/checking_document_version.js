@@ -45,6 +45,13 @@ export const getSimilarityReport = async (query) => {
   return res
 }
 
+export const getSimilarityReportByCourse = async (query) => {
+  const uri = `/getSimilarityReportByCourse`
+  const res = await API_TAMS.get(uri, query, { responseType: 'blob' })
+  return res
+}
+
+
 export const getDuplicateDocumentVersion = async (id) => {
   const uri = `/checking-document-version/${id}/duplicate-document`
   const res = await API_TAMS.get(uri)
@@ -69,7 +76,7 @@ export const getDuplicateSentenceCheckingDocument = async (query, id) => {
   return res
 }
 
-export const downloadTemplateBaoCao = async (id, body_) => {
+export const downloadTemplateBaoCao = async (id, body_, fileName) => {
   const uri = `http://api.khoanhkhac.vn:3003/templater/xlsx/${id}/file`
 
   try {
@@ -93,7 +100,7 @@ export const downloadTemplateBaoCao = async (id, body_) => {
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.setAttribute('download', 'bao_cao_ds_trung_lap_cao.xlsx')// Đặt tên file cho việc tải xuống
+    link.setAttribute('download', `${fileName}.xlsx`)// Đặt tên file cho việc tải xuống
     document.body.appendChild(link)
     link.click()
     link.remove()

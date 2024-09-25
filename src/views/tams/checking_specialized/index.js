@@ -61,7 +61,7 @@ import VersionModal from "./modal/VersionModal"
 import { PAGE_DEFAULT, PER_PAGE_DEFAULT } from "../../../utility/constant"
 import { getCourse } from "../../../api/course"
 import dayjs from "dayjs"
-import { downloadTemplateBaoCao, getSimilarityReport } from "../../../api/checking_document_version"
+import { downloadTemplateBaoCao, getSimilarityReport, getSimilarityReportByCourse } from "../../../api/checking_document_version"
 const { RangePicker } = DatePicker
 
 const oneWeekAgo = new Date()
@@ -284,22 +284,41 @@ const CheckingDocument = () => {
         navigate(`/tams/detailXX-checking-version-result/${record?.id}`, { state: record })
     }
 
-    const handleReport = (recordId) => {
-        setLoadingReports((prev) => ({ ...prev, [recordId]: true }))
-        getSimilarityReport({
-            params: {
-                checkingDocumentVersionId: Number(recordId)
-            },
-            responseType: 'blob'
-        })
-            .then(res => {
-                downloadTemplateBaoCao(2, res)
+    const handleReport = (recordId, item) => {
+        if (item && item.key === "2") {
+            setLoadingReports((prev) => ({ ...prev, [recordId]: true }))
+            getSimilarityReport({
+                params: {
+                    checkingDocumentVersionId: Number(recordId)
+                },
+                responseType: 'blob'
             })
-            .catch(error => {
-                console.log(error)
-            }).finally(() => {
-                setLoadingReports((prev) => ({ ...prev, [recordId]: false }))
+                .then(res => {
+                    downloadTemplateBaoCao(2, res, 'Bao_cao_DS_trung_lap_cao')
+                })
+                .catch(error => {
+                    console.log(error)
+                }).finally(() => {
+                    setLoadingReports((prev) => ({ ...prev, [recordId]: false }))
+                })
+        } else {
+            setLoadingReports((prev) => ({ ...prev, [recordId]: true }))
+            getSimilarityReportByCourse({
+                params: {
+                    checkingDocumentVersionId: Number(recordId)
+                },
+                responseType: 'blob'
             })
+                .then(res => {
+                    downloadTemplateBaoCao(4, res, 'Bao_cao_DS_trung_lap_theo_dot')
+                })
+                .catch(error => {
+                    console.log(error)
+                }).finally(() => {
+                    setLoadingReports((prev) => ({ ...prev, [recordId]: false }))
+                })
+        }
+
     }
 
     const items = [
@@ -308,16 +327,16 @@ const CheckingDocument = () => {
             key: '2',
             icon: <DownCircleOutlined />,
         },
-        // {
-        //     label: 'Báo cáo DS trùng lặp theo đợt',
-        //     key: '1',
-        //     icon: <DownCircleFilled />,
-        // }
+        {
+            label: 'Báo cáo DS trùng lặp theo đợt',
+            key: '1',
+            icon: <DownCircleFilled />,
+        }
     ]
 
     const menuProps = (recordId) => ({
         items,
-        onClick: () => handleReport(recordId),
+        onClick: (item) => handleReport(recordId, item),
     })
 
     const columns = [
@@ -406,7 +425,7 @@ const CheckingDocument = () => {
                     }
                 } else {
                     return (
-                        <span style={{color: 'blue', fontWeight: '600'}}>Đang xử lý</span>
+                        <span style={{ color: 'blue', fontWeight: '600' }}>Đang xử lý</span>
                     )
                 }
             },

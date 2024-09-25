@@ -81,12 +81,13 @@ const AddNewCheckingDocument = ({ open, handleModal, getData, dataTable, onUpdat
         }, [])
 
         const courseRes = responseData[0]
+        const resCourse = courseRes?.data?.filter(item => item.isActive === 1)
         results.map((res) => {
             if (res.status !== 'fulfilled') {
                 setListCourse(null)
             }
         })
-        const courses = courseRes?.data?.map((res) => {
+        const courses = resCourse?.map((res) => {
             return {
                 value: res.id,
                 label: `${res.name}`

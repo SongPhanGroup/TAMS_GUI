@@ -110,57 +110,57 @@ export default [
     resource: 'LINH_VUC_TAI_LIEU',
     role: 0
   },
-  {
-    id: 'organization',
-    title: 'Loại đơn vị',
-    icon: <MenuOutlined size={12} />,
-    navLink: '/tams/organization-type',
-    action: 'read',
-    resource: 'LOAI_DON_VI',
-    role: 0
-  },
+  // {
+  //   id: 'organization',
+  //   title: 'Loại đơn vị',
+  //   icon: <MenuOutlined size={12} />,
+  //   navLink: '/tams/organization-type',
+  //   action: 'read',
+  //   resource: 'LOAI_DON_VI',
+  //   role: 0
+  // },
   {
     header: "Quản lý hệ thống",
     role: 0,
     action: 'read',
     resource: ['DON_VI', 'QL_TAI_KHOAN', 'PHAN_QUYEN_VAI_TRO', 'QL_QUYEN_CO_BAN', 'CAU_HINH_THAM_SO'],
   },
-  {
-    id: 'organization',
-    title: 'QL đơn vị',
-    icon: <ApartmentOutlined size={12} />,
-    navLink: '/tams/organization',
-    action: 'read',
-    resource: 'DON_VI',
-    role: 0
-  },
-  {
-    id: 'permissions',
-    title: 'QL tài khoản',
-    icon: <Users size={12} />,
-    navLink: '/tams/accounts',
-    action: 'read',
-    resource: 'QL_TAI_KHOAN',
-    role: 0
-  },
-  {
-    id: 'role',
-    title: 'QL vai trò và phân quyền',
-    icon: <Users size={12} />,
-    navLink: '/tams/roles',
-    action: 'read',
-    resource: 'PHAN_QUYEN_VAI_TRO',
-    role: 0
-  },
-  {
-    id: 'permissions',
-    title: 'QL các quyền cơ bản',
-    icon: <UserPlus size={12} />,
-    navLink: '/tams/permissions',
-    action: 'read',
-    resource: 'QL_QUYEN_CO_BAN',
-    role: 0
-  },
+  // {
+  //   id: 'organization',
+  //   title: 'QL đơn vị',
+  //   icon: <ApartmentOutlined size={12} />,
+  //   navLink: '/tams/organization',
+  //   action: 'read',
+  //   resource: 'DON_VI',
+  //   role: 0
+  // },
+  // {
+  //   id: 'permissions',
+  //   title: 'QL tài khoản',
+  //   icon: <Users size={12} />,
+  //   navLink: '/tams/accounts',
+  //   action: 'read',
+  //   resource: 'QL_TAI_KHOAN',
+  //   role: 0
+  // },
+  // {
+  //   id: 'role',
+  //   title: 'QL vai trò và phân quyền',
+  //   icon: <Users size={12} />,
+  //   navLink: '/tams/roles',
+  //   action: 'read',
+  //   resource: 'PHAN_QUYEN_VAI_TRO',
+  //   role: 0
+  // },
+  // {
+  //   id: 'permissions',
+  //   title: 'QL các quyền cơ bản',
+  //   icon: <UserPlus size={12} />,
+  //   navLink: '/tams/permissions',
+  //   action: 'read',
+  //   resource: 'QL_QUYEN_CO_BAN',
+  //   role: 0
+  // },
   {
     id: 'configuration',
     title: 'Cấu hình tham số',

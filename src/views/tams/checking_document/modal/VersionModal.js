@@ -168,11 +168,11 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate }) => {
             key: '2',
             icon: <DownCircleOutlined />,
         },
-        // {
-        //     label: 'Báo cáo DS trùng lặp theo đợt',
-        //     key: '1',
-        //     icon: <DownCircleFilled />,
-        // }
+        {
+            label: 'Báo cáo DS trùng lặp theo đợt',
+            key: '1',
+            icon: <DownCircleFilled />,
+        }
     ]
 
     const menuProps = (recordId) => ({

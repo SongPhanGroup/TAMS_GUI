@@ -698,7 +698,7 @@ const CheckingDocument = () => {
                                         mode="multiple"
                                         placeholder="Chọn đợt kiểm tra"
                                         className='mb-50 select-custom flex-1'
-                                        options={listCourse.map((course) => ({
+                                        options={listCourse?.map((course) => ({
                                             value: course.value,
                                             label: renderOptionLabel(course)
                                         }))}

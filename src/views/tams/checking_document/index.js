@@ -40,6 +40,7 @@ import {
     FileDoneOutlined,
     LockOutlined,
     RightSquareOutlined,
+    UnlockOutlined,
 } from "@ant-design/icons"
 import { AbilityContext } from '@src/utility/context/Can'
 // import style from "../../../../assets/scss/index.module.scss"
@@ -91,6 +92,7 @@ const CheckingDocument = () => {
     const [listAllRole, setListAllRole] = useState([])
 
     const [listCourse, setListCourse] = useState([])
+    const [listLockedCourseIds, setListLockedCourseIds] = useState([])
     const [listCourseId, setListCourseId] = useState([])
     const [loadingReports, setLoadingReports] = useState({}) // Tracks loading per record
     const [lastVersionCheckingDoc, setLastVersionCheckingDoc] = useState({
@@ -118,9 +120,9 @@ const CheckingDocument = () => {
             }
         })
 
-        const resCourse = courseRes?.data?.filter(item => item.isActive === 1)
+        const resLockedCourseIds = courseRes?.data?.filter(item => item.isActive !== 1)?.map(item => item.id)
         const courseIds = courseRes?.data?.filter(item => item.isActive === 1)?.map(item => item.id)
-        const courses = resCourse?.map((res) => {
+        const courses = courseRes?.data?.map((res) => {
             return {
                 value: res.id,
                 label: `${res.name}`
@@ -132,6 +134,7 @@ const CheckingDocument = () => {
         })
 
         setListCourse(courses)
+        setListLockedCourseIds(resLockedCourseIds)
         setListCourseId(courseIds)
     }
 
@@ -254,6 +257,7 @@ const CheckingDocument = () => {
         setIsEdit(true)
     }
     const handleChangeCourse = (value) => {
+        console.log(value)
         if (value) {
             setCourseId(value.join(','))
             setCurrentPage(1)
@@ -675,6 +679,25 @@ const CheckingDocument = () => {
         }
     }
 
+    // Custom rendering for each option
+    const renderOptionLabel = (option) => {
+        if (listLockedCourseIds.includes(option.value)) {
+            return (
+                <span style={{ color: 'red', display: 'flex', justifyContent: 'space-between' }}>
+                    {option.label}
+                    <LockOutlined style={{ marginLeft: 5 }} /> {/* Add icon */}
+                </span>
+            )
+        } else {
+            return (
+                <span style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    {option.label}
+                    <UnlockOutlined style={{ marginLeft: 5, color: '#09A863' }} /> {/* Add icon */}
+                </span>
+            )
+        }
+    }
+
     return (
         <Fragment>
             <Card
@@ -743,7 +766,10 @@ const CheckingDocument = () => {
                                         mode="multiple"
                                         placeholder="Chọn đợt kiểm tra"
                                         className='mb-50 select-custom flex-1'
-                                        options={listCourse}
+                                        options={listCourse.map((course) => ({
+                                            value: course.value,
+                                            label: renderOptionLabel(course)
+                                        }))}
                                         allowClear
                                         onChange={(value) => handleChangeCourse(value)}
                                         filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}

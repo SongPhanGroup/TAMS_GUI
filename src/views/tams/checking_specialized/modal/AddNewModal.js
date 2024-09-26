@@ -105,9 +105,23 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
     }, [open])
 
     const handleCloseModal = () => {
-        handleModal()
-        reset()
+        const isDocumentSubmitted = localStorage.getItem('isDocumentSubmitted')
+        if (isDocumentSubmitted === 'true') {
+            handleModal()
+            reset()
+            navigate('/tams/checking-specialized') // Only navigate if the document was successfully submitted
+        } else {
+            handleModal()
+            reset()
+        }
     }
+
+    useEffect(() => {
+        return () => {
+            // Clean up localStorage when the component unmounts
+            localStorage.removeItem('isDocumentSubmitted')
+        }
+    }, [])
 
     const handleChangeFile = (event) => {
         const file = event.target.files[0]
@@ -123,13 +137,14 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
             description: data.description ?? ""
         }).then(result => {
             if (result.status === 'success') {
+                localStorage.setItem('isDocumentSubmitted', 'true')
                 setSuccessMessage(`Thêm mới ${file.name} thành công!!!`)
                 setTimeout(() => setSuccessMessage(''), 2000)
                 const formData = new FormData()
                 formData.append('file', file)
-                // if (data.description) {
-                //     formData.append('description', data.description)
-                // }
+                if (data.description) {
+                    formData.append('description', data.description)
+                }
                 formData.append('checkingDocumentId', result?.data?.id)
                 postCheckingDocumentVersion(formData).then(result => {
                     if (result.status === 'success') {
@@ -141,17 +156,16 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
                         //         confirmButton: "btn btn-success"
                         //     }
                         // })
-                        toast.success('Thêm mới tài liệu kiểm tra thành công')
-                        getData()
+                        toast.success('Kiểm tra tài liệu thành công')
                     } else {
-                        toast.error('Thêm mới tài liệu kiểm tra thất bạị')
+                        toast.error('Kiểm tra tài liệu thất bạị')
                     }
                 }).catch(error => {
                     console.log(error)
                 })
             } else {
                 Swal.fire({
-                    title: "Thêm mới kiểm tra tài liệu thất bại",
+                    title: "Kiểm tra tài liệu thất bại",
                     text: "Vui lòng thử lại sau!",
                     icon: "error",
                     customClass: {

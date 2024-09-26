@@ -167,7 +167,7 @@ const SimilarityDocContentModal = ({ listSentenceByCheckingResult }) => {
             align: "center",
             width: 100,
             render: (text, record, index) => (
-                <span>{(record?.similarity).toFixed(2)}</span>
+                <span>{(record?.similarity)}</span>
             ),
         }
     ]

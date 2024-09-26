@@ -108,9 +108,23 @@ const AddNewCheckingDocument = ({ open, handleModal, getData, dataTable, onUpdat
     }, [open])
 
     const handleCloseModal = () => {
-        handleModal()
-        reset()
+        const isDocumentSubmitted = localStorage.getItem('isDocumentSubmitted')
+        if (isDocumentSubmitted === 'true') {
+            handleModal()
+            reset()
+            navigate('/tams/checking-document') // Only navigate if the document was successfully submitted
+        } else {
+            handleModal()
+            reset()
+        }
     }
+
+    useEffect(() => {
+        return () => {
+            // Clean up localStorage when the component unmounts
+            localStorage.removeItem('isDocumentSubmitted')
+        }
+    }, [])
 
     const handleChangeFile = (event) => {
         const file = event.target.files[0]
@@ -144,7 +158,7 @@ const AddNewCheckingDocument = ({ open, handleModal, getData, dataTable, onUpdat
         setLoadingAdd(true)
         postCheckingDocument(newRecord).then(result => {
             if (result.status === 'success') {
-                navigate('/tams/checking-document')
+                localStorage.setItem('isDocumentSubmitted', 'true')
                 setSuccessMessage(`Thêm mới ${file.name} thành công!!!`)
                 setTimeout(() => setSuccessMessage(''), 2000)
                 const formData = new FormData()
@@ -155,9 +169,9 @@ const AddNewCheckingDocument = ({ open, handleModal, getData, dataTable, onUpdat
                 formData.append('checkingDocumentId', result?.data?.id)
                 postCheckingDocumentVersion(formData).then(result => {
                     if (result.status === 'success') {
-                        toast.success('Thêm mới tài liệu kiểm tra thành công')
+                        toast.success('Kiểm tra tài liệu thành công')
                     } else {
-                        toast.error('Thêm mới tài liệu kiểm tra thất bại')
+                        toast.error('Kiểm tra tài liệu thất bại')
                     }
                 }).catch(error => {
                     console.log(error)
@@ -171,7 +185,7 @@ const AddNewCheckingDocument = ({ open, handleModal, getData, dataTable, onUpdat
                 //         confirmButton: "btn btn-danger"
                 //     }
                 // })
-                toast.error('Thêm mới tài liệu kiểm tra thất bại!')
+                toast.error('Kiểm tra tài liệu thất bại!')
             }
             setValue('title', '')
             setValue('author', '')

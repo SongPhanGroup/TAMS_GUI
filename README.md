@@ -56,5 +56,5 @@ Sau đây là một số quy chuẩn đặt tên thường dùng trong dự án:
 #### Reactjs 
 Gợi ý code reactjs: https://github.com/airbnb/javascript/tree/master/react
 
-#### Copyright and license
- Code and Docs released under the MIT License.
+Run with pm2
+pm2 serve build/ 3000 --name "react-build" --spa

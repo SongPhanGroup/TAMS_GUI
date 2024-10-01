@@ -49,7 +49,7 @@ import { deleteCheckingDocumentVersion, getCheckingDocumentVersion } from "../..
 import { detailCheckingDocument } from "../../../../api/checking_document"
 import { getListSentenceByCheckingResult } from "../../../../api/checking_result_by_word"
 
-const SimilarityDocContentModal = ({ listSentenceByCheckingResult }) => {
+const SimilarityDocContentModal = ({ listSentenceByCheckingResult, thresholdValue }) => {
     const params = useParams()
     const [loadingData, setLoadingData] = useState(false)
     const navigate = useNavigate()
@@ -77,8 +77,9 @@ const SimilarityDocContentModal = ({ listSentenceByCheckingResult }) => {
             }
         })
             .then((res) => {
-                setData(res.data)
-                setCount(res?.total)
+                const thresholdData = res?.data?.filter(item => item.similarity * 100 >= thresholdValue)
+                setData(thresholdData)
+                setCount(thresholdData?.length)
             })
             .catch((err) => {
                 console.log(err)
@@ -167,7 +168,7 @@ const SimilarityDocContentModal = ({ listSentenceByCheckingResult }) => {
             align: "center",
             width: 100,
             render: (text, record, index) => (
-                <span>{(record?.similarity) * 100}</span>
+                <span>{(record?.similarity?.toFixed(2)) * 100}</span>
             ),
         }
     ]

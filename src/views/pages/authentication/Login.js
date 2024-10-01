@@ -42,6 +42,7 @@ import withReactContent from 'sweetalert2-react-content'
 import '@styles/react/pages/page-authentication.scss'
 import style from '../../../assets/scss/index.module.scss'
 import { getPermissionByRole } from '../../../api/permissions'
+import { fetchSystemParameters } from '../../../redux/systemParameterSlice'
 
 const ToastContent = ({ t, name, role }) => {
   return (
@@ -103,6 +104,10 @@ const Login = () => {
       try {
         login(dataSubmit)
           .then((responseDataLogin) => {
+            // dispatch(fetchSystemParameters({params: {
+            //   page: 1,
+            //   limit: 100
+            // }}))
             dispatch(setSelectedYear(new Date().getFullYear()))
             localStorage.setItem('accessToken', responseDataLogin.accessToken)
             localStorage.setItem('refreshToken', responseDataLogin.refreshToken)

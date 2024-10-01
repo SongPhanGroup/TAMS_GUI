@@ -93,8 +93,9 @@ const DetailCheckingDocumentVersionResult = () => {
     const getDocHasTheSameSentence = () => {
         setLoadingDataDoc(true)
         getSimilarDocumentWithoutThreshHold(Number(params?.id)).then(res => {
-            setDataDoc(res?.data)
-            setCount(res?.total)
+            const thresholdData = res?.data?.filter(item => item.similarity >= location?.state?.thresholdValue?.threshold_detail_similarity)
+            setDataDoc(thresholdData)
+            setCount(thresholdData?.length)
         }).catch(error => {
             console.log(error)
         }).finally(() => {
@@ -104,11 +105,11 @@ const DetailCheckingDocumentVersionResult = () => {
 
     useEffect(() => {
         getData()
-    }, [])
+    }, [params?.id, location?.state?.id])
 
     useEffect(() => {
         getDocHasTheSameSentence()
-    }, [])
+    }, [params?.id, location?.state?.thresholdValue?.threshold_detail_similarity])
 
     useEffect(() => {
         getDetailData()

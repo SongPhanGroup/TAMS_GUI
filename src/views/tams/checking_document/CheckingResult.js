@@ -95,6 +95,7 @@ const CheckingResult = () => {
 
     const location = useLocation()
     const navigate = useNavigate()
+    console.log(location)
 
     const getAllDataPromises = async () => {
         const coursePromise = getCourse({ params: { page: PAGE_DEFAULT, perPage: PER_PAGE_DEFAULT, search: '' } })
@@ -124,8 +125,7 @@ const CheckingResult = () => {
         })
         setListCourse(courses)
     }
-
-
+    
     const params = useParams()
     const getData = () => {
         setLoadingData(true)
@@ -134,8 +134,9 @@ const CheckingResult = () => {
                 const result = res?.data?.map(((item, index) => {
                     return { ...item, _id: item.id, key: index }
                 }))
-                setData(result)
-                setCount(res?.total)
+                const thresholdResult = result.filter(item => item.similarity >= location.state.thresholdValue.threshold_document)
+                setData(thresholdResult)
+                setCount(thresholdResult?.length)
             })
             .catch((err) => {
                 console.log(err)
@@ -151,9 +152,10 @@ const CheckingResult = () => {
                 const result = res?.data?.map(((item, index) => {
                     return { ...item, _id: item.id, key: index }
                 }))
-                setData2(result)
-                setSelectedCourse(result[0].cdv.courseId)
-                setCount2(res?.total)
+                const thresholdResult = result.filter(item => item.similarity >= location.state.thresholdValue.threshold_document)
+                setData2(thresholdResult)
+                setSelectedCourse(thresholdResult[0]?.cdv?.courseId)
+                setCount2(thresholdResult?.length)
             })
             .catch((err) => {
                 console.log(err)
@@ -163,13 +165,16 @@ const CheckingResult = () => {
     }
 
     useEffect(() => {
+        getAllDataPromises()
+    }, [])
+
+    useEffect(() => {
         getDataSameCourse()
     }, [params?.id])
 
     useEffect(() => {
-        getAllDataPromises()
         getData()
-    }, [params?.id])
+    }, [params?.id, location?.state?.thresholdValue?.threshold_document])
 
     const handleModal = () => {
         setIsAdd(false)
@@ -644,7 +649,7 @@ const CheckingResult = () => {
                             bordered
                             expandable={{
                                 expandedRowRender: (record) => <SimilarityDocContentModal
-                                    listSentenceByCheckingResult={record} />,
+                                    listSentenceByCheckingResult={record} thresholdValue={location?.state?.thresholdValue?.threshold_sentence} />,
                                 rowExpandable: (record) => record.name !== 'Not Expandable',
                                 // expandRowByClick: true
                             }}
@@ -672,7 +677,7 @@ const CheckingResult = () => {
                                 bordered
                                 expandable={{
                                     expandedRowRender: (record) => <SimilarityCourseContentModal
-                                        listSentenceByCheckingResult={record} />,
+                                        listSentenceByCheckingResult={record} thresholdValue={location?.state?.thresholdValue?.threshold_sentence} />,
                                     rowExpandable: (record) => record.name !== 'Not Expandable',
                                     // expandRowByClick: true
                                 }}

@@ -31,6 +31,7 @@ import classNames from "classnames"
 import { postCheckingDocumentVersion } from "../../../../api/checking_document_version_by_word"
 import toast from "react-hot-toast"
 import { postCheckingDocument } from "../../../../api/checking_document"
+import { useNavigate } from "react-router-dom"
 
 const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
     const AddNewCheckingDocumentSchema = yup.object().shape({
@@ -58,6 +59,7 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
     })
 
     // ** State
+    const navigate = useNavigate()
     const [file, setFile] = useState()
     const [listCourse, setListCourse] = useState([])
     const [loadingAdd, setLoadingAdd] = useState(false)

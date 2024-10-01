@@ -15,7 +15,9 @@ const store = configureStore({
   reducer: persistedReducer,
   middleware: getDefaultMiddleware => {
     return getDefaultMiddleware({
-      serializableCheck: false
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER]
+      }
     })
   }
 })

@@ -47,30 +47,62 @@ const DetailCheckingDocumentVersionResult = () => {
         }
     }, [])
 
-    const getData = () => {
+    // const getData = () => {
+    //     try {
+    //         setLoadingHTML(true) // Bắt đầu quá trình tải
+
+    //         // Kiểm tra xem đã reload chưa
+    //         const hasReloaded = localStorage.getItem('hasReloaded')
+
+    //         getCheckingResultHTML({
+    //             params: {
+    //                 id: params?.id,
+    //                 type: 1
+    //             }
+    //         })
+    //             .then(result => {
+    //                 setHTMLResult(result) // Cập nhật kết quả nhận được
+    //                 localStorage.removeItem('hasReloaded') // Xóa trạng thái reload nếu thành công
+    //             })
+    //             .catch(error => {
+    //                 console.log(error)
+
+    //                 // Nếu gặp lỗi và chưa reload
+    //                 if (!hasReloaded) {
+    //                     localStorage.setItem('hasReloaded', 'true') // Đánh dấu đã reload
+    //                     window.location.reload() // Reload lại trang
+    //                 }
+    //             })
+    //             .finally(() => {
+    //                 setLoadingHTML(false) // Kết thúc quá trình tải
+    //             })
+    //     } catch (error) {
+    //         console.log(error)
+    //     }
+    // }
+
+    const getData = (retryCount = 0) => {
         try {
             setLoadingHTML(true) // Bắt đầu quá trình tải
-
-            // Kiểm tra xem đã reload chưa
-            const hasReloaded = localStorage.getItem('hasReloaded')
-
+    
             getCheckingResultHTML({
                 params: {
                     id: params?.id,
-                    type: 1
-                }
+                    type: 1,
+                },
             })
-                .then(result => {
+                .then((result) => {
                     setHTMLResult(result) // Cập nhật kết quả nhận được
-                    localStorage.removeItem('hasReloaded') // Xóa trạng thái reload nếu thành công
                 })
-                .catch(error => {
+                .catch((error) => {
                     console.log(error)
-
-                    // Nếu gặp lỗi và chưa reload
-                    if (!hasReloaded) {
-                        localStorage.setItem('hasReloaded', 'true') // Đánh dấu đã reload
-                        window.location.reload() // Reload lại trang
+    
+                    // Nếu gặp lỗi và chưa vượt quá số lần retry
+                    if (retryCount < 1) {
+                        console.log(`Retrying... Attempt ${retryCount + 1}`)
+                        getData(retryCount + 1) // Gọi lại chính API và tăng biến đếm retry
+                    } else {
+                        console.error("Max retry attempts reached")
                     }
                 })
                 .finally(() => {
@@ -105,7 +137,7 @@ const DetailCheckingDocumentVersionResult = () => {
 
     useEffect(() => {
         getData()
-    }, [params?.id, location?.state?.id])
+    }, [params?.id])
 
     useEffect(() => {
         getDocHasTheSameSentence()

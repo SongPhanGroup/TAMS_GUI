@@ -364,15 +364,15 @@ const Document = () => {
             title="Danh sách tài liệu"
             style={{ backgroundColor: "white", width: "100%", height: "100%" }}
         >
-            <Row>
-                <Col sm="8" style={{ display: "flex", flexWrap: "wrap" }}>
-                    <Col sm="5" className="mr-1" style={{ display: "flex", justifyContent: "flex-end" }}>
+            <Row style={{alignItems: 'center', flexWrap: 'wrap'}}>
+                <Col sm="8" style={{ display: "flex", flexWrap: 'nowrap'}}>
+                    <Col sm="4" className="mr-1" style={{ display: "flex", justifyContent: "flex-end" }}>
                         <Label
                             className=""
                             style={{
                                 width: "100px",
                                 fontSize: "14px",
-                                height: "34px",
+                                height: "32px",
                                 display: "flex",
                                 alignItems: "center",
                             }}
@@ -382,7 +382,7 @@ const Document = () => {
                         <Input
                             type="text"
                             placeholder="Tìm kiếm"
-                            style={{ height: "34px" }}
+                            style={{ height: "32px" }}
                             onChange={(e) => {
                                 if (e.target.value === "") {
                                     setSearch("")
@@ -396,19 +396,8 @@ const Document = () => {
                             }}
                         />
                     </Col>
-                    <Col sm="5" className="mr-1" style={{ display: "flex", justifyContent: "flex-end" }}>
-                        <Select
-                            placeholder="Chọn loại tài liệu"
-                            className='mb-50 select-custom'
-                            options={listDocumentType}
-                            allowClear
-                            mode="multiple"
-                            onChange={(value) => handleChangeDocumentType(value)}
-                            filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
-                        />
-                    </Col>
                     <Col
-                        sm="5"
+                        sm="4"
                         className="mr-1"
                         style={{ display: "flex", justifyContent: "flex-start" }}
                     >
@@ -424,20 +413,6 @@ const Document = () => {
                         >
                             Ngày tạo
                         </Label>
-                        {/* <Flatpickr
-                            style={{ padding: '0.35rem 1rem' }}
-                            className="form-control invoice-edit-input date-picker mb-50"
-                            options={{
-                                mode: "range",
-                                dateFormat: "d-m-Y", // format ngày giờ
-                                locale: {
-                                    ...Vietnamese
-                                },
-                                defaultDate: [oneWeekAgo, new Date()]
-                            }}
-                            placeholder="dd/mm/yyyy"
-                            onChange={(value => handleChangeDate(value))}
-                        /> */}
                         <RangePicker
                             style={{
                                 width: "100%",
@@ -449,7 +424,18 @@ const Document = () => {
                             onChange={handleChangeTime}
                         />
                     </Col>
-                    <Col sm="5" className="mr-1" style={{ display: "flex", justifyContent: "flex-end" }}>
+                    <Col sm="3" className="mr-1" style={{ display: "flex", justifyContent: "flex-end" }}>
+                        <Select
+                            placeholder="Chọn loại tài liệu"
+                            className='mb-50 select-custom'
+                            options={listDocumentType}
+                            allowClear
+                            mode="multiple"
+                            onChange={(value) => handleChangeDocumentType(value)}
+                            filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                        />
+                    </Col>
+                    <Col sm="4" className="mr-1" style={{ display: "flex", justifyContent: "flex-end" }}>
                         <Select
                             placeholder="Chọn lĩnh vực"
                             className='mb-50 select-custom'
@@ -462,13 +448,13 @@ const Document = () => {
                     </Col>
 
                 </Col>
-                <Col sm="4" style={{ display: "flex", justifyContent: "flex-end", alignItems: "baseline" }}>
+                <Col sm="4" style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginBottom: '8px' }}>
                     {ability.can('create', 'QL_KHO_TAI_LIEU_MAU') && <Col
-                        sm="6"
+                        sm="12"
                         style={{ display: "flex", justifyContent: "flex-end" }}
                     >
-                        <UncontrolledButtonDropdown style={{ width: "120px" }}>
-                            <DropdownToggle color='secondary' caret outline>
+                        <UncontrolledButtonDropdown>
+                            <DropdownToggle color='success' caret>
                                 <File size={15} />
                                 <span className='align-middle ms-50'>Nhập tài liệu</span>
                             </DropdownToggle>
@@ -479,26 +465,26 @@ const Document = () => {
                                 <DropdownItem className='w-100' onClick={onImportFileClick}>
                                     <span className='align-middle ms-50'>Nhập danh sách tài liệu từ file excel</span>
                                 </DropdownItem>
-                                {/* <DropdownItem className='w-100' onClick={onImportFolder}>
-                                <span className='align-middle ms-50'>Tải tài liệu từ thư mục</span>
-                            </DropdownItem> */}
+                                <DropdownItem className='w-100' onClick={(e) => setIsAdd(true)}>
+                                    <span className='align-middle ms-50'>Thêm mới tài liệu mẫu</span>
+                                </DropdownItem>
+                                {/* {ability.can('create', 'QL_KHO_TAI_LIEU_MAU') && <Col
+                                    sm="6"
+                                    style={{ display: "flex", justifyContent: "flex-end" }}
+                                >
+                                    <Button
+                                        onClick={(e) => setIsAdd(true)}
+                                        color="primary"
+                                        className="addBtn"
+                                        style={{
+                                            width: '100px',
+                                        }}
+                                    >
+                                        Thêm mới
+                                    </Button>
+                                </Col>} */}
                             </DropdownMenu>
                         </UncontrolledButtonDropdown>
-                    </Col>}
-                    {ability.can('create', 'QL_KHO_TAI_LIEU_MAU') && <Col
-                        sm="6"
-                        style={{ display: "flex", justifyContent: "flex-end" }}
-                    >
-                        <Button
-                            onClick={(e) => setIsAdd(true)}
-                            color="primary"
-                            className="addBtn"
-                            style={{
-                                width: '100px',
-                            }}
-                        >
-                            Thêm mới
-                        </Button>
                     </Col>}
                 </Col>
             </Row>

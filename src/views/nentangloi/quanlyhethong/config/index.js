@@ -441,7 +441,7 @@ const App = () => {
             dataIndex: 'code',
             align: 'center',
             width: '15%',
-            editable: true,
+            editable: false
         },
         {
             title: 'Giá trị',
@@ -496,7 +496,7 @@ const App = () => {
                                 </Typography.Link>
                             )
                         }
-                        {
+                        {/* {
                             !editable && data.length >= 1 ? (
                                 <Popconfirm title="Bạn có chắc chắn muốn xóa không?" onConfirm={() => {
                                     handleDelete(record.id)
@@ -504,7 +504,7 @@ const App = () => {
                                     <a><DeleteOutlined style={{ color: "red", cursor: 'pointer' }} /></a>
                                 </Popconfirm>
                             ) : null
-                        }
+                        } */}
                     </>
                 )
             },
@@ -537,7 +537,7 @@ const App = () => {
                 style={{ backgroundColor: "white", width: "100%", height: "100%" }}
             >
                 <Form form={form} component={false}>
-                    <Col md="12" style={{ display: "flex", justifyContent: "flex-end" }}>
+                    {/* <Col md="12" style={{ display: "flex", justifyContent: "flex-end" }}>
                         <Button
                             onClick={() => setModalParameter(true)}
                             color="primary"
@@ -549,12 +549,12 @@ const App = () => {
                         >
                             Thêm mới
                         </Button>
-                    </Col>
+                    </Col> */}
                     <Table
                         components={{
                             body: {
-                                cell: EditableCell,
-                            },
+                                cell: EditableCell
+                            }
                         }}
                         bordered
                         dataSource={data}

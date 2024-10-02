@@ -59,7 +59,7 @@ import { detailCheckingDocument } from "../../../../api/checking_document"
 import EditCheckingDocumentVersion from "./EditVersionModal"
 import { toDateTimeString } from "../../../../utility/Utils"
 
-const VersionModal = ({ checkingDocumentSelected, onUpdate }) => {
+const VersionModal = ({ checkingDocumentSelected, onUpdate, thresholdValue }) => {
     const [loadingData, setLoadingData] = useState(false)
     const navigate = useNavigate()
     const MySwal = withReactContent(Swal)
@@ -256,7 +256,7 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate }) => {
                             <AppstoreOutlined
                                 style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
                                 onClick={() => {
-                                    const recordStandard = { ...record, from: 'checking-document' }
+                                    const recordStandard = { ...record, from: 'checking-document', thresholdValue }
                                     return handleResult(recordStandard)
                                 }}
                             />
@@ -267,7 +267,7 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate }) => {
                                 id={`tooltip_detail2_${record._id}`}
                                 style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
                                 onClick={() => {
-                                    const recordStandard = { ...record, from: 'checking-document', title: checkingDocumentSelected?.title }
+                                    const recordStandard = { ...record, from: 'checking-document', title: checkingDocumentSelected?.title, thresholdValue }
                                     return handleButtonClick2(recordStandard)
                                 }}
                             />

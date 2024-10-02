@@ -853,7 +853,7 @@ const CheckingDocument = () => {
                             bordered
                             expandable={{
                                 expandedRowRender: (record) => <VersionModal
-                                    checkingDocumentSelected={record} onUpdate={handleUpdateFromChild} />,
+                                    checkingDocumentSelected={record} onUpdate={handleUpdateFromChild} thresholdValue={thresholdValue} />,
                                 rowExpandable: (record) => record.name !== 'Not Expandable',
                             }}
                             expandedRowKeys={expandedRowKeys}

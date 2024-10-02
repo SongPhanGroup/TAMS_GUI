@@ -11,8 +11,12 @@ import {
     Col,
     FormFeedback,
     UncontrolledTooltip,
+    DropdownToggle,
+    UncontrolledButtonDropdown,
+    DropdownMenu,
+    DropdownItem
 } from "reactstrap"
-import { Plus, X } from "react-feather"
+import { Plus, X, File } from "react-feather"
 import { DeleteOutlined, EditOutlined, LockOutlined } from "@ant-design/icons"
 // import style from "../../../../assets/scss/index.module.scss"
 import Swal from "sweetalert2"
@@ -59,7 +63,10 @@ const Document = () => {
     const [listCourse, setListCourse] = useState([])
     const [listDocumentType, setListDocumentType] = useState([])
     const [listMajor, setListMajor] = useState([])
-
+    const [isAddExcel, setIsAddExcel] = useState(false)
+    const handleModalAddExcel = () => {
+        setIsAddExcel(!isAddExcel)
+    }
     const getAllDataPromises = async () => {
         const coursePromise = getCourse({ params: { page: 1, perPage: 10, search: '' } })
         const documentTypePromise = getDocumentType({ params: { page: 1, perPage: 10, search: '' } })
@@ -338,15 +345,28 @@ const Document = () => {
             setEndDate(dayjs(`${currentYear}-12-31`))
         }
     }
-
+    const onImportFileTemplate = async () => {
+        const urlString = `${process.env.REACT_APP_URL_TAMS}/templates/file_nhap_mau.xlsx`
+        const link = document.createElement('a')
+        link.href = urlString
+        link.setAttribute('download', 'file_nhap_mau.xlsx')
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+    }
+    const onImportFileClick = () => {
+        // `current` points to the mounted file input element
+        // inputFile.current.click()
+        setIsAddExcel(true)
+    }
     return (
         <Card
             title="Danh sách tài liệu"
             style={{ backgroundColor: "white", width: "100%", height: "100%" }}
         >
             <Row>
-                <Col sm="10" style={{ display: "flex" }}>
-                    <Col sm="3" className="mr-1" style={{ display: "flex", justifyContent: "flex-end" }}>
+                <Col sm="8" style={{ display: "flex", flexWrap: "wrap" }}>
+                    <Col sm="5" className="mr-1" style={{ display: "flex", justifyContent: "flex-end" }}>
                         <Label
                             className=""
                             style={{
@@ -376,7 +396,7 @@ const Document = () => {
                             }}
                         />
                     </Col>
-                    <Col sm="3" className="mr-1" style={{ display: "flex", justifyContent: "flex-end" }}>
+                    <Col sm="5" className="mr-1" style={{ display: "flex", justifyContent: "flex-end" }}>
                         <Select
                             placeholder="Chọn loại tài liệu"
                             className='mb-50 select-custom'
@@ -387,25 +407,15 @@ const Document = () => {
                             filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
                         />
                     </Col>
-                    <Col sm="3" className="mr-1" style={{ display: "flex", justifyContent: "flex-end" }}>
-                        <Select
-                            placeholder="Chọn lĩnh vực"
-                            className='mb-50 select-custom'
-                            options={listMajor}
-                            allowClear
-                            mode="multiple"
-                            onChange={(value) => handleChangeMajor(value)}
-                            filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
-                        />
-                    </Col>
                     <Col
-                        sm="3"
+                        sm="5"
+                        className="mr-1"
                         style={{ display: "flex", justifyContent: "flex-start" }}
                     >
                         <Label
                             className=""
                             style={{
-                                width: "90px",
+                                width: "100px",
                                 fontSize: "14px",
                                 height: "34px",
                                 display: "flex",
@@ -439,9 +449,46 @@ const Document = () => {
                             onChange={handleChangeTime}
                         />
                     </Col>
+                    <Col sm="5" className="mr-1" style={{ display: "flex", justifyContent: "flex-end" }}>
+                        <Select
+                            placeholder="Chọn lĩnh vực"
+                            className='mb-50 select-custom'
+                            options={listMajor}
+                            allowClear
+                            mode="multiple"
+                            onChange={(value) => handleChangeMajor(value)}
+                            filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                        />
+                    </Col>
+
                 </Col>
-                {ability.can('create', 'QL_KHO_TAI_LIEU_MAU') &&
-                    <Col sm="2" style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Col sm="4" style={{ display: "flex", justifyContent: "flex-end", alignItems: "baseline" }}>
+                    {ability.can('create', 'QL_KHO_TAI_LIEU_MAU') && <Col
+                        sm="6"
+                        style={{ display: "flex", justifyContent: "flex-end" }}
+                    >
+                        <UncontrolledButtonDropdown style={{ width: "120px" }}>
+                            <DropdownToggle color='secondary' caret outline>
+                                <File size={15} />
+                                <span className='align-middle ms-50'>Nhập tài liệu</span>
+                            </DropdownToggle>
+                            <DropdownMenu>
+                                <DropdownItem className='w-100' onClick={onImportFileTemplate}>
+                                    <span className='align-middle ms-50'>Tải file mẫu</span>
+                                </DropdownItem>
+                                <DropdownItem className='w-100' onClick={onImportFileClick}>
+                                    <span className='align-middle ms-50'>Nhập danh sách tài liệu từ file excel</span>
+                                </DropdownItem>
+                                {/* <DropdownItem className='w-100' onClick={onImportFolder}>
+                                <span className='align-middle ms-50'>Tải tài liệu từ thư mục</span>
+                            </DropdownItem> */}
+                            </DropdownMenu>
+                        </UncontrolledButtonDropdown>
+                    </Col>}
+                    {ability.can('create', 'QL_KHO_TAI_LIEU_MAU') && <Col
+                        sm="6"
+                        style={{ display: "flex", justifyContent: "flex-end" }}
+                    >
                         <Button
                             onClick={(e) => setIsAdd(true)}
                             color="primary"
@@ -452,8 +499,8 @@ const Document = () => {
                         >
                             Thêm mới
                         </Button>
-                    </Col>
-                }
+                    </Col>}
+                </Col>
             </Row>
             {loadingData === true ? <Spin style={{ position: 'relative', left: '50%' }} /> : <Table
                 columns={columns}
@@ -477,7 +524,14 @@ const Document = () => {
                     }
                 }}
             />}
-
+            <SelectCourseModal
+                open={isAddExcel}
+                handleModal={handleModalAddExcel}
+                getData={getData}
+                currentPage={currentPage}
+                rowsPerPage={rowsPerPage}
+            // file
+            />
             <AddNewModal
                 open={isAdd}
                 handleModal={handleModal}
@@ -501,4 +555,6 @@ const Document = () => {
 
 const AddNewModal = React.lazy(() => import("./modal/AddNewModal"))
 const EditModal = React.lazy(() => import("./modal/EditModal"))
+const SelectCourseModal = React.lazy(() => import("./modal/modalSelectCourse"))
+
 export default Document 

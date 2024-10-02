@@ -42,3 +42,8 @@ export const statisticByType = async (params) => {
   const res = await API_TAMS.get(uri, params)
   return res
 }
+export const postFromExcel = async (body) => {
+  const uri = `/document/import-from-excel`
+  const res = await API_FormData_XX.post(uri, body)
+  return res
+}

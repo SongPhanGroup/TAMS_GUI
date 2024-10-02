@@ -152,7 +152,7 @@ const CheckingResult = () => {
                 const result = res?.data?.map(((item, index) => {
                     return { ...item, _id: item.id, key: index }
                 }))
-                const thresholdResult = result.filter(item => item.similarity >= location.state.thresholdValue.threshold_document)
+                const thresholdResult = result.filter(item => item?.cdv?.similarityTotal >= location.state.thresholdValue.threshold_document)
                 setData2(thresholdResult)
                 setSelectedCourse(thresholdResult[0]?.cdv?.courseId)
                 setCount2(thresholdResult?.length)
@@ -262,13 +262,9 @@ const CheckingResult = () => {
             width: 30,
             align: "center",
             render: (text, record, index) => {
-                if (record?.similarity >= 50) {
+                if (record?.similarity >= location.state.thresholdValue.threshold_high_similarity) {
                     return (
                         <span style={{ color: 'red', fontWeight: '600' }}>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
-                    )
-                } else if (record?.similarity >= 30 && record?.similarity < 50) {
-                    return (
-                        <span style={{ color: 'yellowgreen', fontWeight: '600' }}>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
                     )
                 } else {
                     return (
@@ -283,13 +279,9 @@ const CheckingResult = () => {
             width: 500,
             align: "left",
             render: (text, record, index) => {
-                if (record?.similarity >= 50) {
+                if (record?.similarity >= location.state.thresholdValue.threshold_high_similarity) {
                     return (
                         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.document?.title}</span>
-                    )
-                } else if (record?.similarity >= 30 && record?.similarity < 50) {
-                    return (
-                        <span style={{ color: 'yellowgreen', fontWeight: '600' }}>{record?.document?.title}</span>
                     )
                 } else {
                     return (
@@ -304,13 +296,9 @@ const CheckingResult = () => {
             width: 180,
             align: "left",
             render: (text, record, index) => {
-                if (record?.similarity >= 50) {
+                if (record?.similarity >= location.state.thresholdValue.threshold_high_similarity) {
                     return (
                         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.document?.author}</span>
-                    )
-                } else if (record?.similarity >= 30 && record?.similarity < 50) {
-                    return (
-                        <span style={{ color: 'yellowgreen', fontWeight: '600' }}>{record?.document?.author}</span>
                     )
                 } else {
                     return (
@@ -325,13 +313,9 @@ const CheckingResult = () => {
             width: 150,
             align: "left",
             render: (text, record, index) => {
-                if (record?.similarity >= 50) {
+                if (record?.similarity >= location.state.thresholdValue.threshold_high_similarity) {
                     return (
                         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.document?.major?.name}</span>
-                    )
-                } else if (record?.similarity >= 30 && record?.similarity < 50) {
-                    return (
-                        <span style={{ color: 'yellowgreen', fontWeight: '600' }}>{record?.document?.major?.name}</span>
                     )
                 } else {
                     return (
@@ -346,13 +330,9 @@ const CheckingResult = () => {
             width: 120,
             align: "center",
             render: (text, record, index) => {
-                if (record?.similarity >= 50) {
+                if (record?.similarity >= location.state.thresholdValue.threshold_high_similarity) {
                     return (
                         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.document?.documentType?.name}</span>
-                    )
-                } else if (record?.similarity >= 30 && record?.similarity < 50) {
-                    return (
-                        <span style={{ color: 'yellowgreen', fontWeight: '600' }}>{record?.document?.documentType?.name}</span>
                     )
                 } else {
                     return (
@@ -366,13 +346,9 @@ const CheckingResult = () => {
             width: 120,
             align: "center",
             render: (text, record, index) => {
-                if (record?.similarity >= 50) {
+                if (record?.similarity >= location.state.thresholdValue.threshold_high_similarity) {
                     return (
                         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.similarity}</span>
-                    )
-                } else if (record?.similarity >= 30 && record?.similarity < 50) {
-                    return (
-                        <span style={{ color: 'yellowgreen', fontWeight: '600' }}>{record?.similarity}</span>
                     )
                 } else {
                     return (
@@ -410,13 +386,9 @@ const CheckingResult = () => {
             width: 30,
             align: "center",
             render: (text, record, index) => {
-                if (record?.similarity >= 50) {
+                if (record?.similarity >= location.state.thresholdValue.threshold_high_similarity) {
                     return (
                         <span style={{ color: 'red', fontWeight: '600' }}>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
-                    )
-                } else if (record?.similarity >= 30 && record?.similarity < 50) {
-                    return (
-                        <span style={{ color: 'yellowgreen', fontWeight: '600' }}>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
                     )
                 } else {
                     return (
@@ -431,7 +403,7 @@ const CheckingResult = () => {
             width: 500,
             align: "left",
             render: (text, record, index) => {
-                if (record?.cdv?.checkingDocument?.similarityTotal >= 50) {
+                if (record?.cdv?.checkingDocument?.similarityTotal >= location.state.thresholdValue.threshold_high_similarity) {
                     return (
                         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.cdv?.checkingDocument?.title}</span>
                     )
@@ -452,7 +424,7 @@ const CheckingResult = () => {
             width: 180,
             align: "left",
             render: (text, record, index) => {
-                if (record?.cdv?.checkingDocument?.similarityTotal >= 50) {
+                if (record?.cdv?.checkingDocument?.similarityTotal >= location.state.thresholdValue.threshold_high_similarity) {
                     return (
                         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.cdv?.checkingDocument?.author}</span>
                     )
@@ -472,7 +444,7 @@ const CheckingResult = () => {
             width: 120,
             align: "center",
             render: (text, record, index) => {
-                if (record?.cdv?.checkingDocument?.similarityTotal >= 50) {
+                if (record?.cdv?.checkingDocument?.similarityTotal >= location.state.thresholdValue.threshold_high_similarity) {
                     return (
                         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.cdv?.checkingDocument?.similarityTotal}</span>
                     )

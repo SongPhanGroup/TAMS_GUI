@@ -556,7 +556,7 @@ const CheckingDocument = () => {
                                 id={`tooltip_result_${record._id}`}
                                 style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
                                 onClick={() => {
-                                    const recordStandard = { ...recordLastVersion, from: 'checking-specialized', thresholdValue }
+                                    const recordStandard = { ...recordLastVersion, from: 'checking-specialized', thresholdValue, courseId: record?.courseId }
                                     return handleResult(recordStandard)
                                 }}
                             />

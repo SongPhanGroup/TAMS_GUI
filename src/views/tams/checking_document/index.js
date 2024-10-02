@@ -616,6 +616,7 @@ const CheckingDocument = () => {
             width: 100,
             align: "center",
             render: (record) => {
+                console.log(record)
                 const dataVersion = record?.checkingDocumentVersion
                 const recordLastVersion = dataVersion[dataVersion.length - 1]
                 return (
@@ -624,7 +625,7 @@ const CheckingDocument = () => {
                             <AppstoreOutlined
                                 style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
                                 onClick={() => {
-                                    const recordStandard = { ...recordLastVersion, from: 'checking-document', thresholdValue }
+                                    const recordStandard = { ...recordLastVersion, from: 'checking-document', thresholdValue, courseId: record?.courseId }
                                     return handleResult(recordStandard)
                                 }}
                             />

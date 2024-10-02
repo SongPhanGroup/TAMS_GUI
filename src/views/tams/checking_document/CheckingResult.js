@@ -95,7 +95,7 @@ const CheckingResult = () => {
 
     const location = useLocation()
     const navigate = useNavigate()
-    console.log(location)
+    console.log(location.state)
 
     const getAllDataPromises = async () => {
         const coursePromise = getCourse({ params: { page: PAGE_DEFAULT, perPage: PER_PAGE_DEFAULT, search: '' } })
@@ -163,6 +163,8 @@ const CheckingResult = () => {
                 setLoadingData2(false)
             })
     }
+
+    console.log(selectedCourse)
 
     useEffect(() => {
         getAllDataPromises()
@@ -640,7 +642,7 @@ const CheckingResult = () => {
                         />}
                     </Col>
                     {
-                        data2 && selectedCourse !== 1 ? <Col md="12">
+                        data2 && location?.state?.courseId !== 1 ? <Col md="12">
                             <h6 style={{ textTransform: 'uppercase' }}>2. Kết quả trùng lặp với các tài liệu cùng đợt kiểm tra</h6>
                             {/* <Select options={listCourse} placeholder="Chọn đợt kiểm tra" className="mb-1" style={{ float: 'right', width: '200px' }} allowClear onChange={(value) => handleChangeCourse(value)} /> */}
                             {loadingData2 === true ? <Spin style={{ position: 'relative', left: '50%' }} /> : <Table

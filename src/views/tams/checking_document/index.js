@@ -251,10 +251,10 @@ const CheckingDocument = () => {
             const threshold_sentence = res?.payload?.find(item => item.code === 'THRESHOLD_SENTENCE')
             setThresholdValue({
                 ...thresholdValue,
-                threshold_high_similarity: threshold_high_similarity.value,
-                threshold_detail_similarity: threshold_detail_similarity.value,
-                threshold_sentence: threshold_sentence.value,
-                threshold_document: threshold_document.value
+                threshold_high_similarity: threshold_high_similarity?.value,
+                threshold_detail_similarity: threshold_detail_similarity?.value,
+                threshold_sentence: threshold_sentence?.value,
+                threshold_document: threshold_document?.value
             })
         })
     }, [dispatch])
@@ -493,21 +493,21 @@ const CheckingDocument = () => {
                     const similarityType1 = record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal || 0
                     const similarityType2 = record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal || 0
 
-                    return (
-                        <span style={{ whiteSpace: 'break-spaces', color: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? 'red' : 'inherit', fontWeight: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? '600' : 'normal' }}>
-                            {similarityType1}
-                        </span>
-                    )
+                    
                     // Check the similarity and decide color style
-                    // if (lastVersionCheckingDoc.similarityDoc) {
-                    //     return (
-                    //         <span style={{ whiteSpace: 'break-spaces', color: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? 'red' : 'inherit', fontWeight: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? '600' : 'normal' }}>
-                    //             {lastVersionCheckingDoc.similarityDoc}
-                    //         </span>
-                    //     )
-                    // } else {
-                        
-                    // }
+                    if (lastVersionCheckingDoc.similarityDoc) {
+                        return (
+                            <span style={{ whiteSpace: 'break-spaces', color: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? 'red' : 'inherit', fontWeight: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? '600' : 'normal' }}>
+                                {lastVersionCheckingDoc.similarityDoc}
+                            </span>
+                        )
+                    } else {
+                        return (
+                            <span style={{ whiteSpace: 'break-spaces', color: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? 'red' : 'inherit', fontWeight: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? '600' : 'normal' }}>
+                                {similarityType1}
+                            </span>
+                        )
+                    }
                 } else {
                     // Show spinner if no versions are available
                     return <span style={{ color: 'blue', fontWeight: '600' }}>Đang xử lý</span>

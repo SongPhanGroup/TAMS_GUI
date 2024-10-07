@@ -408,7 +408,8 @@ const CheckingDocument = () => {
             width: 30,
             align: "center",
             render: (text, record, index) => {
-                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= thresholdValue.threshold_high_similarity || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= thresholdValue.threshold_high_similarity) {
+                const countVersion = (record.checkingDocumentVersion).length
+                if ((record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= thresholdValue.threshold_high_similarity || (record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= thresholdValue.threshold_high_similarity) {
                     return (
                         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
                     )
@@ -425,7 +426,8 @@ const CheckingDocument = () => {
             width: 500,
             align: "left",
             render: (text, record, index) => {
-                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= thresholdValue.threshold_high_similarity || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= thresholdValue.threshold_high_similarity) {
+                const countVersion = (record.checkingDocumentVersion).length
+                if ((record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= thresholdValue.threshold_high_similarity || (record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= thresholdValue.threshold_high_similarity) {
                     return (
                         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record.title}</span>
                     )
@@ -442,7 +444,8 @@ const CheckingDocument = () => {
             width: 220,
             align: "left",
             render: (text, record, index) => {
-                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= thresholdValue.threshold_high_similarity || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= thresholdValue.threshold_high_similarity) {
+                const countVersion = (record.checkingDocumentVersion).length
+                if ((record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= thresholdValue.threshold_high_similarity || (record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= thresholdValue.threshold_high_similarity) {
                     return (
                         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record.author}</span>
                     )
@@ -459,7 +462,8 @@ const CheckingDocument = () => {
             width: 150,
             align: "left",
             render: (text, record, index) => {
-                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= thresholdValue.threshold_high_similarity || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= thresholdValue.threshold_high_similarity) {
+                const countVersion = (record.checkingDocumentVersion).length
+                if ((record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= thresholdValue.threshold_high_similarity || (record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= thresholdValue.threshold_high_similarity) {
                     return (
                         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.course?.name}</span>
                     )
@@ -485,26 +489,25 @@ const CheckingDocument = () => {
                 //     )
                 // }
                 const countVersion = (record.checkingDocumentVersion).length
-                if (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) {
-                    const similarityType1 = record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal || 0
-                    const similarityType2 = record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal || 0
+                if (record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) {
+                    const similarityType1 = record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal || 0
+                    const similarityType2 = record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal || 0
 
-                    // setSupervisedAt(createdAt)
-
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? 'red' : 'inherit', fontWeight: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? '600' : 'normal' }}>
+                            {similarityType1}
+                        </span>
+                    )
                     // Check the similarity and decide color style
-                    if (lastVersionCheckingDoc.similarityDoc) {
-                        return (
-                            <span style={{ whiteSpace: 'break-spaces', color: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? 'red' : 'inherit', fontWeight: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? '600' : 'normal' }}>
-                                {lastVersionCheckingDoc.similarityDoc}
-                            </span>
-                        )
-                    } else {
-                        return (
-                            <span style={{ whiteSpace: 'break-spaces', color: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? 'red' : 'inherit', fontWeight: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? '600' : 'normal' }}>
-                                {similarityType1}
-                            </span>
-                        )
-                    }
+                    // if (lastVersionCheckingDoc.similarityDoc) {
+                    //     return (
+                    //         <span style={{ whiteSpace: 'break-spaces', color: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? 'red' : 'inherit', fontWeight: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? '600' : 'normal' }}>
+                    //             {lastVersionCheckingDoc.similarityDoc}
+                    //         </span>
+                    //     )
+                    // } else {
+                        
+                    // }
                 } else {
                     // Show spinner if no versions are available
                     return <span style={{ color: 'blue', fontWeight: '600' }}>Đang xử lý</span>
@@ -516,13 +519,14 @@ const CheckingDocument = () => {
             width: 120,
             align: "center",
             render: (text, record, index) => {
-                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= thresholdValue.threshold_high_similarity || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= thresholdValue.threshold_high_similarity) {
+                const countVersion = (record.checkingDocumentVersion).length
+                if ((record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= thresholdValue.threshold_high_similarity || (record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= thresholdValue.threshold_high_similarity) {
                     return (
-                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal}</span>
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal}</span>
                     )
                 } else {
                     return (
-                        <span>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal}</span>
+                        <span>{record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal}</span>
                     )
                 }
             },
@@ -533,6 +537,7 @@ const CheckingDocument = () => {
             align: 'left',
             width: 200,
             render: (text, record, index) => {
+                const countVersion = (record.checkingDocumentVersion).length
                 // if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= thresholdValue.threshold_high_similarity || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= thresholdValue.threshold_high_similarity) {
                 //     return (
                 //         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.description}</span>
@@ -542,8 +547,8 @@ const CheckingDocument = () => {
                 //         <span>{record?.description}</span>
                 //     )
                 // }
-                const similarityType1 = record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal || 0
-                const similarityType2 = record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal || 0
+                const similarityType1 = record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal || 0
+                const similarityType2 = record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal || 0
 
                 // setSupervisedAt(createdAt)
 
@@ -569,7 +574,8 @@ const CheckingDocument = () => {
             width: 120,
             align: "center",
             render: (text, record, index) => {
-                if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= thresholdValue.threshold_high_similarity || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= thresholdValue.threshold_high_similarity) {
+                const countVersion = (record.checkingDocumentVersion).length
+                if ((record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= thresholdValue.threshold_high_similarity || (record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= thresholdValue.threshold_high_similarity) {
                     return (
                         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{toDateTimeString(record.createdAt)}</span>
                     )
@@ -588,8 +594,8 @@ const CheckingDocument = () => {
             render: (text, record, index) => {
                 const countVersion = (record.checkingDocumentVersion).length
                 if (countVersion > 0) {
-                    const similarityType1 = record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal || 0
-                    const similarityType2 = record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal || 0
+                    const similarityType1 = record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal || 0
+                    const similarityType2 = record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal || 0
 
                     const createdAt = toDateTimeString(record?.checkingDocumentVersion[countVersion - 1]?.createdAt)
                     // setSupervisedAt(createdAt)

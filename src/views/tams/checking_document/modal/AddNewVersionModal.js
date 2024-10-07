@@ -86,10 +86,10 @@ const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDoc
                     id: checkingDocumentSelected?.id
                 })
                 toast.success('Thêm mới phiên bản kiểm tra thành công!')
+                getData()
             } else {
                 toast.error('Thêm mới phiên bản kiểm tra thất bại!')
             }
-            getData()
             handleCloseModal()
         }).catch(error => {
             Swal.fire({

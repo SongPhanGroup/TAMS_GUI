@@ -222,10 +222,10 @@ const CheckingDocument = () => {
             const threshold_sentence = res?.payload?.find(item => item.code === 'THRESHOLD_SENTENCE')
             setThresholdValue({
                 ...thresholdValue,
-                threshold_high_similarity: threshold_high_similarity.value,
-                threshold_detail_similarity: threshold_detail_similarity.value,
-                threshold_sentence: threshold_sentence.value,
-                threshold_document: threshold_document.value
+                threshold_high_similarity: threshold_high_similarity?.value,
+                threshold_detail_similarity: threshold_detail_similarity?.value,
+                threshold_sentence: threshold_sentence?.value,
+                threshold_document: threshold_document?.value
             })
         })
     }, [dispatch])

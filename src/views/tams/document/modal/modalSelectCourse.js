@@ -34,6 +34,7 @@ import classNames from "classnames"
 import { postCheckingDocumentVersion } from "../../../../api/checking_document_version"
 import withReactContent from "sweetalert2-react-content"
 import { postFromExcel } from "../../../../api/document"
+import { getUserData } from "../../../../utility/Utils"
 
 const SelectCourseModal = ({ open, handleModal, getData }) => {
     const fileInputRef = useRef(null) // Tạo ref cho input file
@@ -63,6 +64,7 @@ const SelectCourseModal = ({ open, handleModal, getData }) => {
         resolver: yupResolver(AddFileExcelSchema)
     })
     const MySwal = withReactContent(Swal)
+    const user = getUserData()
 
     // ** State
     const [fileExcel, setFileExcel] = useState()
@@ -134,6 +136,8 @@ const SelectCourseModal = ({ open, handleModal, getData }) => {
         const formData = new FormData()
         formData.append('excel', fileExcel)
         formData.append('courseId', 1)
+        formData.append("createdById", user._id)
+
         files?.map((file) => {
             formData.append('files', file)
         })

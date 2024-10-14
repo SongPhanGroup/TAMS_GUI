@@ -364,8 +364,8 @@ const Document = () => {
             title="Danh sách tài liệu"
             style={{ backgroundColor: "white", width: "100%", height: "100%" }}
         >
-            <Row style={{alignItems: 'center', flexWrap: 'wrap'}}>
-                <Col sm="8" style={{ display: "flex", flexWrap: 'nowrap'}}>
+            <Row style={{ alignItems: 'center', flexWrap: 'wrap' }}>
+                <Col sm="8" style={{ display: "flex", flexWrap: 'nowrap' }}>
                     <Col sm="4" className="mr-1" style={{ display: "flex", justifyContent: "flex-end" }}>
                         <Label
                             className=""
@@ -435,7 +435,7 @@ const Document = () => {
                             filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
                         />
                     </Col>
-                    <Col sm="4" className="mr-1" style={{ display: "flex", justifyContent: "flex-end" }}>
+                    <Col sm="3" className="mr-1" style={{ display: "flex", justifyContent: "flex-end" }}>
                         <Select
                             placeholder="Chọn lĩnh vực"
                             className='mb-50 select-custom'

@@ -36,9 +36,11 @@ import { getDocumentType } from "../../../../api/document_type"
 import classNames from "classnames"
 import { Spin } from "antd"
 import { getDocumentSource } from "../../../../api/document_source"
-import { toDateStringv2 } from "../../../../utility/Utils"
+import { getUserData, toDateStringv2 } from "../../../../utility/Utils"
 
 const AddNewDocument = ({ open, handleModal, getData }) => {
+    const user = getUserData()
+    console.log(user._id)
     // ** States
     const AddNewDocumentSchema = yup.object().shape({
         file: yup.mixed().required("Yêu cầu chọn file"),
@@ -155,6 +157,7 @@ const AddNewDocument = ({ open, handleModal, getData }) => {
         formData.append("supervisor", data.supervisor)
         formData.append("publish_date", toDateStringv2(picker))
         formData.append("publish_place", data.place)
+        formData.append("createdById", user._id)
         setLoadingAdd(true)
         postDocument(formData).then(result => {
             if (result.status === "success") {

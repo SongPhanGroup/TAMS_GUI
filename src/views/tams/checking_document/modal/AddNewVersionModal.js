@@ -70,6 +70,8 @@ const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDoc
         // Gọi hàm callback để cập nhật dữ liệu lên cha
         onUpdate(newPropertyValue)
     }
+
+    const user = JSON.parse(localStorage.getItem('userData'))
     
     const onSubmit = (data) => {
         setLoadingAdd(true)
@@ -77,6 +79,7 @@ const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDoc
         formData.append('file', file)
         formData.append('description', data.description ?? "")
         formData.append('checkingDocumentId', checkingDocumentSelected?.id)
+        formData.append('createdById', user?.userName)
         postCheckingDocumentVersion(formData).then(result => {
             if (result.status === 'success') {
                 handlePropertyChange({

@@ -130,6 +130,8 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
         setFile(file)
     }
 
+    const user = JSON.parse(localStorage.getItem('userData'))
+
     const onSubmit = (data) => {
         setLoadingAdd(true)
         postCheckingDocument({
@@ -144,6 +146,7 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
                 setTimeout(() => setSuccessMessage(''), 2000)
                 const formData = new FormData()
                 formData.append('file', file)
+                formData.append('createdById', user?.userName)
                 if (data.description) {
                     formData.append('description', data.description)
                 }

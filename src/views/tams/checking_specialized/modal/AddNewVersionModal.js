@@ -69,12 +69,15 @@ const AddNewCheckingDocumentVersion = ({ open, handleModal, getData, checkingDoc
         onUpdate(newPropertyValue)
     }
     
+    const user = JSON.parse(localStorage.getItem('userData'))
+    
     const onSubmit = (data) => {
         setLoadingAdd(true)
         const formData = new FormData()
         formData.append('file', file)
         formData.append('description', data.description ?? "")
         formData.append('checkingDocumentId', checkingDocumentSelected?.id)
+        formData.append('createdById', user?.userName)
         postCheckingDocumentVersion(formData).then(result => {
             if (result.status === 'success') {
                 handlePropertyChange({

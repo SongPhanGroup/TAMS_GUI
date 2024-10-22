@@ -32,7 +32,7 @@ import classNames from "classnames"
 import { postCheckingDocumentVersion } from "../../../../api/checking_document_version"
 import toast from "react-hot-toast"
 import { useNavigate } from "react-router-dom"
-
+ 
 const AddNewCheckingDocument = ({ open, handleModal, getData, dataTable, onUpdate, setData }) => {
     const AddNewCheckingDocumentSchema = yup.object().shape({
         file: yup.mixed().required("Yêu cầu chọn file").nullable().test(
@@ -147,6 +147,7 @@ const AddNewCheckingDocument = ({ open, handleModal, getData, dataTable, onUpdat
     // }
 
     // console.log("Bản ghi", localData)
+    const user = JSON.parse(localStorage.getItem('userData'))
 
     const onSubmit = (data) => {
         const newRecord = {
@@ -163,6 +164,7 @@ const AddNewCheckingDocument = ({ open, handleModal, getData, dataTable, onUpdat
                 setTimeout(() => setSuccessMessage(''), 2000)
                 const formData = new FormData()
                 formData.append('file', file)
+                formData.append('createdById', user?.userName)
                 if (data.description) {
                     formData.append('description', data.description)
                 }

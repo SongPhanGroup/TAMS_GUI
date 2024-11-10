@@ -26,7 +26,7 @@ const VerticalMenuHeader = props => {
     if (userRoles && userRoles[0]?.description === 'BANGIAMDOC') {
       return "/default/homepage"
     } else {
-      return "#"
+      return "/dashboard/analytics"
     }
   }
   // ** Menu toggler component

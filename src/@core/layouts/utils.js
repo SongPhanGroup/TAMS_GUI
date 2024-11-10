@@ -109,5 +109,8 @@ export const canViewMenuGroup = item => {
 
 export const canViewMenuItem = item => {
   const ability = useContext(AbilityContext)
+  if (item?.header) {
+    return item?.resource?.some(resource => ability.can("read", resource))
+  }
   return ability.can(item.action, item.resource)
 }

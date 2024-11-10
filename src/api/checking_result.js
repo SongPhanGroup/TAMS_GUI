@@ -1,10 +1,18 @@
 import { API_TAMS } from "./API_TAMS"
 
+// có ngưỡng
 export const getSimilarDocument = async (id, query) => {
   const uri = `/getResult/${id}`
   const res = await API_TAMS.get(uri, query)
   return res
 }
+// không có ngưỡng
+export const getSimilarDocumentWithoutThreshHold = async (id, query) => {
+  const uri = `/getResultWithOutThreshHold/${id}`
+  const res = await API_TAMS.get(uri, query)
+  return res
+}
+
 
 export const getTop3SimilarDocument = async (id) => {
   const uri = `/getTop3Result/${id}`
@@ -12,9 +20,9 @@ export const getTop3SimilarDocument = async (id) => {
   return res
 }
 
-export const getListSentenceByCheckingResult = async (id, type) => {
-  const uri = `/getListSentenceByCheckingResult?id=${id}&type=${type}`
-  const res = await API_TAMS.get(uri)
+export const getListSentenceByCheckingResult = async (query) => {
+  const uri = `/getListSentenceByCheckingResult`
+  const res = await API_TAMS.get(uri, query)
   return res
 }
 
@@ -25,13 +33,7 @@ export const getCheckingResult = async (query) => {
 }
 
 export const getCheckingResultHTML = async (query) => {
-  const uri = `/getHtmlResult`
-  const res = await API_TAMS.get(uri, query)
-  return res
-}
-
-export const getListTheSameSentence = async (query) => {
-  const uri = `/getListSentenceByCheckingResult`
+  const uri = `/getHtmlResult2`
   const res = await API_TAMS.get(uri, query)
   return res
 }

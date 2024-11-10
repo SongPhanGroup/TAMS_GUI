@@ -46,6 +46,7 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
   const EditDocumentSchema = yup.object().shape({
     file: yup.mixed().required("Yêu cầu chọn file"),
     title: yup.string().required("Yêu cầu nhập tiêu đề"),
+    language: yup.string().required("Yêu cầu nhập ngôn ngữ"),
     source: yup.object().required("Yêu cầu chọn nguồn tài liệu").nullable(),
     documentType: yup.object().required("Yêu cầu chọn loại tài liệu").nullable(),
     major: yup.object().required("Yêu cầu chọn chuyên ngành").nullable(),
@@ -138,6 +139,7 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
       const formData = new FormData()
       formData.append("description", data.description)
       formData.append("title", data.title)
+      formData.append("language", data.language)
       formData.append("source", data.source)
       formData.append("majorId", data?.major?.value)
       formData.append("typeId", data?.documentType?.value)
@@ -187,6 +189,7 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
       const formData = new FormData()
       formData.append("description", data.description)
       formData.append("title", data.title)
+      formData.append("language", data.language)
       formData.append("source", data.source)
       formData.append("majorId", data?.major?.value)
       formData.append("typeId", data?.documentType?.value)
@@ -325,11 +328,31 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
             />
           </Col>
           <Col sm={6} xs={12}>
+            <Label className='form-label' for='language'>
+              Ngôn ngữ
+            </Label>
+            <Controller
+              defaultValue={infoEdit?.language ?? ''}
+              control={control}
+              name='language'
+              render={({ field }) => {
+                return (
+                  <Input
+                    {...field}
+                    id='language'
+                    placeholder='Nhập ngôn ngữ'
+                    invalid={errors.language && true}
+                  />
+                )
+              }}
+            />
+          </Col>
+          <Col sm={6} xs={12}>
             <Label className='form-label' for='source'>
               Nguồn tài liệu <span style={{ color: 'red' }}>(*)</span>
             </Label>
             <Controller
-              defaultValue={{ value: infoEdit?.source?.id, label: infoEdit?.source?.name }}
+              defaultValue={ infoEdit?.source && { value: infoEdit?.source?.id, label: infoEdit?.source?.name }}
               id="react-select"
               name='source'
               control={control}
@@ -353,7 +376,7 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
             </Label>
             <Controller
               id='react-select'
-              defaultValue={{ value: infoEdit?.documentType?.id, label: infoEdit?.documentType?.name }}
+              defaultValue={ infoEdit?.documentType && { value: infoEdit?.documentType?.id, label: infoEdit?.documentType?.name }}
               name='documentType'
               control={control}
               render={({ field }) => (
@@ -369,13 +392,13 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
             />
             {errors.documentType && <FormFeedback>{errors.documentType.message}</FormFeedback>}
           </Col>
-          <Col sm={6} xs={12}>
+          <Col sm={12} xs={12}>
             <Label className='form-label' for='major'>
               Lĩnh vực <span style={{ color: 'red' }}>(*)</span>
             </Label>
             <Controller
               id='react-select'
-              defaultValue={{ value: infoEdit?.major?.id, label: infoEdit?.major?.name }}
+              defaultValue={ infoEdit?.major && { value: infoEdit?.major?.id, label: infoEdit?.major?.name }}
               name='major'
               control={control}
               render={({ field }) => (

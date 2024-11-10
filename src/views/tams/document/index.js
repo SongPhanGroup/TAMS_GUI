@@ -1,4 +1,4 @@
-import { Table, Input, Card, CardTitle, Tag, Popconfirm, Switch, Select, Spin } from "antd"
+import { Table, Input, Card, CardTitle, Tag, Popconfirm, Switch, Select, Spin, Tooltip, DatePicker } from "antd"
 import React, { useState, Fragment, useEffect, useRef, useContext } from "react"
 import {
     Label,
@@ -11,8 +11,12 @@ import {
     Col,
     FormFeedback,
     UncontrolledTooltip,
+    DropdownToggle,
+    UncontrolledButtonDropdown,
+    DropdownMenu,
+    DropdownItem
 } from "reactstrap"
-import { Plus, X } from "react-feather"
+import { Plus, X, File } from "react-feather"
 import { DeleteOutlined, EditOutlined, LockOutlined } from "@ant-design/icons"
 // import style from "../../../../assets/scss/index.module.scss"
 import Swal from "sweetalert2"
@@ -31,9 +35,12 @@ import { getMajor } from "../../../api/major"
 import Flatpickr from "react-flatpickr"
 import { Vietnamese } from "flatpickr/dist/l10n/vn.js"
 import "@styles/react/libs/flatpickr/flatpickr.scss"
+import dayjs from "dayjs"
 
 const oneWeekAgo = new Date()
 oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
+
+const { RangePicker } = DatePicker
 
 const Document = () => {
     const [loadingData, setLoadingData] = useState(false)
@@ -56,7 +63,10 @@ const Document = () => {
     const [listCourse, setListCourse] = useState([])
     const [listDocumentType, setListDocumentType] = useState([])
     const [listMajor, setListMajor] = useState([])
-
+    const [isAddExcel, setIsAddExcel] = useState(false)
+    const handleModalAddExcel = () => {
+        setIsAddExcel(!isAddExcel)
+    }
     const getAllDataPromises = async () => {
         const coursePromise = getCourse({ params: { page: 1, perPage: 10, search: '' } })
         const documentTypePromise = getDocumentType({ params: { page: 1, perPage: 10, search: '' } })
@@ -157,19 +167,20 @@ const Document = () => {
     const handleDelete = (key) => {
         deleteDocument(key)
             .then((res) => {
-                MySwal.fire({
-                    title: "Xóa tài liệu thành công",
-                    icon: "success",
-                    customClass: {
-                        confirmButton: "btn btn-success",
-                    },
-                }).then((result) => {
-                    if (currentPage === 1) {
-                        getData(1, rowsPerPage)
-                    } else {
-                        setCurrentPage(1)
-                    }
-                })
+                // MySwal.fire({
+                //     title: "Xóa tài liệu thành công",
+                //     icon: "success",
+                //     customClass: {
+                //         confirmButton: "btn btn-success",
+                //     },
+                // }).then((result) => {
+                //     if (currentPage === 1) {
+                //         getData(1, rowsPerPage)
+                //     } else {
+                //         setCurrentPage(1)
+                //     }
+                // })
+                getData(1, rowsPerPage)
             })
             .catch((error) => {
                 MySwal.fire({
@@ -272,15 +283,7 @@ const Document = () => {
                 <span style={{ whiteSpace: 'break-spaces' }}>{toDateString(record?.publish_date)}</span>
             ),
         },
-        {
-            title: "Ngày tạo",
-            dataIndex: "created_at",
-            align: 'center',
-            width: 150,
-            render: (text, record, index) => (
-                <span>{toDateTimeString(record.createdAt)}</span>
-            ),
-        },
+
         {
             title: "Mô tả",
             dataIndex: "description",
@@ -291,53 +294,85 @@ const Document = () => {
             ),
         },
         {
+            title: "Ngày tạo",
+            dataIndex: "created_at",
+            align: 'center',
+            width: 150,
+            render: (text, record, index) => (
+                <span>{toDateTimeString(record.createdAt)}</span>
+            ),
+        },
+        {
             title: "Thao tác",
             width: 100,
             align: "center",
             render: (record) => (
                 <div style={{ display: "flex", justifyContent: "center" }}>
-                    {ability.can('update', 'LOAI_DON_VI') &&
+                    {ability.can('update', 'QL_KHO_TAI_LIEU_MAU') &&
                         <>
-                            <EditOutlined
-                                id={`tooltip_edit${record.ID}`}
-                                style={{ color: "#09A863", cursor: 'pointer', marginRight: '1rem' }}
-                                onClick={() => handleEdit(record)}
-                            />
-                            <UncontrolledTooltip placement="top" target={`tooltip_edit${record.ID}`}>
-                                Chỉnh sửa
-                            </UncontrolledTooltip>
+                            <Tooltip placement="top" title="Chỉnh sửa">
+                                <EditOutlined
+                                    // id={`tooltip_edit${record.ID}`}
+                                    style={{ color: "#09A863", cursor: 'pointer', marginRight: '1rem' }}
+                                    onClick={() => handleEdit(record)}
+                                />
+                            </Tooltip>
                         </>}
-                    {ability.can('delete', 'LOAI_DON_VI') &&
+                    {ability.can('delete', 'QL_KHO_TAI_LIEU_MAU') &&
                         <Popconfirm
                             title="Bạn chắc chắn xóa?"
                             onConfirm={() => handleDelete(record.id)}
                             cancelText="Hủy"
                             okText="Đồng ý"
                         >
-                            <DeleteOutlined style={{ color: "red", cursor: 'pointer' }} id={`tooltip_delete${record.ID}`} />
-                            <UncontrolledTooltip placement="top" target={`tooltip_delete${record.ID}`}>
-                                Xóa
-                            </UncontrolledTooltip>
+                            <Tooltip placement="top" title="Xóa">
+                                <DeleteOutlined style={{ color: "red", cursor: 'pointer' }} id={`tooltip_delete${record.ID}`} />
+                            </Tooltip>
                         </Popconfirm>}
                 </div>
             ),
         },
     ]
 
+    const currentYear = new Date().getFullYear()
+
+    const handleChangeTime = (dates) => {
+        if (dates) {
+            setStartDate(dayjs(dates[0], 'YYYY-MM-DD'))
+            setEndDate(dayjs(dates[1], 'YYYY-MM-DD'))
+        } else {
+            setStartDate(dayjs(`${currentYear}-01-01`))
+            setEndDate(dayjs(`${currentYear}-12-31`))
+        }
+    }
+    const onImportFileTemplate = async () => {
+        const urlString = `${process.env.REACT_APP_URL_TAMS}/templates/file_nhap_mau.xlsx`
+        const link = document.createElement('a')
+        link.href = urlString
+        link.setAttribute('download', 'file_nhap_mau.xlsx')
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+    }
+    const onImportFileClick = () => {
+        // `current` points to the mounted file input element
+        // inputFile.current.click()
+        setIsAddExcel(true)
+    }
     return (
         <Card
             title="Danh sách tài liệu"
             style={{ backgroundColor: "white", width: "100%", height: "100%" }}
         >
-            <Row>
-                <Col sm="10" style={{ display: "flex" }}>
-                    <Col sm="3" className="mr-1" style={{ display: "flex", justifyContent: "flex-end" }}>
+            <Row style={{ alignItems: 'center', flexWrap: 'wrap' }}>
+                <Col sm="8" style={{ display: "flex", flexWrap: 'nowrap' }}>
+                    <Col sm="4" className="mr-1" style={{ display: "flex", justifyContent: "flex-end" }}>
                         <Label
                             className=""
                             style={{
                                 width: "100px",
                                 fontSize: "14px",
-                                height: "34px",
+                                height: "32px",
                                 display: "flex",
                                 alignItems: "center",
                             }}
@@ -347,7 +382,7 @@ const Document = () => {
                         <Input
                             type="text"
                             placeholder="Tìm kiếm"
-                            style={{ height: "34px" }}
+                            style={{ height: "32px" }}
                             onChange={(e) => {
                                 if (e.target.value === "") {
                                     setSearch("")
@@ -361,6 +396,34 @@ const Document = () => {
                             }}
                         />
                     </Col>
+                    <Col
+                        sm="4"
+                        className="mr-1"
+                        style={{ display: "flex", justifyContent: "flex-start" }}
+                    >
+                        <Label
+                            className=""
+                            style={{
+                                width: "100px",
+                                fontSize: "14px",
+                                height: "34px",
+                                display: "flex",
+                                alignItems: "center",
+                            }}
+                        >
+                            Ngày tạo
+                        </Label>
+                        <RangePicker
+                            style={{
+                                width: "100%",
+                                height: '80%'
+                            }}
+                            // defaultValue={[dayjs(`${currentYear}-01-01`), dayjs(`${currentYear}-12-31`)]}
+                            format={"DD-MM-YYYY"}
+                            allowClear={true}
+                            onChange={handleChangeTime}
+                        />
+                    </Col>
                     <Col sm="3" className="mr-1" style={{ display: "flex", justifyContent: "flex-end" }}>
                         <Select
                             placeholder="Chọn loại tài liệu"
@@ -369,6 +432,7 @@ const Document = () => {
                             allowClear
                             mode="multiple"
                             onChange={(value) => handleChangeDocumentType(value)}
+                            filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
                         />
                     </Col>
                     <Col sm="3" className="mr-1" style={{ display: "flex", justifyContent: "flex-end" }}>
@@ -379,51 +443,49 @@ const Document = () => {
                             allowClear
                             mode="multiple"
                             onChange={(value) => handleChangeMajor(value)}
+                            filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
                         />
                     </Col>
-                    <Col
-                        sm="3"
-                        style={{ display: "flex", justifyContent: "flex-start" }}
-                    >
-                        <Label
-                            className=""
-                            style={{
-                                width: "90px",
-                                fontSize: "14px",
-                                height: "34px",
-                                display: "flex",
-                                alignItems: "center",
-                            }}
-                        >
-                            Ngày tạo
-                        </Label>
-                        <Flatpickr
-                            style={{ padding: '0.35rem 1rem' }}
-                            className="form-control invoice-edit-input date-picker mb-50"
-                            options={{
-                                mode: "range",
-                                dateFormat: "d-m-Y", // format ngày giờ
-                                locale: {
-                                    ...Vietnamese
-                                },
-                                defaultDate: [oneWeekAgo, new Date()]
-                            }}
-                            placeholder="dd/mm/yyyy"
-                            onChange={(value => handleChangeDate(value))}
-                        />
-                    </Col>
+
                 </Col>
-                <Col sm="2" style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <Button
-                        onClick={(e) => setIsAdd(true)}
-                        color="primary"
-                        className="addBtn"
-                        style={{
-                            width: '100px',
-                        }}
+                <Col sm="4" style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginBottom: '8px' }}>
+                    {ability.can('create', 'QL_KHO_TAI_LIEU_MAU') && <Col
+                        sm="12"
+                        style={{ display: "flex", justifyContent: "flex-end" }}
                     >
-                        Thêm mới
-                    </Button>
+                        <UncontrolledButtonDropdown>
+                            <DropdownToggle color='success' caret>
+                                <File size={15} />
+                                <span className='align-middle ms-50'>Nhập tài liệu</span>
+                            </DropdownToggle>
+                            <DropdownMenu>
+                                <DropdownItem className='w-100' onClick={onImportFileTemplate}>
+                                    <span className='align-middle ms-50'>Tải file mẫu</span>
+                                </DropdownItem>
+                                <DropdownItem className='w-100' onClick={onImportFileClick}>
+                                    <span className='align-middle ms-50'>Nhập danh sách tài liệu từ file excel</span>
+                                </DropdownItem>
+                                <DropdownItem className='w-100' onClick={(e) => setIsAdd(true)}>
+                                    <span className='align-middle ms-50'>Thêm mới tài liệu mẫu</span>
+                                </DropdownItem>
+                                {/* {ability.can('create', 'QL_KHO_TAI_LIEU_MAU') && <Col
+                                    sm="6"
+                                    style={{ display: "flex", justifyContent: "flex-end" }}
+                                >
+                                    <Button
+                                        onClick={(e) => setIsAdd(true)}
+                                        color="primary"
+                                        className="addBtn"
+                                        style={{
+                                            width: '100px',
+                                        }}
+                                    >
+                                        Thêm mới
+                                    </Button>
+                                </Col>} */}
+                            </DropdownMenu>
+                        </UncontrolledButtonDropdown>
+                    </Col>}
                 </Col>
             </Row>
             {loadingData === true ? <Spin style={{ position: 'relative', left: '50%' }} /> : <Table
@@ -448,7 +510,14 @@ const Document = () => {
                     }
                 }}
             />}
-
+            <SelectCourseModal
+                open={isAddExcel}
+                handleModal={handleModalAddExcel}
+                getData={getData}
+                currentPage={currentPage}
+                rowsPerPage={rowsPerPage}
+            // file
+            />
             <AddNewModal
                 open={isAdd}
                 handleModal={handleModal}
@@ -472,4 +541,6 @@ const Document = () => {
 
 const AddNewModal = React.lazy(() => import("./modal/AddNewModal"))
 const EditModal = React.lazy(() => import("./modal/EditModal"))
+const SelectCourseModal = React.lazy(() => import("./modal/modalSelectCourse"))
+
 export default Document 

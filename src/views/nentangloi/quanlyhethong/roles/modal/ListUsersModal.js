@@ -118,6 +118,11 @@ const ListAccounts = ({ roleSelected, open, setIsView }) => {
     setIsView(false)
     setCurrentPage(1)
   }
+  const handleAddModal = () => {
+    setIsAdd(false)
+    setInfo(null)
+    setCurrentPage(1)
+  }
   const CloseBtn = (
     <X className="cursor-pointer" size={15} onClick={handleModal} />
   )
@@ -350,8 +355,9 @@ const ListAccounts = ({ roleSelected, open, setIsView }) => {
       </ModalBody>
       <AddNewModal
         open={isAdd}
-        handleModal={handleModal}
+        handleModal={handleAddModal}
         // listGroup={listGroup}
+        roleSelected={roleSelected}
         listStatus={listStatus}
         getData={getData}
         currentPage={currentPage}

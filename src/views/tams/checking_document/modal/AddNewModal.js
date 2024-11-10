@@ -30,8 +30,10 @@ import { postCheckingDocument } from "../../../../api/checking_document"
 import { getCourse } from "../../../../api/course"
 import classNames from "classnames"
 import { postCheckingDocumentVersion } from "../../../../api/checking_document_version"
-
-const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
+import toast from "react-hot-toast"
+import { useNavigate } from "react-router-dom"
+ 
+const AddNewCheckingDocument = ({ open, handleModal, getData, dataTable, onUpdate, setData }) => {
     const AddNewCheckingDocumentSchema = yup.object().shape({
         file: yup.mixed().required("Yêu cầu chọn file").nullable().test(
             "is-not-empty",
@@ -57,9 +59,12 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
     })
 
     // ** State
+    const navigate = useNavigate()
     const [file, setFile] = useState()
     const [listCourse, setListCourse] = useState([])
     const [loadingAdd, setLoadingAdd] = useState(false)
+    const [successMessage, setSuccessMessage] = useState('')
+    const [firstApiResult, setFirstApiResult] = useState(null)
 
     const getAllDataPromises = async () => {
         const coursePromise = getCourse({ params: { page: 1, perPage: 10, search: '' } })
@@ -76,17 +81,23 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
         }, [])
 
         const courseRes = responseData[0]
+        const resCourse = courseRes?.data?.filter(item => item.isActive === 1)
         results.map((res) => {
             if (res.status !== 'fulfilled') {
                 setListCourse(null)
             }
         })
-        const courses = courseRes?.data?.map((res) => {
+        const courses = resCourse?.map((res) => {
             return {
                 value: res.id,
                 label: `${res.name}`
             }
+        }).sort((a, b) => {
+            if (a.value === 1) return -1 // Đưa phần tử có id = 1 lên đầu
+            if (b.value === 1) return 1 // Đưa phần tử có id = 1 lên đầu
+            return 0 // Giữ nguyên thứ tự của các phần tử còn lại
         })
+        // const courses2 = [{value: 1, label: 'Đợt kiểm tra độc lập'}, ...courses]
         setListCourse(courses)
     }
 
@@ -97,53 +108,87 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
     }, [open])
 
     const handleCloseModal = () => {
-        handleModal()
-        reset()
+        const isDocumentSubmitted = localStorage.getItem('isDocumentSubmitted')
+        if (isDocumentSubmitted === 'true') {
+            handleModal()
+            reset()
+            navigate('/tams/checking-document') // Only navigate if the document was successfully submitted
+        } else {
+            handleModal()
+            reset()
+        }
     }
+
+    useEffect(() => {
+        return () => {
+            // Clean up localStorage when the component unmounts
+            localStorage.removeItem('isDocumentSubmitted')
+        }
+    }, [])
 
     const handleChangeFile = (event) => {
         const file = event.target.files[0]
         setFile(file)
     }
 
+    // const [localData, setLocalData] = useState(data)
+
+    // const handlePropertyChange = (newPropertyValue) => {
+    //     const updatedRecord = [
+    //         ...localData,
+    //         newPropertyValue, // Thay đổi thuộc tính nào đó
+    //     ]
+
+    //     // Cập nhật local state của modal
+    //     setLocalData(updatedRecord)
+
+    //     // Gọi hàm callback để cập nhật dữ liệu lên cha
+    //     onUpdate(updatedRecord)
+    // }
+
+    // console.log("Bản ghi", localData)
+    const user = JSON.parse(localStorage.getItem('userData'))
+
     const onSubmit = (data) => {
-        setLoadingAdd(true)
-        postCheckingDocument({
+        const newRecord = {
             title: data.title,
             author: data.author,
             courseId: data.course.value,
             description: data.description ?? ""
-        }).then(result => {
+        }
+        setLoadingAdd(true)
+        postCheckingDocument(newRecord).then(result => {
             if (result.status === 'success') {
+                localStorage.setItem('isDocumentSubmitted', 'true')
+                setSuccessMessage(`Thêm mới ${file.name} thành công!!!`)
+                setTimeout(() => setSuccessMessage(''), 2000)
                 const formData = new FormData()
                 formData.append('file', file)
+                formData.append('createdById', user?.userName)
                 if (data.description) {
                     formData.append('description', data.description)
                 }
                 formData.append('checkingDocumentId', result?.data?.id)
                 postCheckingDocumentVersion(formData).then(result => {
                     if (result.status === 'success') {
-                        Swal.fire({
-                            title: "Thêm mới kiểm tra tài liệu thành công",
-                            text: "",
-                            icon: "success",
-                            customClass: {
-                                confirmButton: "btn btn-success"
-                            }
-                        })
+                        toast.success('Kiểm tra tài liệu thành công')
+                    } else {
+                        toast.error('Kiểm tra tài liệu thất bại')
                     }
+                }).catch(error => {
+                    console.log(error)
                 })
             } else {
-                Swal.fire({
-                    title: "Thêm mới kiểm tra tài liệu thất bại",
-                    text: "Vui lòng thử lại sau!",
-                    icon: "error",
-                    customClass: {
-                        confirmButton: "btn btn-danger"
-                    }
-                })
+                // Swal.fire({
+                //     title: "Thêm mới kiểm tra tài liệu thất bại",
+                //     text: "Vui lòng thử lại sau!",
+                //     icon: "error",
+                //     customClass: {
+                //         confirmButton: "btn btn-danger"
+                //     }
+                // })
+                toast.error('Kiểm tra tài liệu thất bại!')
             }
-            getData()
             setValue('title', '')
             setValue('author', '')
             setValue('description', '')
@@ -154,6 +199,79 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
             setLoadingAdd(false)
         })
     }
+
+    // const [dataDescription, setDataDescription] = useState('')
+
+    // const handleFirstApiCall = async (data) => {
+    //     try {
+    //         setLoadingAdd(true)
+    //         const result = await postCheckingDocument({
+    //             title: data.title,
+    //             author: data.author,
+    //             courseId: data.course.value,
+    //             description: data.description ?? ""
+    //         })
+
+    //         if (result.status === 'success') {
+    //             setDataDescription(data.description ?? "")
+    //             setFirstApiResult(result.data.id)
+    //             setSuccessMessage(`Thêm mới ${file.name} thành công!!!`)
+    //             setTimeout(() => setSuccessMessage(''), 2000)
+    //             setValue('title', '')
+    //             setValue('author', '')
+    //             setValue('description', '')
+    //             setValue('file', '')
+    //         } else {
+    //             Swal.fire({
+    //                 title: "Thêm mới kiểm tra tài liệu thất bại",
+    //                 text: "Vui lòng thử lại sau!",
+    //                 icon: "error",
+    //                 customClass: {
+    //                     confirmButton: "btn btn-danger"
+    //                 }
+    //             })
+    //         }
+    //     } catch (error) {
+    //         console.log(error)
+    //     } finally {
+    //         setLoadingAdd(false)
+    //     }
+    // }
+
+    // const handleSecondApiCall = async () => {
+    //     if (!firstApiResult) return
+
+    //     const formData = new FormData()
+    //     formData.append('file', file)
+    //     formData.append('description', dataDescription)
+    //     formData.append('checkingDocumentId', firstApiResult)
+
+    //     try {
+    //         const result = await postCheckingDocumentVersion(formData)
+    //         if (result.status === 'success') {
+    //             Swal.fire({
+    //                 title: "Thêm mới kiểm tra tài liệu thành công",
+    //                 text: "",
+    //                 icon: "success",
+    //                 customClass: {
+    //                     confirmButton: "btn btn-success"
+    //                 }
+    //             })
+    //         }
+    //     } catch (error) {
+    //         console.log(error)
+    //     }
+    // }
+
+    // useEffect(() => {
+    //     if (firstApiResult) {
+    //         handleSecondApiCall()
+    //     }
+    // }, [firstApiResult])
+
+    // const onSubmit = (data) => {
+    //     handleFirstApiCall(data)
+    // }
 
     return (
         <Modal isOpen={open} toggle={handleModal} className='modal-dialog-top modal-lg'>
@@ -245,6 +363,9 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
                         />
                         {errors.file && <FormFeedback>{errors.file.message}</FormFeedback>}
                     </Col>
+                    <span style={{ color: 'red' }}>
+                        {successMessage}
+                    </span>
                     <Col xs={12} className='text-center mt-2 pt-50'>
                         <Button type='submit' name='add' className='me-1' color='primary'>
                             {

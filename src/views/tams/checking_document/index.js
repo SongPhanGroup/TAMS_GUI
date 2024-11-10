@@ -8,7 +8,10 @@ import {
     Switch,
     Collapse,
     Select,
-    Spin
+    Spin,
+    Tooltip,
+    DatePicker,
+    Dropdown
 } from "antd"
 import React, { useState, Fragment, useEffect, useRef, useContext } from "react"
 import {
@@ -23,38 +26,50 @@ import {
     FormFeedback,
     UncontrolledTooltip,
     CardBody,
+    Spinner,
 } from "reactstrap"
-import { Link, useLocation } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import { Plus, X } from "react-feather"
 import {
     AppstoreAddOutlined,
+    AppstoreOutlined,
     DeleteOutlined,
+    DownCircleFilled,
+    DownCircleOutlined,
     EditOutlined,
+    FileDoneOutlined,
     LockOutlined,
+    RightSquareOutlined,
+    UnlockOutlined,
 } from "@ant-design/icons"
 import { AbilityContext } from '@src/utility/context/Can'
 // import style from "../../../../assets/scss/index.module.scss"
 import Swal from "sweetalert2"
 import withReactContent from "sweetalert2-react-content"
 import AvatarGroup from "@components/avatar-group"
-// import Select from 'react-select'
-import Flatpickr from "react-flatpickr"
-import { Vietnamese } from "flatpickr/dist/l10n/vn.js"
 import "@styles/react/libs/flatpickr/flatpickr.scss"
 import * as yup from "yup"
 import { useForm, Controller } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import classnames from "classnames"
-import { toDateString, toDateStringv2, toDateTimeString } from "../../../utility/Utils"
+import { toDateStringv2, toDateTimeString } from "../../../utility/Utils"
 import { deleteCheckingDocument, getCheckingDocument } from "../../../api/checking_document"
 import VersionModal from "./modal/VersionModal"
 import { PAGE_DEFAULT, PER_PAGE_DEFAULT } from "../../../utility/constant"
 import { getCourse } from "../../../api/course"
+import dayjs from "dayjs"
+import { downloadTemplateBaoCao, getSimilarityReport, getSimilarityReportByCourse } from "../../../api/checking_document_version"
+import { useDispatch, useSelector } from "react-redux"
+import { fetchSystemParameters, systemParameterActions } from "../../../redux/systemParameterSlice"
+import { store } from "../../../redux/store"
+const { RangePicker } = DatePicker
 
 const oneWeekAgo = new Date()
 oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
 
 const CheckingDocument = () => {
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
     const location = useLocation()
     const [loadingData, setLoadingData] = useState(false)
     const ability = useContext(AbilityContext)
@@ -64,7 +79,7 @@ const CheckingDocument = () => {
     const [count, setCount] = useState(0)
     const [totalUser, setTotalUser] = useState(0)
     const [currentPage, setCurrentPage] = useState(1)
-    const [rowsPerPage, setRowsPerpage] = useState(100)
+    const [rowsPerPage, setRowsPerpage] = useState(10)
     const [search, setSearch] = useState("")
     const [courseId, setCourseId] = useState()
     const [startDate, setStartDate] = useState()
@@ -81,6 +96,12 @@ const CheckingDocument = () => {
     const [listAllRole, setListAllRole] = useState([])
 
     const [listCourse, setListCourse] = useState([])
+    const [listLockedCourseIds, setListLockedCourseIds] = useState([])
+    const [listCourseId, setListCourseId] = useState([])
+    const [loadingReports, setLoadingReports] = useState({}) // Tracks loading per record
+    const [lastVersionCheckingDoc, setLastVersionCheckingDoc] = useState({
+        // supervisedAt: '', similarityDoc: '', description: ''
+    })
 
     const getAllDataPromises = async () => {
         const coursePromise = getCourse({ params: { page: PAGE_DEFAULT, perPage: PER_PAGE_DEFAULT, search: '' } })
@@ -103,72 +124,147 @@ const CheckingDocument = () => {
             }
         })
 
-        const resCourse = courseRes?.data?.filter(item => item.isActive === 1)
-        const courses = resCourse?.map((res) => {
+        const resLockedCourseIds = courseRes?.data?.filter(item => item.isActive !== 1)?.map(item => item.id)
+        const courseIds = courseRes?.data?.filter(item => item.isActive === 1)?.map(item => item.id)
+        const courses = courseRes?.data?.map((res) => {
             return {
                 value: res.id,
                 label: `${res.name}`
             }
+        }).sort((a, b) => {
+            if (a.value === 1) return -1 // Đưa phần tử có id = 1 lên đầu
+            if (b.value === 1) return 1 // Đưa phần tử có id = 1 lên đầu
+            return 0 // Giữ nguyên thứ tự của các phần tử còn lại
         })
+
         setListCourse(courses)
+        setListLockedCourseIds(resLockedCourseIds)
+        setListCourseId(courseIds)
     }
+
+    // const getData = (page, limit, search, courseIds, startDate, endDate) => {
+    //     setLoadingData(true)
+    //     if (location?.state) {
+    //         getCheckingDocument({
+    //             params: {
+    //                 page: currentPage,
+    //                 limit: rowsPerPage,
+    //                 ...(search && search !== "" && { search }),
+    //                 courseIds: location?.state?.id,
+    //                 ...(startDate && { startDate }),
+    //                 ...(endDate && { endDate })
+    //             }
+    //         })
+    //             .then((res) => {
+    //                 // const resul   t = res?.data?.map(((item, index) => {
+    //                 //     return { ...item, _id: item.id, key: index }
+    //                 // }))
+    //                 const result = res?.data
+    //                     ?.filter(item => listCourseId.includes(item.courseId)) // Lọc dựa trên courseId
+    //                     .map((item, index) => {
+    //                         return { ...item, _id: item.id, key: index }
+    //                     })
+    //                 setData(result)
+    //                 setCount(res?.pagination?.totalRecords)
+    //             })
+    //             .catch((err) => {
+    //                 console.log(err)
+    //             }).finally(() => {
+    //                 setLoadingData(false)
+    //             })
+    //     } else {
+    //         getCheckingDocument({
+    //             params: {
+    //                 page,
+    //                 limit,
+    //                 ...(search && search !== "" && { search }),
+    //                 ...(courseIds && { courseIds }),
+    //                 ...(startDate && { startDate }),
+    //                 ...(endDate && { endDate })
+    //             }
+    //         })
+    //             .then((res) => {
+    //                 // console.log(res)
+    //                 // const result = res?.data?.map(((item, index) => {
+    //                 //     return { ...item, _id: item.id, key: index }
+    //                 // }))
+    //                 const result = res?.data
+    //                     ?.filter(item => listCourseId.includes(item.courseId)) // Lọc dựa trên courseId
+    //                     .map((item, index) => {
+    //                         return { ...item, _id: item.id, key: index }
+    //                     })
+    //                 setData(result)
+    //                 setCount(res?.pagination?.totalRecords)
+    //             })
+    //             .catch((err) => {
+    //                 console.log(err)
+    //             }).finally(() => {
+    //                 setLoadingData(false)
+    //             })
+    //     }
+    // }
 
     const getData = (page, limit, search, courseIds, startDate, endDate) => {
         setLoadingData(true)
-        if (location?.state) {
-            getCheckingDocument({
-                params: {
-                    page,
-                    limit,
-                    ...(search && search !== "" && { search }),
-                    courseIds: location?.state?.id,
-                    ...(startDate && { startDate }),
-                    ...(endDate && { endDate })
-                }
-            })
-                .then((res) => {
-                    const result = res?.data?.map(((item, index) => {
-                        return { ...item, _id: item.id, key: index }
-                    }))
-                    setData(result)
-                    setCount(res?.pagination?.totalRecords)
-                })
-                .catch((err) => {
-                    console.log(err)
-                }).finally(() => {
-                    setLoadingData(false)
-                })
-        } else {
-            getCheckingDocument({
-                params: {
-                    page,
-                    limit,
-                    ...(search && search !== "" && { search }),
-                    ...(courseIds && { courseIds }),
-                    ...(startDate && { startDate }),
-                    ...(endDate && { endDate })
-                }
-            })
-                .then((res) => {
-                    const result = res?.data?.map(((item, index) => {
-                        return { ...item, _id: item.id, key: index }
-                    }))
-                    setData(result)
-                    setCount(res?.pagination?.totalRecords)
-                })
-                .catch((err) => {
-                    console.log(err)
-                }).finally(() => {
-                    setLoadingData(false)
-                })
+
+        // Prepare the parameters for the API call
+        const params = {
+            page,
+            limit,
+            ...(search && search !== "" && { search }),
+            ...((courseIds || location?.state?.id) && { courseIds: courseIds || location.state.id }),
+            ...(startDate && { startDate }),
+            ...(endDate && { endDate })
         }
+
+        getCheckingDocument({ params })
+            .then((res) => {
+                const result = res?.data
+                    ?.filter(item => listCourseId.includes(item.courseId)) // Filter based on courseId
+                    .map((item, index) => {
+                        return { ...item, _id: item.id, key: index }
+                    })
+                setData(result)
+                setCount(res?.pagination?.totalRecords)
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+            .finally(() => {
+                setLoadingData(false)
+            })
     }
+
+    const [dataSystemParameter, setDataSystemParameter] = useState([])
+    const [thresholdValue, setThresholdValue] = useState({})
+
+    useEffect(() => {
+        dispatch(fetchSystemParameters({
+            params: {
+                page: 1,
+                limit: 100
+            }
+        })).then(res => {
+            const threshold_high_similarity = res?.payload?.find(item => item.code === 'THRESHOLD_HIGHT_SIMILARITY')
+            const threshold_detail_similarity = res?.payload?.find(item => item.code === 'THRESHOLD_DETAIL_SIMILARITY')
+            const threshold_document = res?.payload?.find(item => item.code === 'THRESHOLD_DOCUMENT')
+            const threshold_sentence = res?.payload?.find(item => item.code === 'THRESHOLD_SENTENCE')
+            setThresholdValue({
+                ...thresholdValue,
+                threshold_high_similarity: threshold_high_similarity?.value,
+                threshold_detail_similarity: threshold_detail_similarity?.value,
+                threshold_sentence: threshold_sentence?.value,
+                threshold_document: threshold_document?.value
+            })
+        })
+    }, [dispatch])
+
 
     useEffect(() => {
         if ((startDate && endDate) || (!startDate && !endDate)) {
             getData(currentPage, rowsPerPage, search, courseId, startDate, endDate)
         }
-    }, [currentPage, rowsPerPage, search, courseId, startDate, endDate])
+    }, [currentPage, rowsPerPage, search, courseId, startDate, endDate, listCourseId])
 
     useEffect(() => {
         getAllDataPromises()
@@ -189,6 +285,7 @@ const CheckingDocument = () => {
         setIsEdit(true)
     }
     const handleChangeCourse = (value) => {
+        console.log(value)
         if (value) {
             setCourseId(value.join(','))
             setCurrentPage(1)
@@ -213,20 +310,21 @@ const CheckingDocument = () => {
     const handleDelete = (key) => {
         deleteCheckingDocument(key)
             .then((res) => {
-                MySwal.fire({
-                    title: "Xóa kiểm tra tài liệu thành công",
-                    icon: "success",
-                    customClass: {
-                        confirmButton: "btn btn-success",
-                    },
-                }).then((result) => {
-                    if (currentPage === 1) {
-                        getData(1, rowsPerPage)
-                    } else {
-                        setCurrentPage(1)
-                    }
-                    handleModal()
-                })
+                // MySwal.fire({
+                //     title: "Xóa kiểm tra tài liệu thành công",
+                //     icon: "success",
+                //     customClass: {
+                //         confirmButton: "btn btn-success",
+                //     },
+                // }).then((result) => {
+                //     if (currentPage === 1) {
+                //         getData(1, rowsPerPage)
+                //     } else {
+                //         setCurrentPage(1)
+                //     }
+                //     handleModal()
+                // })
+                getData(1, rowsPerPage)
             })
             .catch((error) => {
                 MySwal.fire({
@@ -240,126 +338,405 @@ const CheckingDocument = () => {
             })
     }
 
+    const handleResult = (record) => {
+        navigate(`/tams/checking-document-result/${record?.id}`, { state: record })
+    }
+
+    const handleButtonClick2 = (record) => {
+        navigate(`/tams/detailTD-checking-version-result/${record?.id}`, { state: record })
+    }
+
+    const handleReport = (recordId, item) => {
+        if (item && item.key === "2") {
+            setLoadingReports((prev) => ({ ...prev, [recordId]: true }))
+            getSimilarityReport({
+                params: {
+                    checkingDocumentVersionId: Number(recordId)
+                },
+                responseType: 'blob'
+            })
+                .then(res => {
+                    downloadTemplateBaoCao(2, res, 'Bao_cao_DS_trung_lap_cao')
+                })
+                .catch(error => {
+                    console.log(error)
+                }).finally(() => {
+                    setLoadingReports((prev) => ({ ...prev, [recordId]: false }))
+                })
+        } else {
+            setLoadingReports((prev) => ({ ...prev, [recordId]: true }))
+            getSimilarityReportByCourse({
+                params: {
+                    checkingDocumentVersionId: Number(recordId)
+                },
+                responseType: 'blob'
+            })
+                .then(res => {
+                    downloadTemplateBaoCao(4, res, 'Bao_cao_DS_trung_lap_theo_dot')
+                })
+                .catch(error => {
+                    console.log(error)
+                }).finally(() => {
+                    setLoadingReports((prev) => ({ ...prev, [recordId]: false }))
+                })
+        }
+
+    }
+
+    const items = [
+        {
+            label: 'Báo cáo DS trùng lặp cao',
+            key: '2',
+            icon: <DownCircleOutlined />,
+        },
+        {
+            label: 'Báo cáo DS trùng lặp theo đợt',
+            key: '1',
+            icon: <DownCircleFilled />,
+        }
+    ]
+
+    const menuProps = (recordId) => ({
+        items,
+        onClick: (item) => handleReport(recordId, item),
+    })
+
     const columns = [
         {
             title: "STT",
             dataIndex: "stt",
             width: 30,
             align: "center",
-            render: (text, record, index) => (
-                <span>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
-            ),
+            render: (text, record, index) => {
+                const countVersion = (record.checkingDocumentVersion).length
+                if ((record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= thresholdValue.threshold_high_similarity || (record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= thresholdValue.threshold_high_similarity) {
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
+                    )
+                } else {
+                    return (
+                        <span>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
+                    )
+                }
+            },
         },
         {
             title: "Tiêu đề",
             dataIndex: "title",
             width: 500,
             align: "left",
-            render: (text, record, index) => (
-                <span style={{ whiteSpace: 'break-spaces' }}>{record.title}</span>
-            ),
+            render: (text, record, index) => {
+                const countVersion = (record.checkingDocumentVersion).length
+                if ((record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= thresholdValue.threshold_high_similarity || (record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= thresholdValue.threshold_high_similarity) {
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record.title}</span>
+                    )
+                } else {
+                    return (
+                        <span>{record.title}</span>
+                    )
+                }
+            },
         },
         {
             title: "Tác giả",
             dataIndex: "author",
             width: 220,
             align: "left",
-            render: (text, record, index) => (
-                <span style={{ whiteSpace: 'break-spaces' }}>{record.author}</span>
-            ),
+            render: (text, record, index) => {
+                const countVersion = (record.checkingDocumentVersion).length
+                if ((record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= thresholdValue.threshold_high_similarity || (record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= thresholdValue.threshold_high_similarity) {
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record.author}</span>
+                    )
+                } else {
+                    return (
+                        <span>{record.author}</span>
+                    )
+                }
+            },
         },
         {
             title: "Đợt kiểm tra",
             dataIndex: "course",
             width: 150,
             align: "left",
-            render: (text, record, index) => (
-                <span style={{ whiteSpace: 'break-spaces' }}>{record?.course?.name}</span>
-            ),
-        },
-        {
-            title: "Ngày tạo",
-            dataIndex: "createdAt",
-            width: 120,
-            align: "center",
-            render: (text, record, index) => (
-                <span style={{ whiteSpace: 'break-spaces' }}>{toDateTimeString(record.createdAt)}</span>
-            ),
-        },
-        {
-            title: "Trùng với TL cùng đợt (%)",
-            width: 120,
-            align: "center",
-            render: (text, record, index) => (
-                <span style={{ whiteSpace: 'break-spaces' }}>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal}</span>
-            ),
+            render: (text, record, index) => {
+                const countVersion = (record.checkingDocumentVersion).length
+                if ((record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= thresholdValue.threshold_high_similarity || (record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= thresholdValue.threshold_high_similarity) {
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.course?.name}</span>
+                    )
+                } else {
+                    return (
+                        <span>{record?.course?.name}</span>
+                    )
+                }
+            },
         },
         {
             title: "Trùng với DL mẫu (%)",
             width: 120,
             align: "center",
-            render: (text, record, index) => (
-                <span style={{ whiteSpace: 'break-spaces' }}>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}</span>
-            ),
+            render: (text, record, index) => {
+                // if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= thresholdValue.threshold_high_similarity || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= thresholdValue.threshold_high_similarity) {
+                //     return (
+                //         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}</span>
+                //     )
+                // } else {
+                //     return (
+                //         <span>{record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}</span>
+                //     )
+                // }
+                const countVersion = (record.checkingDocumentVersion).length
+                if (record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) {
+                    const similarityType1 = record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal || 0
+                    const similarityType2 = record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal || 0
+
+                    
+                    // Check the similarity and decide color style
+                    if (lastVersionCheckingDoc.similarityDoc) {
+                        return (
+                            <span style={{ whiteSpace: 'break-spaces', color: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? 'red' : 'inherit', fontWeight: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? '600' : 'normal' }}>
+                                {lastVersionCheckingDoc.similarityDoc}
+                            </span>
+                        )
+                    } else {
+                        return (
+                            <span style={{ whiteSpace: 'break-spaces', color: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? 'red' : 'inherit', fontWeight: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? '600' : 'normal' }}>
+                                {similarityType1}
+                            </span>
+                        )
+                    }
+                } else {
+                    // Show spinner if no versions are available
+                    return <span style={{ color: 'blue', fontWeight: '600' }}>Đang xử lý</span>
+                }
+            },
+        },
+        {
+            title: "Trùng với TL cùng đợt (%)",
+            width: 120,
+            align: "center",
+            render: (text, record, index) => {
+                const countVersion = (record.checkingDocumentVersion).length
+                if ((record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= thresholdValue.threshold_high_similarity || (record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= thresholdValue.threshold_high_similarity) {
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal}</span>
+                    )
+                } else {
+                    return (
+                        <span>{record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal}</span>
+                    )
+                }
+            },
         },
         {
             title: "Mô tả",
             dataIndex: "description",
             align: 'left',
             width: 200,
+            render: (text, record, index) => {
+                const countVersion = (record.checkingDocumentVersion).length
+                // if ((record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= thresholdValue.threshold_high_similarity || (record?.checkingDocumentVersion[0]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= thresholdValue.threshold_high_similarity) {
+                //     return (
+                //         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.description}</span>
+                //     )
+                // } else {
+                //     return (
+                //         <span>{record?.description}</span>
+                //     )
+                // }
+                const similarityType1 = record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal || 0
+                const similarityType2 = record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal || 0
+
+                // setSupervisedAt(createdAt)
+
+                // Check the similarity and decide color style
+                if (lastVersionCheckingDoc.description) {
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? 'red' : 'inherit', fontWeight: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? '600' : 'normal' }}>
+                            {record.description}
+                        </span>
+                    )
+                } else {
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? 'red' : 'inherit', fontWeight: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? '600' : 'normal' }}>
+                            {record?.description}
+                        </span>
+                    )
+                }
+            },
+        },
+        {
+            title: "Ngày tạo",
+            dataIndex: "createdAt",
+            width: 120,
+            align: "center",
+            render: (text, record, index) => {
+                const countVersion = (record.checkingDocumentVersion).length
+                if ((record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= thresholdValue.threshold_high_similarity || (record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= thresholdValue.threshold_high_similarity) {
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{toDateTimeString(record.createdAt)}</span>
+                    )
+                } else {
+                    return (
+                        <span>{toDateTimeString(record.createdAt)}</span>
+                    )
+                }
+            },
+        },
+        {
+            title: "Ngày kiểm tra",
+            dataIndex: "supervisedAt",
+            width: 120,
+            align: "center",
+            render: (text, record, index) => {
+                const countVersion = (record.checkingDocumentVersion).length
+                if (countVersion > 0) {
+                    const similarityType1 = record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal || 0
+                    const similarityType2 = record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal || 0
+
+                    const createdAt = toDateTimeString(record?.checkingDocumentVersion[countVersion - 1]?.createdAt)
+                    // setSupervisedAt(createdAt)
+
+                    // Check the similarity and decide color style
+                    if (lastVersionCheckingDoc.supervisedAt) {
+                        return (
+                            <span style={{ whiteSpace: 'break-spaces', color: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? 'red' : 'inherit', fontWeight: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? '600' : 'normal' }}>
+                                {lastVersionCheckingDoc.supervisedAt}
+                            </span>
+                        )
+                    } else {
+                        return (
+                            <span style={{ whiteSpace: 'break-spaces', color: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? 'red' : 'inherit', fontWeight: (similarityType1 >= thresholdValue.threshold_high_similarity || similarityType2 >= thresholdValue.threshold_high_similarity) ? '600' : 'normal' }}>
+                                {createdAt}
+                            </span>
+                        )
+                    }
+                }
+            },
         },
         {
             title: "Thao tác",
             width: 100,
             align: "center",
-            render: (record) => (
-                <div style={{ display: "flex", justifyContent: "center" }}>
-                    {ability.can('update', 'PHAN_QUYEN_VAI_TRO') &&
-                        <>
-                            <EditOutlined
-                                id={`tooltip_edit_${record._id}`}
+            render: (record) => {
+                console.log(record)
+                const dataVersion = record?.checkingDocumentVersion
+                const recordLastVersion = dataVersion[dataVersion.length - 1]
+                return (
+                    <div style={{ display: "flex", justifyContent: "center" }}>
+                        <Tooltip placement="top" title="Kết quả kiểm tra">
+                            <AppstoreOutlined
                                 style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
-                                onClick={(e) => handleEdit(record)}
+                                onClick={() => {
+                                    const recordStandard = { ...recordLastVersion, from: 'checking-document', thresholdValue, courseId: record?.courseId }
+                                    return handleResult(recordStandard)
+                                }}
                             />
-                            <UncontrolledTooltip placement="top" target={`tooltip_edit_${record._id}`}
+                        </Tooltip>
+                        <Tooltip placement="top" title="Kết quả chi tiết">
+
+                            <RightSquareOutlined
+                                id={`tooltip_detail2_${record._id}`}
+                                style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
+                                onClick={() => {
+                                    const recordStandard = { ...recordLastVersion, from: 'checking-document', title: record?.title, thresholdValue }
+                                    return handleButtonClick2(recordStandard)
+                                }}
+                            />
+                        </Tooltip>
+                        <Tooltip placement="top" title="Xuất báo cáo">
+                            <Dropdown menu={menuProps(recordLastVersion?.id)}>
+                                {
+                                    loadingReports[recordLastVersion?.id] ? <Spinner color="#fff" style={{ width: '14px', height: '14px' }} /> : <FileDoneOutlined style={{ cursor: 'pointer', color: '#09A863', marginRight: '1rem' }} />
+                                }
+                            </Dropdown>
+                        </Tooltip>
+                        {ability.can('update', 'KIEM_TRA_TRUNG_LAP_TUYET_DOI') &&
+                            <>
+                                <Tooltip placement="top" title="Chỉnh sửa" >
+                                    <EditOutlined
+                                        style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
+                                        onClick={(e) => handleEdit(record)}
+                                    />
+                                </Tooltip>
+                            </>}
+                        {ability.can('delete', 'KIEM_TRA_TRUNG_LAP_TUYET_DOI') &&
+                            <Popconfirm
+                                title="Bạn chắc chắn xóa?"
+                                onConfirm={() => handleDelete(record._id)}
+                                cancelText="Hủy"
+                                okText="Đồng ý"
                             >
-                                Chỉnh sửa
-                            </UncontrolledTooltip>
-                        </>}
-                    {/* { ability.can('update', 'PHAN_QUYEN_VAI_TRO') && 
-                              <>
-              <AppstoreAddOutlined
-                id={`tooltip_per_${record._id}`}
-                style={{ color: "#09A863", cursor: "pointer" }}
-                onClick={(e) => handlePer(record)}
-              />
-              <UncontrolledTooltip placement="top" target={`tooltip_per_${record._id}`}>
-                Phân quyền
-              </UncontrolledTooltip></>} */}
-                    {ability.can('delete', 'PHAN_QUYEN_VAI_TRO') &&
-                        <Popconfirm
-                            title="Bạn chắc chắn xóa?"
-                            onConfirm={() => handleDelete(record._id)}
-                            cancelText="Hủy"
-                            okText="Đồng ý"
-                        >
-                            <DeleteOutlined
-                                style={{ color: "red", cursor: "pointer" }}
-                                id={`tooltip_delete_${record._id}`}
-                            />
-                            <UncontrolledTooltip placement="top" target={`tooltip_delete_${record._id}`}>
-                                Xóa
-                            </UncontrolledTooltip>
-                        </Popconfirm>}
-                </div>
-            ),
+                                <Tooltip placement="top" title="Xóa" >
+                                    <DeleteOutlined
+                                        style={{ color: "red", cursor: "pointer" }}
+                                    />
+                                </Tooltip>
+                            </Popconfirm>}
+                    </div>
+                )
+            }
         },
     ]
+
+    const [expandedRowKeys, setExpandedRowKeys] = useState([])
+
+    const onExpand = (expanded, record) => {
+        setExpandedRowKeys(expanded ? [record.key] : [])
+    }
+
+    const currentYear = new Date().getFullYear()
+
+    const handleChangeTime = (dates) => {
+        if (dates) {
+            setStartDate(dayjs(dates[0], 'YYYY-MM-DD'))
+            setEndDate(dayjs(dates[1], 'YYYY-MM-DD'))
+        } else {
+            setStartDate(dayjs(`${currentYear}-01-01`))
+            setEndDate(dayjs(`${currentYear}-12-31`))
+        }
+    }
+
+    const [loadingUpdate, setLoadingUpdate] = useState(false)
+
+    // Callback để cập nhật dữ liệu từ con
+    const handleUpdateFromChild = async (updatedRecord) => {
+        setLoadingUpdate(true)
+        try {
+            setLastVersionCheckingDoc(updatedRecord)
+        } catch (error) {
+            console.error("Error updating data", error)
+        } finally {
+            setLoadingUpdate(false)
+        }
+    }
+
+    // Custom rendering for each option
+    const renderOptionLabel = (option) => {
+        if (listLockedCourseIds.includes(option.value)) {
+            return (
+                <span style={{ color: 'red', display: 'flex', justifyContent: 'space-between' }}>
+                    {option.label}
+                    <LockOutlined style={{ marginLeft: 5 }} /> {/* Add icon */}
+                </span>
+            )
+        } else {
+            return (
+                <span style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    {option.label}
+                    <UnlockOutlined style={{ marginLeft: 5, color: '#09A863' }} /> {/* Add icon */}
+                </span>
+            )
+        }
+    }
 
     return (
         <Fragment>
             <Card
-                title="Danh sách kiểm tra tài liệu"
+                title="Danh sách tài liệu kiểm tra"
                 style={{ backgroundColor: "white", width: "100%", height: "100%" }}
             >
                 <Row>
@@ -424,9 +801,13 @@ const CheckingDocument = () => {
                                         mode="multiple"
                                         placeholder="Chọn đợt kiểm tra"
                                         className='mb-50 select-custom flex-1'
-                                        options={listCourse}
+                                        options={listCourse?.map((course) => ({
+                                            value: course.value,
+                                            label: renderOptionLabel(course)
+                                        }))}
                                         allowClear
                                         onChange={(value) => handleChangeCourse(value)}
+                                        filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
                                     />
 
                                 </Col>
@@ -446,24 +827,20 @@ const CheckingDocument = () => {
                                     >
                                         Ngày kiểm tra
                                     </Label>
-                                    <Flatpickr
-                                        style={{ padding: '0.35rem 1rem' }}
-                                        className="form-control invoice-edit-input date-picker mb-50"
-                                        options={{
-                                            mode: "range",
-                                            dateFormat: "d-m-Y", // format ngày giờ
-                                            locale: {
-                                                ...Vietnamese
-                                            },
-                                            defaultDate: [oneWeekAgo, new Date()]
+                                    <RangePicker
+                                        style={{
+                                            width: "100%",
+                                            height: '80%'
                                         }}
-                                        placeholder="dd/mm/yyyy"
-                                        onChange={(value => handleChangeDate(value))}
+                                        // defaultValue={[dayjs(`${currentYear}-01-01`), dayjs(`${currentYear}-12-31`)]}
+                                        format={"DD-MM-YYYY"}
+                                        allowClear={true}
+                                        onChange={handleChangeTime}
                                     />
                                 </Col>
                             </Col>
                             <Col md="2" style={{ display: "flex", justifyContent: "flex-end" }}>
-                                {ability.can('create', 'PHAN_QUYEN_VAI_TRO') &&
+                                {ability.can('create', 'KIEM_TRA_TRUNG_LAP_TUYET_DOI') &&
                                     <Button
                                         onClick={(e) => setIsAdd(true)}
                                         color="primary"
@@ -483,18 +860,28 @@ const CheckingDocument = () => {
                             bordered
                             expandable={{
                                 expandedRowRender: (record) => <VersionModal
-                                    checkingDocumentSelected={record} />,
+                                    checkingDocumentSelected={record} onUpdate={handleUpdateFromChild} thresholdValue={thresholdValue} />,
                                 rowExpandable: (record) => record.name !== 'Not Expandable',
-                                // expandRowByClick: true
                             }}
+                            expandedRowKeys={expandedRowKeys}
+                            onExpand={onExpand}
                             pagination={{
-                                defaultPageSize: 10,
+                                current: currentPage,
+                                pageSize: rowsPerPage,
+                                defaultPageSize: rowsPerPage,
                                 showSizeChanger: true,
                                 pageSizeOptions: ["10", "20", "30"],
-                                total: { count },
+                                total: count,
                                 locale: { items_per_page: "/ trang" },
                                 showSizeChanger: true,
                                 showTotal: (total, range) => <span>Tổng số: {total}</span>,
+                                onShowSizeChange: (current, pageSize) => {
+                                    setCurrentPage(current)
+                                    setRowsPerpage(pageSize)
+                                },
+                                onChange: (pageNumber) => {
+                                    setCurrentPage(pageNumber)
+                                }
                             }}
                         />}
                         <AddNewModal
@@ -503,6 +890,9 @@ const CheckingDocument = () => {
                             getData={getData}
                             currentPage={currentPage}
                             rowsPerPage={rowsPerPage}
+                            onUpdate={handleUpdateFromChild}
+                            dataTable={data}
+                            setData={setData}
                         />
                         {
                             <EditModal
@@ -514,13 +904,6 @@ const CheckingDocument = () => {
                                 rowsPerPage={rowsPerPage}
                             />
                         }
-                        {/* {
-                            <ListUsersModal
-                                open={isView}
-                                setIsView={setIsView}
-                                roleSelected={roleSelected}
-                            />
-                        } */}
                     </Col>
                 </Row>
             </Card>
@@ -529,5 +912,4 @@ const CheckingDocument = () => {
 }
 const AddNewModal = React.lazy(() => import("./modal/AddNewModal"))
 const EditModal = React.lazy(() => import("./modal/EditModal"))
-// const ListUsersModal = React.lazy(() => import("./modal/ListUsersModal"))
 export default CheckingDocument

@@ -51,6 +51,11 @@ export const getSimilarityReportByCourse = async (query) => {
   return res
 }
 
+export const getSimilarityReportSentence = async (query) => {
+  const uri = `/getSimilarityReportSentence`
+  const res = await API_TAMS.get(uri, query, { responseType: 'blob' })
+  return res
+}
 
 export const getDuplicateDocumentVersion = async (id) => {
   const uri = `/checking-document-version/${id}/duplicate-document`

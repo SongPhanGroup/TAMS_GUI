@@ -107,7 +107,17 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate, thresholdValue }) =>
     }
 
     const handleButtonClick2 = (record) => {
-        navigate(`/tams/detailTD-checking-version-result/${record?.id}`, { state: record })
+        fetch(`http://localhost:3000/checkHTMLResult?id=${record?.id}&type=2`, {
+            method: 'GET',
+            headers: {'Content-Type': 'application/json'}
+        }).then(response => response.json())
+        .then(data => { 
+            console.log('API Response:', data) 
+            data ? navigate(`/tams/detailTD-checking-version-result/${record?.id}`, { state: record }) : alert('Dữ liệu đang khởi tạo')
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error)
+        })
     }
 
     useEffect(() => {
@@ -171,6 +181,11 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate, thresholdValue }) =>
         {
             label: 'Báo cáo DS trùng lặp theo đợt',
             key: '1',
+            icon: <DownCircleFilled />,
+        },
+        {
+            label: 'Báo cáo DS câu trùng lặp',
+            key: '3',
             icon: <DownCircleFilled />,
         }
     ]

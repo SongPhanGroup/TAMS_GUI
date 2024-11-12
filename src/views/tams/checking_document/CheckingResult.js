@@ -521,6 +521,7 @@ const CheckingResult = () => {
     }
 
     const items = [
+        
         {
             label: 'Báo cáo DS trùng lặp cao',
             key: '2',
@@ -530,7 +531,12 @@ const CheckingResult = () => {
             label: 'Báo cáo DS trùng lặp theo đợt',
             key: '1',
             icon: <DownCircleFilled />,
-        }
+        },
+        {
+            label: 'Báo cáo DS câu trùng lặp',
+            key: '3',
+            icon: <DownCircleFilled />,
+        },     
     ]
 
     const menuProps = {

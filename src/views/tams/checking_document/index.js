@@ -58,7 +58,7 @@ import VersionModal from "./modal/VersionModal"
 import { PAGE_DEFAULT, PER_PAGE_DEFAULT } from "../../../utility/constant"
 import { getCourse } from "../../../api/course"
 import dayjs from "dayjs"
-import { downloadTemplateBaoCao, getSimilarityReport, getSimilarityReportByCourse } from "../../../api/checking_document_version"
+import { downloadTemplateBaoCao, getSimilarityReport, getSimilarityReportByCourse, getSimilarityReportSentence } from "../../../api/checking_document_version"
 import { useDispatch, useSelector } from "react-redux"
 import { fetchSystemParameters, systemParameterActions } from "../../../redux/systemParameterSlice"
 import { store } from "../../../redux/store"
@@ -343,7 +343,17 @@ const CheckingDocument = () => {
     }
 
     const handleButtonClick2 = (record) => {
-        navigate(`/tams/detailTD-checking-version-result/${record?.id}`, { state: record })
+        fetch(`http://localhost:3000/checkHTMLResult?id=${record?.id}&type=2`, {
+            method: 'GET',
+            headers: {'Content-Type': 'application/json'}
+        }).then(response => response.json())
+        .then(data => { 
+            console.log('API Response:', data) 
+            data ? navigate(`/tams/detailTD-checking-version-result/${record?.id}`, { state: record }) : alert('Dữ liệu đang khởi tạo')
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error)
+        })
     }
 
     const handleReport = (recordId, item) => {
@@ -357,6 +367,22 @@ const CheckingDocument = () => {
             })
                 .then(res => {
                     downloadTemplateBaoCao(2, res, 'Bao_cao_DS_trung_lap_cao')
+                })
+                .catch(error => {
+                    console.log(error)
+                }).finally(() => {
+                    setLoadingReports((prev) => ({ ...prev, [recordId]: false }))
+                })
+        } else if (item && item.key === "3") {
+            setLoadingReports((prev) => ({ ...prev, [recordId]: true }))
+            getSimilarityReportSentence({
+                params: {
+                    checkingDocumentVersionId: Number(recordId)
+                },
+                responseType: 'blob'
+            })
+                .then(res => {
+                    downloadTemplateBaoCao(5, res, 'Bao_cao_DS_cau_trung_lap')
                 })
                 .catch(error => {
                     console.log(error)
@@ -384,6 +410,7 @@ const CheckingDocument = () => {
     }
 
     const items = [
+        
         {
             label: 'Báo cáo DS trùng lặp cao',
             key: '2',
@@ -392,6 +419,11 @@ const CheckingDocument = () => {
         {
             label: 'Báo cáo DS trùng lặp theo đợt',
             key: '1',
+            icon: <DownCircleFilled />,
+        },
+        {
+            label: 'Báo cáo DS câu trùng lặp',
+            key: '3',
             icon: <DownCircleFilled />,
         }
     ]

@@ -1,4 +1,4 @@
-# Phần mềm phát hiện đạo văn - HVCT
+# Phần mềm phát hiện đạo văn - HVLQ
 
 ### Công nghệ sử dụng
 

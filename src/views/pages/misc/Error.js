@@ -9,7 +9,7 @@ import { useSkin } from '@hooks/useSkin'
 
 // ** Styles
 import '@styles/base/pages/page-misc.scss'
-import logo from '@src/assets/images/logo/logo_hvlq.png'
+import logo from '@src/assets/images/logo/logo_hvqp.png'
 
 const Error = () => {
   // ** Hooks
@@ -21,7 +21,7 @@ const Error = () => {
     <div className='misc-wrapper'>
       <a className='brand-logo' href='/' style={{ alignSelf: "center" }}>
         <img className='fallback-logo' src={logo} alt='logo' style={{ width: "5rem" }} />
-        <h2 className='brand-text text-primary ms-1' style={{ alignSelf: "center" }}>HVLQ</h2>
+        <h2 className='brand-text text-primary ms-1' style={{ alignSelf: "center" }}>HVQP</h2>
       </a>
       <div className='misc-inner p-2 p-sm-3'>
         <div className='w-100 text-center'>

@@ -3,8 +3,8 @@
 //Template config options
 const themeConfig = {
   app: {
-    appName: 'HVLQ',
-    appLogoImage: require('@src/assets/images/logo/logo_hvlq.png').default
+    appName: 'HVQP',
+    appLogoImage: require('@src/assets/images/logo/logo_hvqp.png').default
   },
   layout: {
     isRTL: false,

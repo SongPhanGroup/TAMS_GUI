@@ -44,6 +44,6 @@ export const statisticByType = async (params) => {
 }
 export const postFromExcel = async (body) => {
   const uri = `/document/import-from-excel`
-  const res = await API_FormData_XX.post(uri, body)
+  const res = await API_FormData.post(uri, body)
   return res
 }

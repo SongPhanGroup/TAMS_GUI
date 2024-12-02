@@ -81,8 +81,14 @@ export const getDuplicateSentenceCheckingDocument = async (query, id) => {
   return res
 }
 
+export const getCourseReport = async (query) => {
+  const uri = `/getCouseReport`
+  const res = await API_TAMS.get(uri, query, { responseType: 'blob' })
+  return res
+}
+
 export const downloadTemplateBaoCao = async (id, body_, fileName) => {
-  const uri = `${process.env.REACT_APP_URL_REPORT}/templater/xlsx/${id}/file`
+  const uri = `${process.env.REACT_APP_URL_REPORT}templater/xlsx/${id}/file`
 
   try {
     // Gửi yêu cầu POST với body và nhận phản hồi dưới dạng blob

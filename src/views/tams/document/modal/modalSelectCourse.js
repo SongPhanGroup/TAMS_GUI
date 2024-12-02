@@ -24,6 +24,7 @@ import * as yup from "yup"
 import { yupResolver } from '@hookform/resolvers/yup'
 // import { Select } from "antd"
 // ** Utils
+import toast from 'react-hot-toast'
 
 // ** Styles
 import '@styles/react/libs/react-select/_react-select.scss'
@@ -47,7 +48,7 @@ const SelectCourseModal = ({ open, handleModal, getData }) => {
         //     "Yêu cầu chọn file",
         //     value => value !== null && value !== ''
         // ),
-        file: yup.mixed().required("Yêu cầu chọn file"),
+        file: yup.mixed().required("Vui lòng chọn file"),
         folder: yup.mixed().required("Vui lòng chọn thư mục"),
     })
 
@@ -172,19 +173,52 @@ const SelectCourseModal = ({ open, handleModal, getData }) => {
         })
     }
 
+    // const handleChangeFolder = (event) => {
+    //     const fileList = event.target.files
+    //     const fileArray = Array.from(fileList)
+
+    //     setFiles(fileArray)
+
+    //     // Hiện modal preview ở đây
+    //     setModalPreview(true)
+
+    //     // Reset lại input file
+    //     if (folderInputRef.current) {
+    //         folderInputRef.current.value = undefined // Reset giá trị input
+    //     }
+    // }
     const handleChangeFolder = (event) => {
         const fileList = event.target.files
         const fileArray = Array.from(fileList)
-        // setValue('folder', fileArray) // Cập nhật giá trị vào form
 
-        setFiles(fileArray)
+        // Phân loại tệp hợp lệ và tệp sai định dạng
+        const validFiles = fileArray.filter(file => file.name.endsWith('.docx'))
+        const invalidFiles = fileArray.filter(file => !file.name.endsWith('.docx'))
 
-        // Hiện modal preview ở đây
-        setModalPreview(true)
+        // Nếu có tệp sai định dạng, thông báo cho người dùng
+        if (invalidFiles.length > 0) {
+            const invalidFileNames = invalidFiles.map(file => file.name).join(', ')// Lấy tên các tệp sai định dạng
+            MySwal.fire({
+                title: "Vui lòng kiểm tra lại định dạng",
+                text: `Các tệp sau không đúng định dạng docx: ${invalidFileNames}`,
+                icon: "error",
+                customClass: {
+                    confirmButton: "btn btn-danger",
+                },
+            })
+        }
+
+        // Chỉ cập nhật tệp hợp lệ
+        setFiles(validFiles)
+
+        // Hiện modal preview nếu có tệp hợp lệ
+        if (validFiles.length > 0) {
+            setModalPreview(true)
+        }
 
         // Reset lại input file
         if (folderInputRef.current) {
-            folderInputRef.current.value = undefined // Reset giá trị input
+            folderInputRef.current.value = undefined
         }
     }
 
@@ -226,7 +260,7 @@ const SelectCourseModal = ({ open, handleModal, getData }) => {
                     <Col xs={12}>
                         <div className='d-flex justify-content-between'>
                             <Label className='form-label' for='folder'>
-                                Thư mục tài liệu <span style={{ color: 'red' }}>(*)</span>
+                                Thư mục tài liệu (chỉ chứa các tệp có định dạng docx) <span style={{ color: 'red' }}>(*)</span>
                             </Label>
                             {/* {
                                 files?.length > 0 && <small style={{ color: "#09a863", cursor: "pointer" }} onClick={() => setModalPreview(true)}>Chi tiết các tệp tải lên</small>
@@ -248,6 +282,7 @@ const SelectCourseModal = ({ open, handleModal, getData }) => {
                                     ref={folderInputRef} // Sử dụng ref để truy cập input
                                     placeholder='Chọn thư mục'
                                     invalid={errors.folder && true}
+                                    accept=".docx" // Chỉ cho phép tệp .docx
                                     onChange={(event) => {
                                         handleChangeFolder(event)
                                         field.onChange(event) // Gọi field.onChange để cập nhật form state

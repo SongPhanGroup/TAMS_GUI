@@ -223,9 +223,6 @@ export default function DocumentByTime({ colorForLabel, colors }) {
                 return 0                // Giữ nguyên thứ tự của các phần tử còn lại
             }).map(item => item.name)
 
-            console.log(sortedMajors)
-
-
             // Tạo mảng `datasets` động
             const datasets_ = sortedMajors?.map((majorName, index) => {
                 return {

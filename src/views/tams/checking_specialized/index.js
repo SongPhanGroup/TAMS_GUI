@@ -311,18 +311,43 @@ const CheckingDocument = () => {
         navigate(`/tams/checking-specialized-result/${record?.id}`, { state: record })
     }
 
+    // const handleButtonClick2 = (record) => {
+    //     fetch(`http://localhost:3000/checkHTMLResult?id=${record?.id}&type=2`, {
+    //         method: 'GET',
+    //         headers: {'Content-Type': 'application/json'}
+    //     }).then(response => response.json())
+    //     .then(data => { 
+    //         console.log('API Response:', data) 
+    //         data ? navigate(`/tams/detailXX-checking-version-result/${record?.id}`, { state: record }) : alert('Dữ liệu đang khởi tạo')
+    //     })
+    //     .catch(error => {
+    //         console.error('Error fetching data:', error)
+    //     })
+    // }
     const handleButtonClick2 = (record) => {
-        fetch(`http://localhost:3000/checkHTMLResult?id=${record?.id}&type=2`, {
+        fetch(`${process.env.REACT_APP_API_URL_TAMS_CHECKING_UPLOAD_TD}/checkHTMLResult?id=${record?.id}&type=2`, {
             method: 'GET',
-            headers: {'Content-Type': 'application/json'}
-        }).then(response => response.json())
-        .then(data => { 
-            console.log('API Response:', data) 
-            data ? navigate(`/tams/detailXX-checking-version-result/${record?.id}`, { state: record }) : alert('Dữ liệu đang khởi tạo')
+            headers: { 'Content-Type': 'application/json' },
         })
-        .catch(error => {
-            console.error('Error fetching data:', error)
-        })
+            .then(response => response.json())
+            .then(data => {
+                if (data) {
+                    navigate(`/tams/detailXX-checking-version-result/${record?.id}`, { state: record })
+                } else {
+                    MySwal.fire({
+                        title: "Dữ liệu đang khởi tạo",
+                        icon: "info",
+                        customClass: {
+                            confirmButton: "btn btn-info",
+                        },
+                    }).then(() => {
+                        console.log("Thông báo hiển thị xong")
+                    })
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error)
+            })
     }
 
     const handleReport = (recordId, item) => {

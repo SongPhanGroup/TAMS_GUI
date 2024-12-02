@@ -343,18 +343,31 @@ const CheckingDocument = () => {
     }
 
     const handleButtonClick2 = (record) => {
-        fetch(`http://localhost:3000/checkHTMLResult?id=${record?.id}&type=2`, {
+        fetch(`${process.env.REACT_APP_API_URL_TAMS_CHECKING_UPLOAD_TD}/checkHTMLResult?id=${record?.id}&type=2`, {
             method: 'GET',
-            headers: {'Content-Type': 'application/json'}
-        }).then(response => response.json())
-        .then(data => { 
-            console.log('API Response:', data) 
-            data ? navigate(`/tams/detailTD-checking-version-result/${record?.id}`, { state: record }) : alert('Dữ liệu đang khởi tạo')
+            headers: { 'Content-Type': 'application/json' },
         })
-        .catch(error => {
-            console.error('Error fetching data:', error)
-        })
+            .then(response => response.json())
+            .then(data => {
+                if (data) {
+                    navigate(`/tams/detailTD-checking-version-result/${record?.id}`, { state: record })
+                } else {
+                    MySwal.fire({
+                        title: "Dữ liệu đang khởi tạo",
+                        icon: "info",
+                        customClass: {
+                            confirmButton: "btn btn-info",
+                        },
+                    }).then(() => {
+                        console.log("Thông báo hiển thị xong")
+                    })
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error)
+            })
     }
+
 
     const handleReport = (recordId, item) => {
         if (item && item.key === "2") {
@@ -410,7 +423,7 @@ const CheckingDocument = () => {
     }
 
     const items = [
-        
+
         {
             label: 'Báo cáo DS trùng lặp cao',
             key: '2',
@@ -525,7 +538,7 @@ const CheckingDocument = () => {
                     const similarityType1 = record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal || 0
                     const similarityType2 = record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal || 0
 
-                    
+
                     // Check the similarity and decide color style
                     if (lastVersionCheckingDoc.similarityDoc) {
                         return (

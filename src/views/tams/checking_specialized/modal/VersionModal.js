@@ -250,10 +250,12 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate, thresholdValue }) =>
             align: "center",
             width: 100,
             render: (text, record, index) => {
-                if (record?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) {
-                    return (
-                        <span>{record?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}</span>
-                    )
+                const checkingItem = record?.checkingResult?.find(item => item.typeCheckingId === 1)
+                const similarityTotal = checkingItem?.similarityTotal
+                if (similarityTotal === 0) {
+                    return <span>0</span>
+                } else if (similarityTotal) {
+                    return <span>{similarityTotal}</span>
                 } else {
                     return <span style={{ color: 'blue', fontWeight: '600' }}>Đang xử lý</span>
                 }

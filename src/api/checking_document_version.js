@@ -82,11 +82,7 @@ export const getDuplicateSentenceCheckingDocument = async (query, id) => {
 }
 
 export const downloadTemplateBaoCao = async (id, body_, fileName) => {
-<<<<<<< HEAD
-  const uri = `http://${process.env.REACT_APP_DOMAIN_TEMPLATE_REPORT}:3003/templater/xlsx/${id}/file`
-=======
   const uri = `${process.env.REACT_APP_URL_REPORT}/templater/xlsx/${id}/file`
->>>>>>> 641b77eaaa90688787ed9a684f33c2cb0861ed53
 
   try {
     // Gửi yêu cầu POST với body và nhận phản hồi dưới dạng blob

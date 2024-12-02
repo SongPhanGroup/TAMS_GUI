@@ -1,4 +1,4 @@
-import { Table, Input, Card, CardTitle, Tag, Popconfirm, Switch, Spin, Select, Tooltip } from "antd"
+import { Table, Input, Card, CardTitle, Tag, Popconfirm, Switch, Spin, Select, Tooltip, Dropdown } from "antd"
 import React, { useState, Fragment, useEffect, useRef, useContext } from "react"
 import {
     Label,
@@ -13,7 +13,7 @@ import {
     UncontrolledTooltip,
 } from "reactstrap"
 import { Plus, X } from "react-feather"
-import { BarsOutlined, DeleteOutlined, EditOutlined, LockOutlined, UnlockOutlined } from "@ant-design/icons"
+import { BarsOutlined, DeleteOutlined, EditOutlined, LockOutlined, UnlockOutlined, DownCircleFilled, FileDoneOutlined } from "@ant-design/icons"
 // import style from "../../../../assets/scss/index.module.scss"
 import Swal from "sweetalert2"
 import withReactContent from "sweetalert2-react-content"
@@ -51,6 +51,8 @@ const Course = () => {
     const [isAdd, setIsAdd] = useState(false)
     const [isEdit, setIsEdit] = useState(false)
     const [info, setInfo] = useState()
+    const [loadingReports, setLoadingReports] = useState({}) // Tracks loading per record
+
     const getData = (page, limit, search, isActive) => {
         setLoadingData(true)
         getCourse({
@@ -184,7 +186,77 @@ const Course = () => {
             setIsActive()
         }
     }
+    
+    // Note for Mr. Hiep
+    const handleReport = (recordId, item) => {
+        if (item && item.key === "2") {
+            setLoadingReports((prev) => ({ ...prev, [recordId]: true }))
+            getSimilarityReport({
+                params: {
+                    checkingDocumentVersionId: Number(recordId)
+                },
+                responseType: 'blob'
+            })
+                .then(res => {
+                    downloadTemplateBaoCao(2, res, 'Bao_cao_DS_trung_lap_cao')
+                })
+                .catch(error => {
+                    console.log(error)
+                }).finally(() => {
+                    setLoadingReports((prev) => ({ ...prev, [recordId]: false }))
+                })
+        } else if (item && item.key === "3") {
+            setLoadingReports((prev) => ({ ...prev, [recordId]: true }))
+            getSimilarityReportSentence({
+                params: {
+                    checkingDocumentVersionId: Number(recordId)
+                },
+                responseType: 'blob'
+            })
+                .then(res => {
+                    downloadTemplateBaoCao(5, res, 'Bao_cao_DS_cau_trung_lap')
+                })
+                .catch(error => {
+                    console.log(error)
+                }).finally(() => {
+                    setLoadingReports((prev) => ({ ...prev, [recordId]: false }))
+                })
+        } else {
+            setLoadingReports((prev) => ({ ...prev, [recordId]: true }))
+            getSimilarityReportByCourse({
+                params: {
+                    checkingDocumentVersionId: Number(recordId)
+                },
+                responseType: 'blob'
+            })
+                .then(res => {
+                    downloadTemplateBaoCao(4, res, 'Bao_cao_DS_trung_lap_theo_dot')
+                })
+                .catch(error => {
+                    console.log(error)
+                }).finally(() => {
+                    setLoadingReports((prev) => ({ ...prev, [recordId]: false }))
+                })
+        }
 
+    }
+    const items = [
+
+        {
+            label: 'Kiểm tra tuyệt đối',
+            key: '2',
+            icon: <DownCircleFilled />,
+        },
+        {
+            label: 'Kiểm tra xấp xỉ',
+            key: '1',
+            icon: <DownCircleFilled />,
+        }
+    ]
+    const menuProps = (recordId) => ({
+        items,
+        onClick: (item) => handleReport(recordId, item),
+    })
     const columns = [
         {
             title: "STT",
@@ -289,6 +361,13 @@ const Course = () => {
                                 />
                             </Tooltip>
                         </>}
+                    <Tooltip placement="top" title="Xuất báo cáo">
+                        <Dropdown menu={menuProps(record?.id)}>
+                            {
+                                loadingReports[record?.id] ? <Spinner color="#fff" style={{ width: '14px', height: '14px' }} /> : <FileDoneOutlined style={{ cursor: 'pointer', color: '#09A863', marginRight: '1rem' }} />
+                            }
+                        </Dropdown>
+                    </Tooltip>
                     {ability.can('delete', 'DOT_KIEM_TRA') &&
                         <Popconfirm
                             title="Bạn chắc chắn xóa?"

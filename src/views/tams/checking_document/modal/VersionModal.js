@@ -258,6 +258,7 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate, thresholdValue }) =>
                     return <span style={{ color: 'blue', fontWeight: '600' }}>Đang xử lý</span>
                 }
             }
+
         },
         {
             title: "Trùng với TL cùng đợt (%)",

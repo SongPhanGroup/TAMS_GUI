@@ -1,4 +1,4 @@
-import { Table, Input, Card, CardTitle, Tag, Popconfirm, Switch, Spin, Select, Tooltip } from "antd"
+import { Table, Input, Card, CardTitle, Tag, Popconfirm, Switch, Spin, Select, Tooltip, Dropdown } from "antd"
 import React, { useState, Fragment, useEffect, useRef, useContext } from "react"
 import {
     Label,
@@ -11,9 +11,10 @@ import {
     Col,
     FormFeedback,
     UncontrolledTooltip,
+    Spinner
 } from "reactstrap"
 import { Plus, X } from "react-feather"
-import { BarsOutlined, DeleteOutlined, EditOutlined, LockOutlined, UnlockOutlined } from "@ant-design/icons"
+import { BarsOutlined, DeleteOutlined, EditOutlined, LockOutlined, UnlockOutlined, DownCircleFilled, FileDoneOutlined } from "@ant-design/icons"
 // import style from "../../../../assets/scss/index.module.scss"
 import Swal from "sweetalert2"
 import withReactContent from "sweetalert2-react-content"
@@ -26,6 +27,8 @@ import { AbilityContext } from '@src/utility/context/Can'
 import { deleteCourse, getCourse, toggleActiveCourse } from "../../../api/course"
 import { toDateString, toDateTimeString } from "../../../utility/Utils"
 import { useNavigate } from "react-router-dom"
+import { supervisedCheckingDocument } from "../../../api/checking_document"
+import { downloadTemplateBaoCao, getCourseReport } from "../../../api/checking_document_version"
 const LIST_STATUS = [
     {
         value: 1,
@@ -50,6 +53,8 @@ const Course = () => {
     const [isAdd, setIsAdd] = useState(false)
     const [isEdit, setIsEdit] = useState(false)
     const [info, setInfo] = useState()
+    const [loadingReports, setLoadingReports] = useState({}) // Tracks loading per record
+
     const getData = (page, limit, search, isActive) => {
         setLoadingData(true)
         getCourse({
@@ -89,25 +94,55 @@ const Course = () => {
     }
 
     const handleSupervisor = (record) => {
-        navigate(`/tams/checking-document`, {state: record})
+        // navigate(`/tams/checking-document`, {    state: record })
+        supervisedCheckingDocument({
+            courseId: record.id,
+        }).then((res) => {
+            if (res.status === 'success') {
+                MySwal.fire({
+                    title: "Kiểm tra cùng khóa thành công",
+                    icon: "success",
+                    customClass: {
+                        confirmButton: "btn btn-success",
+                    },
+                })
+            } else {
+                MySwal.fire({
+                    title: "Kiểm tra cùng khóa thất bại",
+                    icon: "error",
+                    customClass: {
+                        confirmButton: "btn btn-danger",
+                    },
+                })
+            }
+        }).catch(error => {
+            MySwal.fire({
+                title: `${error}`,
+                icon: "error",
+                customClass: {
+                    confirmButton: "btn btn-danger",
+                },
+            })
+        })
     }
 
     const handleDelete = (key) => {
         deleteCourse(key)
             .then((res) => {
-                MySwal.fire({
-                    title: "Xóa đợt kiểm tra thành công",
-                    icon: "success",
-                    customClass: {
-                        confirmButton: "btn btn-success",
-                    },
-                }).then((result) => {
-                    if (currentPage === 1) {
-                        getData(1, rowsPerPage)
-                    } else {
-                        setCurrentPage(1)
-                    }
-                })
+                // MySwal.fire({
+                //     title: "Xóa đợt kiểm tra thành công",
+                //     icon: "success",
+                //     customClass: {
+                //         confirmButton: "btn btn-success",
+                //     },
+                // }).then((result) => {
+                //     if (currentPage === 1) {
+                //         getData(1, rowsPerPage)
+                //     } else {
+                //         setCurrentPage(1)
+                //     }
+                // })
+                getData(1, rowsPerPage)
             })
             .catch((error) => {
                 MySwal.fire({
@@ -154,6 +189,61 @@ const Course = () => {
         }
     }
 
+    // Note for Mr. Hiep
+    const handleReport = (recordId, item) => {
+        if (item && item.key === '1') {
+            setLoadingReports((prev) => ({ ...prev, [recordId]: true }))
+            getCourseReport({
+                params: {
+                    courseId: Number(recordId),
+                    type: 1
+                },
+                responseType: 'blob'
+            })
+                .then(res => {
+                    downloadTemplateBaoCao(6, res, 'Bao_cao_kiem_tra_tuyet_doi')
+                })
+                .catch(error => {
+                    console.log(error)
+                }).finally(() => {
+                    setLoadingReports((prev) => ({ ...prev, [recordId]: false }))
+                })
+        } else {
+            setLoadingReports((prev) => ({ ...prev, [recordId]: true }))
+            getCourseReport({
+                params: {
+                    courseId: Number(recordId),
+                    type: 2
+                },
+                responseType: 'blob'
+            })
+                .then(res => {
+                    downloadTemplateBaoCao(6, res, 'Bao_cao_kiem_tra_xap_xi')
+                })
+                .catch(error => {
+                    console.log(error)
+                }).finally(() => {
+                    setLoadingReports((prev) => ({ ...prev, [recordId]: false }))
+                })
+        }
+    }
+    const items = [
+
+        {
+            label: 'Kiểm tra tuyệt đối',
+            key: 1,
+            icon: <DownCircleFilled />,
+        },
+        {
+            label: 'Kiểm tra xấp xỉ',
+            key: 2,
+            icon: <DownCircleFilled />,
+        }
+    ]
+    const menuProps = (recordId) => ({
+        items,
+        onClick: (item) => handleReport(recordId, item),
+    })
     const columns = [
         {
             title: "STT",
@@ -164,15 +254,7 @@ const Course = () => {
                 <span>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
             ),
         },
-        {
-            title: "Ngày tạo",
-            dataIndex: "createdAt",
-            align: 'center',
-            width: 150,
-            render: (text, record, index) => (
-                <span>{toDateTimeString(record.createdAt)}</span>
-            ),
-        },
+
         {
             title: "Tên đợt kiểm tra",
             dataIndex: "name",
@@ -212,6 +294,15 @@ const Course = () => {
             },
         },
         {
+            title: "Ngày tạo",
+            dataIndex: "createdAt",
+            align: 'center',
+            width: 150,
+            render: (text, record, index) => (
+                <span>{toDateTimeString(record.createdAt)}</span>
+            ),
+        },
+        {
             title: "Thao tác",
             width: 100,
             align: "center",
@@ -226,27 +317,30 @@ const Course = () => {
                             okText="Đồng ý"
                         >
                             {
-                                record.isActive === 1 ? <LockOutlined
-                                    style={{ color: "red", cursor: 'pointer', marginRight: '1rem' }}
-                                /> : <UnlockOutlined
-                                    style={{ color: "#09A863", cursor: 'pointer', marginRight: '1rem' }}
-                                />
+                                record.isActive === 1 ? <Tooltip placement="top" title="Khóa đợt kiểm tra">
+                                    <LockOutlined
+                                        style={{ color: "red", cursor: 'pointer', marginRight: '1rem' }}
+                                    />
+                                </Tooltip> : <Tooltip placement="top" title="Mở khóa đợt kiểm tra">
+                                    <UnlockOutlined
+                                        style={{ color: "#09A863", cursor: 'pointer', marginRight: '1rem' }}
+                                    />
+                                </Tooltip>
                             }
                         </Popconfirm>
                     }
-                    {ability.can('update', 'LOAI_DON_VI') &&
+                    {ability.can('update', 'DOT_KIEM_TRA') &&
                         <>
 
-                            <Tooltip placement="top" title="Kiểm tra trong khóa" >
+                            <Tooltip placement="top" title="Kiểm tra cùng đợt" >
                                 <BarsOutlined
                                     style={{ color: "#09A863", cursor: 'pointer', marginRight: '1rem' }}
                                     onClick={(e) => handleSupervisor(record)}
                                 />
                             </Tooltip>
                         </>}
-                    {ability.can('update', 'LOAI_DON_VI') &&
+                    {ability.can('update', 'DOT_KIEM_TRA') &&
                         <>
-
                             <Tooltip placement="top" title="Chỉnh sửa" >
                                 <EditOutlined
                                     style={{ color: "#09A863", cursor: 'pointer', marginRight: '1rem' }}
@@ -254,7 +348,14 @@ const Course = () => {
                                 />
                             </Tooltip>
                         </>}
-                    {ability.can('delete', 'LOAI_DON_VI') &&
+                    <Tooltip placement="top" title="Xuất báo cáo">
+                        <Dropdown menu={menuProps(record?.id)}>
+                            {
+                                loadingReports[record?.id] ? <Spinner color="#fff" style={{ width: '14px', height: '14px', marginRight: '1rem' }} /> : <FileDoneOutlined style={{ cursor: 'pointer', color: '#09A863', marginRight: '1rem' }} />
+                            }
+                        </Dropdown>
+                    </Tooltip>
+                    {ability.can('delete', 'DOT_KIEM_TRA') &&
                         <Popconfirm
                             title="Bạn chắc chắn xóa?"
                             onConfirm={() => handleDelete(record.id)}
@@ -329,18 +430,20 @@ const Course = () => {
                         />
                     </Col>
                 </Col>
-                <Col sm="4" style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <Button
-                        onClick={(e) => setIsAdd(true)}
-                        color="primary"
-                        className="addBtn"
-                        style={{
-                            width: '100px',
-                        }}
-                    >
-                        Thêm mới
-                    </Button>
-                </Col>
+                {ability.can('create', 'DOT_KIEM_TRA') &&
+                    <Col sm="4" style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <Button
+                            onClick={(e) => setIsAdd(true)}
+                            color="primary"
+                            className="addBtn"
+                            style={{
+                                width: '100px',
+                            }}
+                        >
+                            Thêm mới
+                        </Button>
+                    </Col>
+                }
             </Row>
             {loadingData === true ? <Spin style={{ position: 'relative', left: '50%' }} /> : <Table
                 columns={columns}

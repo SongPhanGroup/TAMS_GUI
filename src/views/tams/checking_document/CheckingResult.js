@@ -7,7 +7,10 @@ import {
     Switch,
     Collapse,
     Spin,
-    Select
+    Select,
+    Tooltip,
+    Dropdown,
+    Space
 } from "antd"
 import React, { useState, Fragment, useEffect, useRef, useContext } from "react"
 import {
@@ -23,15 +26,21 @@ import {
     UncontrolledTooltip,
     CardBody,
     CardTitle,
+    Spinner,
 } from "reactstrap"
 import { Link, NavLink, useLocation, useNavigate, useParams } from "react-router-dom"
 import { Plus, X } from "react-feather"
 import {
     AppstoreAddOutlined,
     DeleteOutlined,
+    DownCircleFilled,
+    DownCircleOutlined,
+    DownloadOutlined,
+    DownOutlined,
     EditOutlined,
     LockOutlined,
     RightCircleOutlined,
+    RightSquareOutlined,
     UnorderedListOutlined,
 } from "@ant-design/icons"
 import { AbilityContext } from '@src/utility/context/Can'
@@ -43,31 +52,14 @@ import * as yup from "yup"
 import { useForm, Controller } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import classnames from "classnames"
-import { toDateString, toDateTimeString } from "../../../utility/Utils"
-// import {
-//     getRole,
-//     createRole,
-//     updateRole,
-//     deleteRole,
-//     listAllRoleUserCount,
-// } from "../../../../api/roles"
-// import {
-//     listAllUser,
-//     getListUserByRole
-// } from "../../../../api/users"
-// import { getGroupPermission } from "../../../../api/permissionGroups"
-// import {
-//     getPerByRoleId,
-//     getAllRolePer,
-//     updateRoleManyPer,
-// } from "../../../../api/rolePermissions"
-// import { getPermission } from "../../../../api/permissions"
-// import ListPermission from './detail'
+import { downloadFile, toDateString, toDateTimeString } from "../../../utility/Utils"
 import { deleteCheckingDocument, getCheckingDocument } from "../../../api/checking_document"
-import ContentModal from "./modal/ContentModal"
 import { getCheckingResult, getSimilarDocument, getTop3SimilarDocument } from "../../../api/checking_result"
 import { getCourse } from "../../../api/course"
 import { PAGE_DEFAULT, PER_PAGE_DEFAULT } from "../../../utility/constant"
+import { downloadFileCheckingDocumentVersion, downloadTemplateBaoCao, getDuplicateCheckingDocumentVersion, getDuplicateDocumentVersion, getSimilarityReport } from "../../../api/checking_document_version"
+import SimilarityDocContentModal from "./modal/DocContentModal"
+import SimilarityCourseContentModal from "./modal/CourseContentModal"
 
 const CheckingResult = () => {
     const [loadingData, setLoadingData] = useState(false)
@@ -94,11 +86,16 @@ const CheckingResult = () => {
     const [listPermissionSelected, setListPermissionSelected] = useState([])
     const [checkingDocumentSelected, setCheckingDocumentSelected] = useState()
     const [listAllRole, setListAllRole] = useState([])
+    const [selectedCourse, setSelectedCourse] = useState()
+    const [isLoadingDownload, setIsLoadingDownload] = useState(false)
+    const [isLoadingReport, setIsLoadingReport] = useState(false)
+    const [loadingId, setLoadingId] = useState(null)
 
     const [listCourse, setListCourse] = useState([])
 
     const location = useLocation()
     const navigate = useNavigate()
+    console.log(location.state)
 
     const getAllDataPromises = async () => {
         const coursePromise = getCourse({ params: { page: PAGE_DEFAULT, perPage: PER_PAGE_DEFAULT, search: '' } })
@@ -128,17 +125,18 @@ const CheckingResult = () => {
         })
         setListCourse(courses)
     }
-
+    
     const params = useParams()
     const getData = () => {
         setLoadingData(true)
-        getTop3SimilarDocument(Number(params?.id))
+        getDuplicateDocumentVersion(Number(params?.id))
             .then((res) => {
                 const result = res?.data?.map(((item, index) => {
                     return { ...item, _id: item.id, key: index }
                 }))
-                setData(result)
-                setCount(res?.total)
+                const thresholdResult = result.filter(item => item.similarity >= location.state.thresholdValue.threshold_document)
+                setData(thresholdResult)
+                setCount(thresholdResult?.length)
             })
             .catch((err) => {
                 console.log(err)
@@ -147,19 +145,17 @@ const CheckingResult = () => {
             })
     }
 
-    const getDataSameCourse = (courseId) => {
+    const getDataSameCourse = () => {
         setLoadingData2(true)
-        getSimilarDocument(Number(params?.id), {
-            params: {
-                courseId
-            }
-        })
+        getDuplicateCheckingDocumentVersion(Number(params?.id))
             .then((res) => {
                 const result = res?.data?.map(((item, index) => {
                     return { ...item, _id: item.id, key: index }
                 }))
-                setData2(result)
-                setCount2(res?.total)
+                const thresholdResult = result.filter(item => item?.cdv?.similarityTotal >= location.state.thresholdValue.threshold_document)
+                setData2(thresholdResult)
+                setSelectedCourse(thresholdResult[0]?.cdv?.courseId)
+                setCount2(thresholdResult?.length)
             })
             .catch((err) => {
                 console.log(err)
@@ -168,14 +164,19 @@ const CheckingResult = () => {
             })
     }
 
-    useEffect(() => {
-        getDataSameCourse(courseId)
-    }, [params?.id, courseId])
+    console.log(selectedCourse)
 
     useEffect(() => {
         getAllDataPromises()
-        getData()
+    }, [])
+
+    useEffect(() => {
+        getDataSameCourse()
     }, [params?.id])
+
+    useEffect(() => {
+        getData()
+    }, [params?.id, location?.state?.thresholdValue?.threshold_document])
 
     const handleModal = () => {
         setIsAdd(false)
@@ -228,6 +229,34 @@ const CheckingResult = () => {
         return ''
     }
 
+    const handleButtonClick = (record) => {
+        navigate(`/tams/detail-result/${record?.id}`, { state: record })
+    }
+
+    const handleButtonClick2 = (record) => {
+        navigate(`/tams/detail-result2/${record?.id}`, { state: record })
+    }
+
+    const handleDownloadFile = (id) => {
+        setIsLoadingDownload(true)
+        setLoadingId(id)
+        downloadFileCheckingDocumentVersion(id)
+            .then(res => {
+                const originalURL = window.URL.createObjectURL(new Blob([res]))
+                const link = document.createElement('a')
+                link.href = originalURL
+                link.setAttribute('download', `Tài liệu kiểm tra.docx`)
+                document.body.appendChild(link)
+                link.click()
+            })
+            .catch(error => {
+                console.log(error)
+            }).finally(() => {
+                setIsLoadingDownload(false)
+                setLoadingId(null)
+            })
+    }
+
     const columns = [
         {
             title: "STT",
@@ -235,13 +264,9 @@ const CheckingResult = () => {
             width: 30,
             align: "center",
             render: (text, record, index) => {
-                if (record?.similarity >= 50) {
+                if (record?.similarity >= location.state.thresholdValue.threshold_high_similarity) {
                     return (
                         <span style={{ color: 'red', fontWeight: '600' }}>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
-                    )
-                } else if (record?.similarity >= 30 && record?.similarity < 50) {
-                    return (
-                        <span style={{ color: 'yellowgreen', fontWeight: '600' }}>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
                     )
                 } else {
                     return (
@@ -251,18 +276,14 @@ const CheckingResult = () => {
             }
         },
         {
-            title: "Tên tài liệu",
+            title: "Tên tài liệu mẫu",
             dataIndex: "title",
             width: 500,
             align: "left",
             render: (text, record, index) => {
-                if (record?.similarity >= 50) {
+                if (record?.similarity >= location.state.thresholdValue.threshold_high_similarity) {
                     return (
                         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.document?.title}</span>
-                    )
-                } else if (record?.similarity >= 30 && record?.similarity < 50) {
-                    return (
-                        <span style={{ color: 'yellowgreen', fontWeight: '600' }}>{record?.document?.title}</span>
                     )
                 } else {
                     return (
@@ -277,13 +298,9 @@ const CheckingResult = () => {
             width: 180,
             align: "left",
             render: (text, record, index) => {
-                if (record?.similarity >= 50) {
+                if (record?.similarity >= location.state.thresholdValue.threshold_high_similarity) {
                     return (
                         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.document?.author}</span>
-                    )
-                } else if (record?.similarity >= 30 && record?.similarity < 50) {
-                    return (
-                        <span style={{ color: 'yellowgreen', fontWeight: '600' }}>{record?.document?.author}</span>
                     )
                 } else {
                     return (
@@ -298,13 +315,9 @@ const CheckingResult = () => {
             width: 150,
             align: "left",
             render: (text, record, index) => {
-                if (record?.similarity >= 50) {
+                if (record?.similarity >= location.state.thresholdValue.threshold_high_similarity) {
                     return (
                         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.document?.major?.name}</span>
-                    )
-                } else if (record?.similarity >= 30 && record?.similarity < 50) {
-                    return (
-                        <span style={{ color: 'yellowgreen', fontWeight: '600' }}>{record?.document?.major?.name}</span>
                     )
                 } else {
                     return (
@@ -319,13 +332,9 @@ const CheckingResult = () => {
             width: 120,
             align: "center",
             render: (text, record, index) => {
-                if (record?.similarity >= 50) {
+                if (record?.similarity >= location.state.thresholdValue.threshold_high_similarity) {
                     return (
                         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.document?.documentType?.name}</span>
-                    )
-                } else if (record?.similarity >= 30 && record?.similarity < 50) {
-                    return (
-                        <span style={{ color: 'yellowgreen', fontWeight: '600' }}>{record?.document?.documentType?.name}</span>
                     )
                 } else {
                     return (
@@ -339,13 +348,9 @@ const CheckingResult = () => {
             width: 120,
             align: "center",
             render: (text, record, index) => {
-                if (record?.similarity >= 50) {
+                if (record?.similarity >= location.state.thresholdValue.threshold_high_similarity) {
                     return (
                         <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.similarity}</span>
-                    )
-                } else if (record?.similarity >= 30 && record?.similarity < 50) {
-                    return (
-                        <span style={{ color: 'yellowgreen', fontWeight: '600' }}>{record?.similarity}</span>
                     )
                 } else {
                     return (
@@ -359,9 +364,121 @@ const CheckingResult = () => {
             width: 100,
             align: "center",
             render: (record) => (
-                <div style={{ display: "flex", justifyContent: "center" }}>
-                    
-                </div>
+                // <div style={{ display: "flex", justifyContent: "center" }}>
+                <>
+                    {
+                        isLoadingDownload === true && loadingId === record.id ? <Spinner color="#fff" style={{ width: '14px', height: '14px', backgroundColor: '#fff' }} /> : <Tooltip placement="top" title="Download file">
+                            <DownloadOutlined
+                                id={`tooltip_download_${record._id}`}
+                                style={{ color: "#09A863", cursor: "pointer" }}
+                                onClick={() => handleDownloadFile(record.id)}
+                            />
+                        </Tooltip>
+                    }
+                </>
+                // </div>
+            ),
+        },
+    ]
+
+    const columns2 = [
+        {
+            title: "STT",
+            dataIndex: "stt",
+            width: 30,
+            align: "center",
+            render: (text, record, index) => {
+                if (record?.similarity >= location.state.thresholdValue.threshold_high_similarity) {
+                    return (
+                        <span style={{ color: 'red', fontWeight: '600' }}>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
+                    )
+                } else {
+                    return (
+                        <span>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
+                    )
+                }
+            }
+        },
+        {
+            title: "Tên tài liệu mẫu",
+            dataIndex: "title",
+            width: 500,
+            align: "left",
+            render: (text, record, index) => {
+                if (record?.cdv?.checkingDocument?.similarityTotal >= location.state.thresholdValue.threshold_high_similarity) {
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.cdv?.checkingDocument?.title}</span>
+                    )
+                } else if (record?.cdv?.checkingDocument?.similarityTotal >= 30 && record?.cdv?.checkingDocument?.similarityTotal < 50) {
+                    return (
+                        <span style={{ color: 'yellowgreen', fontWeight: '600' }}>{record?.cdv?.checkingDocument?.title}</span>
+                    )
+                } else {
+                    return (
+                        <span>{record?.cdv?.checkingDocument?.title}</span>
+                    )
+                }
+            }
+        },
+        {
+            title: "Tác giả",
+            dataIndex: "author",
+            width: 180,
+            align: "left",
+            render: (text, record, index) => {
+                if (record?.cdv?.checkingDocument?.similarityTotal >= location.state.thresholdValue.threshold_high_similarity) {
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.cdv?.checkingDocument?.author}</span>
+                    )
+                } else if (record?.cdv?.checkingDocument?.similarityTotal >= 30 && record?.cdv?.checkingDocument?.similarityTotal < 50) {
+                    return (
+                        <span style={{ color: 'yellowgreen', fontWeight: '600' }}>{record?.cdv?.checkingDocument?.author}</span>
+                    )
+                } else {
+                    return (
+                        <span>{record?.cdv?.checkingDocument?.author}</span>
+                    )
+                }
+            }
+        },
+        {
+            title: "Độ trùng lặp (%)",
+            width: 120,
+            align: "center",
+            render: (text, record, index) => {
+                if (record?.cdv?.checkingDocument?.similarityTotal >= location.state.thresholdValue.threshold_high_similarity) {
+                    return (
+                        <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.cdv?.checkingDocument?.similarityTotal}</span>
+                    )
+                } else if (record?.cdv?.checkingDocument?.similarityTotal >= 30 && record?.cdv?.checkingDocument?.similarityTotal < 50) {
+                    return (
+                        <span style={{ color: 'yellowgreen', fontWeight: '600' }}>{record?.cdv?.checkingDocument?.similarityTotal}</span>
+                    )
+                } else {
+                    return (
+                        <span>{record?.cdv?.checkingDocument?.similarityTotal}</span>
+                    )
+                }
+            }
+        },
+        {
+            title: "Thao tác",
+            width: 100,
+            align: "center",
+            render: (record) => (
+                // <div style={{ display: "flex", justifyContent: "center" }}>
+                <>
+                    {
+                        isLoadingDownload === true && loadingId === record.id ? <Spinner color="#fff" style={{ width: '14px', height: '14px', backgroundColor: '#fff' }} /> : <Tooltip placement="top" title="Download file">
+                            <DownloadOutlined
+                                id={`tooltip_download_${record._id}`}
+                                style={{ color: "#09A863", cursor: "pointer" }}
+                                onClick={() => handleDownloadFile(record.id)}
+                            />
+                        </Tooltip>
+                    }
+                </>
+                // </div>
             ),
         },
     ]
@@ -374,13 +491,73 @@ const CheckingResult = () => {
         }
     }
 
+    const [expandedRowKeys, setExpandedRowKeys] = useState([])
+    const [expandedRowKeys2, setExpandedRowKeys2] = useState([])
+
+    const onExpand = (expanded, record) => {
+        setExpandedRowKeys(expanded ? [record.key] : [])
+    }
+
+    const onExpand2 = (expanded, record) => {
+        setExpandedRowKeys2(expanded ? [record.key] : [])
+    }
+
+    const handleReport = () => {
+        setIsLoadingReport(true)
+        getSimilarityReport({
+            params: {
+                checkingDocumentVersionId: Number(params.id)
+            },
+            responseType: 'blob'
+        })
+            .then(res => {
+                downloadTemplateBaoCao(2, res)
+            })
+            .catch(error => {
+                console.log(error)
+            }).finally(() => {
+                setIsLoadingReport(false)
+            })
+    }
+
+    const items = [
+        
+        {
+            label: 'Báo cáo DS trùng lặp cao',
+            key: '2',
+            icon: <DownCircleOutlined />,
+        },
+        {
+            label: 'Báo cáo DS trùng lặp theo đợt',
+            key: '1',
+            icon: <DownCircleFilled />,
+        },
+        {
+            label: 'Báo cáo DS câu trùng lặp',
+            key: '3',
+            icon: <DownCircleFilled />,
+        },     
+    ]
+
+    const menuProps = {
+        items,
+        onClick: handleReport,
+    }
+
     return (
         <Fragment>
             <Card
                 title="Kết quả kiểm tra tài liệu"
                 style={{ backgroundColor: "white", width: "100%", height: "100%" }}
                 extra={
-                    <Col md="12" style={{ display: "flex", justifyContent: "flex-end" }}>
+                    <>
+
+                    </>
+                }
+            >
+
+                <Row>
+                    <Col md="12" style={{ display: "flex", justifyContent: "space-between", gap: 16 }}>
                         {ability.can('create', 'PHAN_QUYEN_VAI_TRO') &&
                             <Link to="/tams/checking-document">
                                 <Button
@@ -390,7 +567,7 @@ const CheckingResult = () => {
                                     style={{
                                         width: '100px',
                                         marginBottom: 0,
-                                        padding: '8px 15px'
+                                        // padding: '8px 15px'
                                     }}
                                     outline
                                 >
@@ -398,26 +575,66 @@ const CheckingResult = () => {
                                 </Button>
                             </Link>
                         }
+                        {/* <Dropdown menu={menuProps}>
+                            <Button color="primary">
+                                <Space>
+                                    Báo cáo
+                                    {
+                                        isLoadingReport === true ? <Spinner color="#fff" style={{ width: '14px', height: '14px' }} /> : <DownOutlined />
+                                    }
+                                </Space>
+                            </Button>
+                        </Dropdown> */}
                     </Col>
-                }
-            >
-
-                <Row>
                     <Col md="12" style={{ textAlign: 'center' }}>
                         <h5>Kết quả trùng lặp so với CSDL mẫu: <span style={{ color: 'red' }}>{location?.state?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}%</span></h5>
                     </Col>
                     <Col md="12">
-                        <h6>1. Danh sách các tài liệu trùng lặp cao</h6>
+                        <h6 style={{ textTransform: 'uppercase' }}>1. Danh sách các tài liệu mẫu có độ trùng lặp cao</h6>
+                        <Row style={{ justifyContent: 'flex-end' }}>
+                            <Col md="4" style={{ display: 'flex' }}>
+                                <Label
+                                    className=""
+                                    style={{
+                                        width: "100px",
+                                        fontSize: "14px",
+                                        height: "34px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                    }}
+                                >
+                                    Tìm kiếm
+                                </Label>
+                                <Input
+                                    type="text"
+                                    placeholder="Tìm kiếm"
+                                    style={{ height: "34px" }}
+                                // onChange={(e) => {
+                                //     if (e.target.value === "") {
+                                //         setSearch("")
+                                //     }
+                                // }}
+                                // onKeyPress={(e) => {
+                                //     if (e.key === "Enter") {
+                                //         setSearch(e.target.value)
+                                //         setCurrentPage(1)
+                                //     }
+                                // }}
+                                />
+                            </Col>
+                        </Row>
                         {loadingData === true ? <Spin style={{ position: 'relative', left: '50%' }} /> : <Table
                             columns={columns}
                             dataSource={data}
                             bordered
                             expandable={{
-                                expandedRowRender: (record) => <ContentModal
-                                    listSentenceByCheckingResult={record} />,
+                                expandedRowRender: (record) => <SimilarityDocContentModal
+                                    listSentenceByCheckingResult={record} thresholdValue={location?.state?.thresholdValue?.threshold_sentence} />,
                                 rowExpandable: (record) => record.name !== 'Not Expandable',
                                 // expandRowByClick: true
                             }}
+                            expandedRowKeys={expandedRowKeys}
+                            onExpand={onExpand}
                             pagination={{
                                 defaultPageSize: 10,
                                 showSizeChanger: true,
@@ -430,31 +647,35 @@ const CheckingResult = () => {
                         // rowClassName={rowClassName}
                         />}
                     </Col>
-                    <Col md="12">
-                        <h6>2. Kết quả trùng lặp với các tài liệu cùng đợt kiểm tra</h6>
-                        <Select options={listCourse} placeholder="Chọn đợt kiểm tra" className="mb-1" style={{ float: 'right', width: '200px' }} allowClear onChange={(value) => handleChangeCourse(value)} />
-                        {loadingData2 === true ? <Spin style={{ position: 'relative', left: '50%' }} /> : <Table
-                            columns={columns}
-                            dataSource={data2}
-                            bordered
-                            expandable={{
-                                expandedRowRender: (record) => <ContentModal
-                                    listSentenceByCheckingResult={record} />,
-                                rowExpandable: (record) => record.name !== 'Not Expandable',
-                                // expandRowByClick: true
-                            }}
-                            pagination={{
-                                defaultPageSize: 10,
-                                showSizeChanger: true,
-                                pageSizeOptions: ["10", "20", "30"],
-                                total: { count2 },
-                                locale: { items_per_page: "/ trang" },
-                                showSizeChanger: true,
-                                showTotal: (total, range) => <span>Tổng số: {total}</span>,
-                            }}
-                        // rowClassName={rowClassName}
-                        />}
-                    </Col>
+                    {
+                        data2 && location?.state?.courseId !== 1 ? <Col md="12">
+                            <h6 style={{ textTransform: 'uppercase' }}>2. Kết quả trùng lặp với các tài liệu cùng đợt kiểm tra</h6>
+                            {/* <Select options={listCourse} placeholder="Chọn đợt kiểm tra" className="mb-1" style={{ float: 'right', width: '200px' }} allowClear onChange={(value) => handleChangeCourse(value)} /> */}
+                            {loadingData2 === true ? <Spin style={{ position: 'relative', left: '50%' }} /> : <Table
+                                columns={columns2}
+                                dataSource={data2}
+                                bordered
+                                expandable={{
+                                    expandedRowRender: (record) => <SimilarityCourseContentModal
+                                        listSentenceByCheckingResult={record} thresholdValue={location?.state?.thresholdValue?.threshold_sentence} />,
+                                    rowExpandable: (record) => record.name !== 'Not Expandable',
+                                    // expandRowByClick: true
+                                }}
+                                expandedRowKeys={expandedRowKeys2}
+                                onExpand={onExpand2}
+                                pagination={{
+                                    defaultPageSize: 30,
+                                    showSizeChanger: true,
+                                    pageSizeOptions: ["10", "20", "30"],
+                                    total: { count2 },
+                                    locale: { items_per_page: "/ trang" },
+                                    showSizeChanger: true,
+                                    showTotal: (total, range) => <span>Tổng số: {total}</span>,
+                                }}
+                            // rowClassName={rowClassName}
+                            />}
+                        </Col> : <></>
+                    }
                 </Row>
             </Card>
         </Fragment>

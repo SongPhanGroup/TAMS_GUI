@@ -9,6 +9,8 @@ import {
     Collapse,
     Checkbox,
     Spin,
+    Tooltip,
+    Dropdown
 } from "antd"
 import React, { useState, Fragment, useEffect, useRef, useContext } from "react"
 import {
@@ -23,6 +25,7 @@ import {
     FormFeedback,
     UncontrolledTooltip,
     CardBody,
+    Spinner,
 } from "reactstrap"
 import { Link, NavLink, useNavigate } from "react-router-dom"
 import { Plus, X } from "react-feather"
@@ -32,7 +35,11 @@ import {
     EditOutlined,
     LockOutlined,
     AppstoreOutlined,
-    RightCircleOutlined
+    RightCircleOutlined,
+    RightSquareOutlined,
+    FileDoneOutlined,
+    DownCircleOutlined,
+    DownCircleFilled
 
 } from "@ant-design/icons"
 import { AbilityContext } from "@src/utility/context/Can"
@@ -47,11 +54,12 @@ import { useForm, Controller } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import classnames from "classnames"
 import AddNewCheckingDocumentVersion from "./AddNewVersionModal"
-import { deleteCheckingDocumentVersion, getCheckingDocumentVersion } from "../../../../api/checking_document_version"
+import { deleteCheckingDocumentVersion, downloadTemplateBaoCao, getCheckingDocumentVersion, getSimilarityReport } from "../../../../api/checking_document_version"
 import { detailCheckingDocument } from "../../../../api/checking_document"
 import EditCheckingDocumentVersion from "./EditVersionModal"
+import { toDateTimeString } from "../../../../utility/Utils"
 
-const VersionModal = ({ checkingDocumentSelected, }) => {
+const VersionModal = ({ checkingDocumentSelected, onUpdate, thresholdValue }) => {
     const [loadingData, setLoadingData] = useState(false)
     const navigate = useNavigate()
     const MySwal = withReactContent(Swal)
@@ -67,7 +75,7 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
     const [isAdd, setIsAdd] = useState(false)
     const [isEdit, setIsEdit] = useState(false)
     const [checkingDocumentVersionSelected, setCheckingDocumentVersionSelected] = useState()
-    const [showIframe, setShowIframe] = useState(false)
+    const [loadingReports, setLoadingReports] = useState({}) // Tracks loading per record
 
     const getData = () => {
         setLoadingData(true)
@@ -95,11 +103,46 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
     }
 
     const handleResult = (record) => {
-        navigate(`/tams/checking-result/${record?.id}`, { state: record })
+        navigate(`/tams/checking-document-result/${record?.id}`, { state: record })
     }
 
-    const handleButtonClick = (record) => {
-        navigate(`/tams/detail-result/${record?.id}`, { state: record }) 
+    // const handleButtonClick2 = (record) => {
+    //     fetch(`http://localhost:3000/checkHTMLResult?id=${record?.id}&type=2`, {
+    //         method: 'GET',
+    //         headers: {'Content-Type': 'application/json'}
+    //     }).then(response => response.json())
+    //     .then(data => { 
+    //         console.log('API Response:', data) 
+    //         data ? navigate(`/tams/detailTD-checking-version-result/${record?.id}`, { state: record }) : alert('Dữ liệu đang khởi tạo')
+    //     })
+    //     .catch(error => {
+    //         console.error('Error fetching data:', error)
+    //     })
+    // }
+    const handleButtonClick2 = (record) => {
+        fetch(`${process.env.REACT_APP_API_URL_TAMS_CHECKING_UPLOAD_TD}/checkHTMLResult?id=${record?.id}&type=2`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data) {
+                    navigate(`/tams/detailTD-checking-version-result/${record?.id}`, { state: record })
+                } else {
+                    MySwal.fire({
+                        title: "Dữ liệu đang khởi tạo",
+                        icon: "info",
+                        customClass: {
+                            confirmButton: "btn btn-info",
+                        },
+                    }).then(() => {
+                        console.log("Thông báo hiển thị xong")
+                    })
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error)
+            })
     }
 
     useEffect(() => {
@@ -109,16 +152,17 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
     const handleDelete = (record) => {
         deleteCheckingDocumentVersion(record?.id)
             .then((res) => {
-                MySwal.fire({
-                    title: "Xóa thành công",
+                // MySwal.fire({
+                //     title: "Xóa thành công",
 
-                    icon: "success",
-                    customClass: {
-                        confirmButton: "btn btn-success",
-                    },
-                }).then((result) => {
-                    getData()
-                })
+                //     icon: "success",
+                //     customClass: {
+                //         confirmButton: "btn btn-success",
+                //     },
+                // }).then((result) => {
+                //     getData()
+                // })
+                getData()
             })
             .catch((err) => {
                 console.log(err)
@@ -134,6 +178,48 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
                 })
             })
     }
+
+    const handleReport = (recordId) => {
+        setLoadingReports((prev) => ({ ...prev, [recordId]: true }))
+        getSimilarityReport({
+            params: {
+                checkingDocumentVersionId: Number(recordId)
+            },
+            responseType: 'blob'
+        })
+            .then(res => {
+                downloadTemplateBaoCao(2, res)
+            })
+            .catch(error => {
+                console.log(error)
+            }).finally(() => {
+                setLoadingReports((prev) => ({ ...prev, [recordId]: false }))
+            })
+    }
+
+    const items = [
+        {
+            label: 'Báo cáo DS trùng lặp cao',
+            key: '2',
+            icon: <DownCircleOutlined />,
+        },
+        {
+            label: 'Báo cáo DS trùng lặp theo đợt',
+            key: '1',
+            icon: <DownCircleFilled />,
+        },
+        {
+            label: 'Báo cáo DS câu trùng lặp',
+            key: '3',
+            icon: <DownCircleFilled />,
+        }
+    ]
+
+    const menuProps = (recordId) => ({
+        items,
+        onClick: () => handleReport(recordId),
+    })
+
     const columns = [
         {
             title: "STT",
@@ -162,10 +248,17 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
             align: "center",
             width: 100,
             render: (text, record, index) => {
-                return (
-                    <span>{record?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}</span>
-                )
+                const checkingItem = record?.checkingResult?.find(item => item.typeCheckingId === 1)
+                const similarityTotal = checkingItem?.similarityTotal
+                if (similarityTotal === 0) {
+                    return <span>0</span>
+                } else if (similarityTotal) {
+                    return <span>{similarityTotal}</span>
+                } else {
+                    return <span style={{ color: 'blue', fontWeight: '600' }}>Đang xử lý</span>
+                }
             }
+
         },
         {
             title: "Trùng với TL cùng đợt (%)",
@@ -185,51 +278,68 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
             width: 200,
         },
         {
+            title: "Ngày kiểm tra",
+            dataIndex: "createdAt",
+            align: "center",
+            width: 200,
+            render: (text, record, index) => {
+                return (
+                    <span>{toDateTimeString(record?.createdAt)}</span>
+                )
+            }
+        },
+        {
             title: "Thao tác",
             width: 100,
             align: "center",
             render: (record) => {
                 return (
                     <div style={{ display: "flex", justifyContent: "center" }}>
+                        <Tooltip placement="top" title="Kết quả kiểm tra">
+                            <AppstoreOutlined
+                                style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
+                                onClick={() => {
+                                    const recordStandard = { ...record, from: 'checking-document', thresholdValue }
+                                    return handleResult(recordStandard)
+                                }}
+                            />
+                        </Tooltip>
+                        <Tooltip placement="top" title="Kết quả chi tiết">
 
-                        <EditOutlined
-                            id={`tooltip_edit_${record._id}`}
-                            style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
-                            onClick={(e) => handleEdit(record)}
-                        />
-                        <UncontrolledTooltip placement="top" target={`tooltip_edit_${record._id}`}
-                        >
-                            Chỉnh sửa
-                        </UncontrolledTooltip>
-                        <AppstoreOutlined
-                            id={`tooltip_result_${record._id}`}
-                            style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
-                            onClick={(e) => handleResult(record)}
-                        />
-                        <UncontrolledTooltip placement="top" target={`tooltip_result_${record._id}`}
-                        >
-                            Kết quả kiểm tra
-                        </UncontrolledTooltip>
-                        <RightCircleOutlined
-                            id={`tooltip_detail_${record._id}`}
-                            style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
-                            onClick={() => handleButtonClick(record)}
-                        />
-                        <UncontrolledTooltip placement="top" target={`tooltip_detail_${record._id}`}
-                        >
-                            Kết quả chi tiết
-                        </UncontrolledTooltip>
+                            <RightSquareOutlined
+                                id={`tooltip_detail2_${record._id}`}
+                                style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
+                                onClick={() => {
+                                    const recordStandard = { ...record, from: 'checking-document', title: checkingDocumentSelected?.title, thresholdValue }
+                                    return handleButtonClick2(recordStandard)
+                                }}
+                            />
+                        </Tooltip>
+                        <Tooltip placement="top" title="Xuất báo cáo">
+                            <Dropdown menu={menuProps(record.id)}>
+                                {
+                                    loadingReports[record.id] ? <Spinner color="#fff" style={{ width: '14px', height: '14px' }} /> : <FileDoneOutlined style={{ cursor: 'pointer', color: '#09A863', marginRight: '1rem' }} />
+                                }
+                            </Dropdown>
+                        </Tooltip>
+                        <Tooltip placement="top" title="Chỉnh sửa">
+                            <EditOutlined
+                                style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}
+                                onClick={(e) => handleEdit(record)}
+                            />
+                        </Tooltip>
                         <Popconfirm
                             title="Bạn chắc chắn xóa?"
                             onConfirm={() => handleDelete(record)}
                             cancelText="Hủy"
                             okText="Đồng ý"
                         >
-                            <DeleteOutlined
-                                style={{ color: "red", cursor: "pointer", marginRight: '1rem' }}
-                            />
+                            <Tooltip placement="top" title="Xóa">
+                                <DeleteOutlined
+                                    style={{ color: "red", cursor: "pointer" }}
+                                />
+                            </Tooltip>
                         </Popconfirm>
-
                     </div>
                 )
             },
@@ -307,9 +417,9 @@ const VersionModal = ({ checkingDocumentSelected, }) => {
                     }
                 }}
             />}
-            
-            <AddNewCheckingDocumentVersion open={isAdd} handleModal={handleModal} getData={getData} rowsPerPage={rowsPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} checkingDocumentSelected={checkingDocumentSelected} listSubmit={listSubmit} />
-            {checkingDocumentVersionSelected && <EditCheckingDocumentVersion open={isEdit} handleModal={handleModal} getData={getData} rowsPerPage={rowsPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} infoEditVersion={checkingDocumentVersionSelected} listSubmit={listSubmit} dataCheckingDocument={checkingDocumentSelected} />}
+
+            <AddNewCheckingDocumentVersion open={isAdd} handleModal={handleModal} getData={getData} rowsPerPage={rowsPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} checkingDocumentSelected={checkingDocumentSelected} listSubmit={listSubmit} onUpdate={onUpdate} />
+            {checkingDocumentVersionSelected && <EditCheckingDocumentVersion open={isEdit} handleModal={handleModal} getData={getData} rowsPerPage={rowsPerPage} currentPage={currentPage} setCurrentPage={setCurrentPage} infoEditVersion={checkingDocumentVersionSelected} listSubmit={listSubmit} dataCheckingDocument={checkingDocumentSelected} onUpdate={onUpdate} />}
         </Card>
     )
 }

@@ -1,12 +1,13 @@
 // ** React Imports
 import { Link, useNavigate } from "react-router-dom"
-import { useEffect, Fragment, useState } from "react"
+import { useEffect, Fragment, useState, useContext } from "react"
 import { getHomeRouteForLoggedInUser } from "../../../../utility/Utils"
 
 // ** Third Party Components
 import InputNumber from "rc-input-number"
 import PerfectScrollbar from "react-perfect-scrollbar"
-import { ShoppingCart, X, Plus, Minus, Grid, Star, Heart } from "react-feather"
+import * as IconReact from "react-feather"
+const { ShoppingCart, X, Plus, Minus, Grid, Star, Heart } = IconReact
 
 // ** Reactstrap Imports
 import {
@@ -25,7 +26,6 @@ import {
   UncontrolledTooltip,
 } from "reactstrap"
 import classnames from "classnames"
-import * as IconReact from "react-feather"
 // ** Store & Actions
 import { useDispatch, useSelector } from "react-redux"
 import {
@@ -40,7 +40,10 @@ import { setSelectedRole } from "../../../../views/apps/ecommerce/store"
 import "@styles/react/libs/input-number/input-number.scss"
 import navigation from '@src/navigation/vertical'
 import menuIcon from "@src/assets/images/icons/menu.png"
+import { AbilityContext } from '@src/utility/context/Can'
 const CartDropdown = () => {
+  const ability = useContext(AbilityContext)
+
   // ** State
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [show, setShow] = useState(false)
@@ -65,18 +68,19 @@ const CartDropdown = () => {
     toggle()
   }
   const handleClickRole = (key) => {
-    dispatch(setSelectedRole(key))
-    const routeItem = navigation.find(x => x.role === key)
-    if (routeItem && routeItem.children) {
-      const children = routeItem.children
-      if (children && children[0]?.children) {
-        navigate(children[0]?.children[0]?.navLink)
-      } else {
-        navigate(routeItem.children[0]?.navLink)
-      }
-    } else {
-      navigate(routeItem?.navLink ?? getHomeRouteForLoggedInUser('admin'))
-    }
+    // dispatch(setSelectedRole(key))
+    // const routeItem = navigation.find(x => x.role === key)
+    // if (routeItem && routeItem.children) {
+    //   const children = routeItem.children
+    //   if (children && children[0]?.children) {
+    //     navigate(children[0]?.children[0]?.navLink)
+    //   } else {
+    //     navigate(routeItem.children[0]?.navLink)
+    //   }
+    // } else {
+    //   navigate(routeItem?.navLink ?? getHomeRouteForLoggedInUser('admin'))
+    // }
+    navigate(key)
 
   }
   // ** Loops through Cart Array to return Cart Items
@@ -84,28 +88,30 @@ const CartDropdown = () => {
     return (
       <div className="grid-view" style={{ padding: '0 1rem' }}>
         {listRoles?.map((item, index) => {
-          const IconTag = IconReact[item.icon]
-          return (
-            <div className="subContainer">
-              <Card className="ecommerce-card subSystem" key={item.id} onClick={(e) => {
-                handleClickRole(item?.role)
-                //  setShow(!show)
-                toggle()
-              }}>
-                <div
-                  className="item-img text-center mx-auto"
-                  style={{ minHeight: "60px", paddingTop: '0rem' }}
-                >
-                  <Link className="iconContainer" to={item.navLink}><IconTag className="font-large-1" style={{ stroke: "#09A863" }} /></Link>
-                </div>
-              </Card>
-              <h6 className="item-name" style={{ marginBottom: '0.5rem', textAlign: 'center' }}>
-                <Link className="" to={item.navLink} style={{ justifyContent: 'center', marginTop: '0.75rem', fontSize: '15px' }}>
-                  {item.title}
-                </Link>
-              </h6>
-            </div>
-          )
+          if (ability.can(item.action, item.resource)) {
+            const IconTag = IconReact[item.icon]
+            return (
+              <div className="subContainer">
+                <Card className="ecommerce-card subSystem" key={item.id} onClick={(e) => {
+                  handleClickRole(item?.description)
+                  //  setShow(!show)
+                  toggle()
+                }}>
+                  <div
+                    className="item-img text-center mx-auto"
+                    style={{ minHeight: "60px", paddingTop: '0rem' }}
+                  >
+                    <Link className="iconContainer" to={item.navLink}><IconTag className="font-large-1" style={{ stroke: "#09A863" }} /></Link>
+                  </div>
+                </Card>
+                <h6 className="item-name" style={{ marginBottom: '0.5rem', textAlign: 'center' }}>
+                  <Link className="" to={item.navLink} style={{ justifyContent: 'center', marginTop: '0.75rem', fontSize: '15px' }}>
+                    {item.title}
+                  </Link>
+                </h6>
+              </div>
+            )
+          } else return null
         })}
       </div>
     )
@@ -132,7 +138,7 @@ const CartDropdown = () => {
           Danh sách chức năng
         </UncontrolledTooltip>
       </DropdownToggle>
-      {/* <DropdownMenu
+      <DropdownMenu
         end
         tag="ul"
         className="dropdown-menu-media dropdown-cart mt-0 shadow-box customMenu"
@@ -148,13 +154,13 @@ const CartDropdown = () => {
             >
               DANH SÁCH CHỨC NĂNG
             </h5>
-            <Badge color='light-primary' pill>
+            {/* <Badge color='light-primary' pill>
               {store.cart.length || 0} Items
-            </Badge>
+            </Badge> */}
           </DropdownItem>
         </li>
         <div className="ecommerce-application">{renderMenuItems()}</div>
-      </DropdownMenu> */}
+      </DropdownMenu>
     </Dropdown>
   )
 }

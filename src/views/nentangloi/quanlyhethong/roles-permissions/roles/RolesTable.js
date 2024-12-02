@@ -329,15 +329,7 @@ const RolesTable = () => {
         <span>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
       ),
     },
-    {
-      title: "Ngày tạo",
-      dataIndex: "createdAt",
-      width: "10%",
-      align: "center",
-      render: (text, record, index) => (
-        <span>{toDateString(record.createdAt)}</span>
-      ),
-    },
+
     {
       title: "Tên vai trò",
       dataIndex: "name",
@@ -360,6 +352,15 @@ const RolesTable = () => {
       dataIndex: "description",
       // align: 'center'
       width: 150,
+    },
+    {
+      title: "Ngày tạo",
+      dataIndex: "createdAt",
+      width: "10%",
+      align: "center",
+      render: (text, record, index) => (
+        <span>{toDateString(record.createdAt)}</span>
+      ),
     },
     {
       title: "Thao tác",

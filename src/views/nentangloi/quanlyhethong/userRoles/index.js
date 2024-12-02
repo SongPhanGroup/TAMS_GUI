@@ -223,15 +223,7 @@ const ListUserRoles = () => {
         <span>{((currentPage - 1) * rowsPerPage) + index + 1}</span>
       ),
     },
-    {
-      title: "Ngày tạo",
-      dataIndex: "createdAt",
-      width: "10%",
-      align: "center",
-      render: (text, record, index) => (
-        <span>{toDateString(record.createdAt)}</span>
-      ),
-    },
+
     {
       title: "Tên đăng nhập",
       dataIndex: "userName",
@@ -254,6 +246,15 @@ const ListUserRoles = () => {
           return <Tag color="success">Đang hoạt động</Tag>
         } else return <Tag color="error">Bị khóa</Tag>
       },
+    },
+    {
+      title: "Ngày tạo",
+      dataIndex: "createdAt",
+      width: "10%",
+      align: "center",
+      render: (text, record, index) => (
+        <span>{toDateString(record.createdAt)}</span>
+      ),
     },
     {
       title: "Thao tác",

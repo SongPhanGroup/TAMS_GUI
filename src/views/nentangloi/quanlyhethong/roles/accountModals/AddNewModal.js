@@ -25,8 +25,8 @@ import { useForm, Controller } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import classnames from "classnames"
 import { MESSAGES, MESSAGES_MEAN } from "../../../../../utility/constant"
-
-const AddNewModal = ({ open, handleModal, getData, listStatus, currentPage, rowsPerPage }) => {
+import { updateUserManyRole } from "../../../../../api/userRoles"
+const AddNewModal = ({ open, handleModal, getData, listStatus, currentPage, rowsPerPage, roleSelected }) => {
   const [loading, setLoading] = useState(false)
   const MySwal = withReactContent(Swal)
   const [userGroupID_, setUserGroupID] = useState(null)
@@ -73,22 +73,39 @@ const AddNewModal = ({ open, handleModal, getData, listStatus, currentPage, rows
     delete dataSubmit.passWord_
     createUser(dataSubmit)
       .then((res) => {
-        MySwal.fire({
-          title: "Thêm mới thành công",
-
-          icon: "success",
-          customClass: {
-            confirmButton: "btn btn-success",
-          },
-        }).then((result) => {
-          if (currentPage === 1) {
-            getData(1, rowsPerPage)
-          } else {
-            setCurrentPage(1)
-          }
-          setLoading(false)
-          handleModal()
-          reset()
+        console.log(res)
+        const id = res?._id
+        const dataSubmit_ = {
+          userID: id,
+          roleIDArr: [roleSelected?.id],
+          description: ''
+        }
+        updateUserManyRole(JSON.stringify(dataSubmit_)).then((res_) => {
+          MySwal.fire({
+            title: "Thêm mới thành công",
+            icon: "success",
+            customClass: {
+              confirmButton: "btn btn-success",
+            },
+          }).then((result) => {
+            if (currentPage === 1) {
+              getData(1, rowsPerPage)
+            } else {
+              setCurrentPage(1)
+            }
+            setLoading(false)
+            handleModal()
+            reset()
+          })
+        }).catch((err_) => {
+          console.log(err_)
+          MySwal.fire({
+            title: MESSAGES_MEAN[err_?.response?.data?.message] ?? "Thêm mới thất bại",
+            icon: "error",
+            customClass: {
+              confirmButton: "btn btn-danger",
+            },
+          })
         })
       })
       .catch((err) => {

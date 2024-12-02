@@ -152,7 +152,7 @@ export const addAttributeToTree = (node, newProperty, oldProperty) => {
   }
   // Lặp qua các nút con của nút hiện tại
   if (node.children) {
-    for (const child of node.children) {
+    for (const child of node?.children) {
       addAttributeToTree(child, newProperty, oldProperty) // Gọi đệ quy cho mỗi nút con
     }
   }
@@ -167,7 +167,7 @@ export const addAttributeToTreeRoom = (node, attributeName) => {
   }
   // Lặp qua các nút con của nút hiện tại
   if (node.children) {
-    for (const child of node.children) {
+    for (const child of node?.children) {
       addAttributeToTreeRoom(child, attributeName) // Gọi đệ quy cho mỗi nút con
     }
   }
@@ -181,7 +181,7 @@ export const addAttributeToTreeRoomDaoTao = (node, attributeName, parent) => {
   }
   // Lặp qua các nút con của nút hiện tại
   if (node.children) {
-    for (const child of node.children) {
+    for (const child of node?.children) {
       addAttributeToTreeRoomDaoTao(child, attributeName, node) // Gọi đệ quy cho mỗi nút con
     }
   }
@@ -198,7 +198,7 @@ export const addValueToTree = (node) => {
 export const removeAtributeTypeUserToTree = (node) => {
   // Lặp qua các nút con của nút hiện tại
   if (node.children) {
-    node.children = node.children.filter(child => !child["typeUser"])
+    node.children = node?.children.filter(child => !child["typeUser"])
     for (const child of node.children) {
       removeAtributeTypeUserToTree(child) // Gọi đệ quy cho mỗi nút con
     }
@@ -423,4 +423,20 @@ export const toDateStringv2 = date => {
   const yyyy = today.getFullYear()
 
   return `${yyyy}-${mm}-${dd}`
+}
+
+export async function downloadFile(fileName, api) {
+  return callApi(api, 'GET', null, null, true).then((response) => {
+    const url = window.URL.createObjectURL(new Blob([response]))
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', fileName)
+    document.body.appendChild(link)
+    link.click()
+    if (!response.error) {
+      showMessage('Tải file thành công', 'success')
+    }
+  }).catch(() => {
+    showMessage('Tải file thất bại', 'error')
+  })
 }

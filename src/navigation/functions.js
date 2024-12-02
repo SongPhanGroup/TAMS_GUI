@@ -3,7 +3,7 @@ import { Users, BookOpen, Box, Chrome, Trello, Info, Map, Globe } from "react-fe
 export default [
     {
         id: 'base',
-        title: 'Quản lý hệ thống',
+        title: 'Kiểm tra trùng lặp tuyệt đối',
         icon: <Users className="font-large-1" style={{ stroke: "#09A863" }} />,
         role: 0
     },

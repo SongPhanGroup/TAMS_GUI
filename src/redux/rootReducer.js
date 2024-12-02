@@ -11,6 +11,8 @@ import calendar from '@src/views/apps/calendar/store'
 import ecommerce from '@src/views/apps/ecommerce/store'
 import dataTables from '@src/views/tables/data-tables/store'
 import permissions from '@src/views/nentangloi/quanlyhethong/roles-permissions/store'
+import systemParameterReducer from './systemParameterSlice'  // Import reducer từ file slice
+// inport systemParameters from ''
 import { combineReducers } from 'redux'
 
 const rootReducer = combineReducers({
@@ -25,7 +27,8 @@ const rootReducer = combineReducers({
     calendar,
     ecommerce,
     dataTables,
-    permissions
+    permissions,
+    systemParameterReducer  // Thêm reducer mới vào rootReducer
 })
 
 export default rootReducer

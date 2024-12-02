@@ -111,15 +111,15 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate, thresholdValue }) =>
     const handleButtonClick2 = (record) => {
         fetch(`http://localhost:3000/checkHTMLResult?id=${record?.id}&type=2`, {
             method: 'GET',
-            headers: {'Content-Type': 'application/json'}
+            headers: { 'Content-Type': 'application/json' }
         }).then(response => response.json())
-        .then(data => { 
-            console.log('API Response:', data) 
-            data ? navigate(`/tams/detailXX-checking-version-result/${record?.id}`, { state: record }) : alert('Dữ liệu đang khởi tạo')
-        })
-        .catch(error => {
-            console.error('Error fetching data:', error)
-        })
+            .then(data => {
+                console.log('API Response:', data)
+                data ? navigate(`/tams/detailXX-checking-version-result/${record?.id}`, { state: record }) : alert('Dữ liệu đang khởi tạo')
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error)
+            })
     }
 
     useEffect(() => {
@@ -225,10 +225,12 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate, thresholdValue }) =>
             align: "center",
             width: 100,
             render: (text, record, index) => {
-                if (record?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) {
-                    return (
-                        <span>{record?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}</span>
-                    )
+                const checkingItem = record?.checkingResult?.find(item => item.typeCheckingId === 1)
+                const similarityTotal = checkingItem?.similarityTotal
+                if (similarityTotal === 0) {
+                    return <span>0</span>
+                } else if (similarityTotal) {
+                    return <span>{similarityTotal}</span>
                 } else {
                     return <span style={{ color: 'blue', fontWeight: '600' }}>Đang xử lý</span>
                 }

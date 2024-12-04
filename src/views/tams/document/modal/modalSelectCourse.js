@@ -142,6 +142,7 @@ const SelectCourseModal = ({ open, handleModal, getData }) => {
         files?.map((file) => {
             formData.append('files', file)
         })
+        handleCloseModal()
         postFromExcel(formData).then(result => {
             if (result.status === 'success') {
                 getData()
@@ -163,13 +164,12 @@ const SelectCourseModal = ({ open, handleModal, getData }) => {
                     }
                 })
             }
-            setFileExcel(null)
-            setFiles([])
-            handleCloseModal()
         }).catch(error => {
             console.log(error)
         }).finally(() => {
             setLoadingAdd(false)
+            setFileExcel(null)
+            setFiles([])
         })
     }
 

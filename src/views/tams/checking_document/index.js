@@ -667,7 +667,6 @@ const CheckingDocument = () => {
             width: 100,
             align: "center",
             render: (record) => {
-                console.log(record)
                 const dataVersion = record?.checkingDocumentVersion
                 const recordLastVersion = dataVersion[dataVersion.length - 1]
                 return (
@@ -682,7 +681,6 @@ const CheckingDocument = () => {
                             />
                         </Tooltip>
                         <Tooltip placement="top" title="Kết quả chi tiết">
-
                             <RightSquareOutlined
                                 id={`tooltip_detail2_${record._id}`}
                                 style={{ color: "#09A863", cursor: "pointer", marginRight: '1rem' }}

@@ -1,4 +1,4 @@
-import { Table, Input, Card, CardTitle, Tag, Popconfirm, Switch, Spin, Select, Tooltip } from "antd"
+import { Table, Input, Card, CardTitle, Tag, Popconfirm, Switch, Spin, Select, Tooltip, Dropdown } from "antd"
 import React, { useState, Fragment, useEffect, useRef, useContext } from "react"
 import {
     Label,
@@ -11,9 +11,10 @@ import {
     Col,
     FormFeedback,
     UncontrolledTooltip,
+    Spinner
 } from "reactstrap"
 import { Plus, X } from "react-feather"
-import { BarsOutlined, DeleteOutlined, EditOutlined, LockOutlined, UnlockOutlined } from "@ant-design/icons"
+import { BarsOutlined, DeleteOutlined, EditOutlined, LockOutlined, UnlockOutlined, DownCircleFilled, FileDoneOutlined } from "@ant-design/icons"
 // import style from "../../../../assets/scss/index.module.scss"
 import Swal from "sweetalert2"
 import withReactContent from "sweetalert2-react-content"
@@ -27,6 +28,7 @@ import { deleteCourse, getCourse, toggleActiveCourse } from "../../../api/course
 import { toDateString, toDateTimeString } from "../../../utility/Utils"
 import { useNavigate } from "react-router-dom"
 import { supervisedCheckingDocument } from "../../../api/checking_document"
+import { downloadTemplateBaoCao, getCourseReport } from "../../../api/checking_document_version"
 const LIST_STATUS = [
     {
         value: 1,
@@ -51,6 +53,8 @@ const Course = () => {
     const [isAdd, setIsAdd] = useState(false)
     const [isEdit, setIsEdit] = useState(false)
     const [info, setInfo] = useState()
+    const [loadingReports, setLoadingReports] = useState({}) // Tracks loading per record
+
     const getData = (page, limit, search, isActive) => {
         setLoadingData(true)
         getCourse({
@@ -185,6 +189,61 @@ const Course = () => {
         }
     }
 
+    // Note for Mr. Hiep
+    const handleReport = (recordId, item) => {
+        if (item && item.key === '1') {
+            setLoadingReports((prev) => ({ ...prev, [recordId]: true }))
+            getCourseReport({
+                params: {
+                    courseId: Number(recordId),
+                    type: 1
+                },
+                responseType: 'blob'
+            })
+                .then(res => {
+                    downloadTemplateBaoCao(6, res, 'Bao_cao_kiem_tra_tuyet_doi')
+                })
+                .catch(error => {
+                    console.log(error)
+                }).finally(() => {
+                    setLoadingReports((prev) => ({ ...prev, [recordId]: false }))
+                })
+        } else {
+            setLoadingReports((prev) => ({ ...prev, [recordId]: true }))
+            getCourseReport({
+                params: {
+                    courseId: Number(recordId),
+                    type: 2
+                },
+                responseType: 'blob'
+            })
+                .then(res => {
+                    downloadTemplateBaoCao(6, res, 'Bao_cao_kiem_tra_xap_xi')
+                })
+                .catch(error => {
+                    console.log(error)
+                }).finally(() => {
+                    setLoadingReports((prev) => ({ ...prev, [recordId]: false }))
+                })
+        }
+    }
+    const items = [
+
+        {
+            label: 'Kiểm tra tuyệt đối',
+            key: 1,
+            icon: <DownCircleFilled />,
+        },
+        {
+            label: 'Kiểm tra xấp xỉ',
+            key: 2,
+            icon: <DownCircleFilled />,
+        }
+    ]
+    const menuProps = (recordId) => ({
+        items,
+        onClick: (item) => handleReport(recordId, item),
+    })
     const columns = [
         {
             title: "STT",
@@ -273,7 +332,7 @@ const Course = () => {
                     {ability.can('update', 'DOT_KIEM_TRA') &&
                         <>
 
-                            <Tooltip placement="top" title="Kiểm tra trong khóa" >
+                            <Tooltip placement="top" title="Kiểm tra cùng đợt" >
                                 <BarsOutlined
                                     style={{ color: "#09A863", cursor: 'pointer', marginRight: '1rem' }}
                                     onClick={(e) => handleSupervisor(record)}
@@ -289,6 +348,13 @@ const Course = () => {
                                 />
                             </Tooltip>
                         </>}
+                    <Tooltip placement="top" title="Xuất báo cáo">
+                        <Dropdown menu={menuProps(record?.id)}>
+                            {
+                                loadingReports[record?.id] ? <Spinner color="#fff" style={{ width: '14px', height: '14px', marginRight: '1rem' }} /> : <FileDoneOutlined style={{ cursor: 'pointer', color: '#09A863', marginRight: '1rem' }} />
+                            }
+                        </Dropdown>
+                    </Tooltip>
                     {ability.can('delete', 'DOT_KIEM_TRA') &&
                         <Popconfirm
                             title="Bạn chắc chắn xóa?"

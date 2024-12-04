@@ -252,7 +252,6 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate, thresholdValue }) =>
             render: (text, record, index) => {
                 const checkingItem = record?.checkingResult?.find(item => item.typeCheckingId === 1)
                 const similarityTotal = checkingItem?.similarityTotal
-
                 if (similarityTotal === 0) {
                     return <span>0</span>
                 } else if (similarityTotal) {

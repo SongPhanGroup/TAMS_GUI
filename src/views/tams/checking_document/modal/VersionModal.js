@@ -250,7 +250,6 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate, thresholdValue }) =>
             render: (text, record, index) => {
                 const checkingItem = record?.checkingResult?.find(item => item.typeCheckingId === 1)
                 const similarityTotal = checkingItem?.similarityTotal
-
                 if (similarityTotal === 0) {
                     return <span>0</span>
                 } else if (similarityTotal) {
@@ -259,6 +258,7 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate, thresholdValue }) =>
                     return <span style={{ color: 'blue', fontWeight: '600' }}>Đang xử lý</span>
                 }
             }
+
         },
         {
             title: "Trùng với TL cùng đợt (%)",

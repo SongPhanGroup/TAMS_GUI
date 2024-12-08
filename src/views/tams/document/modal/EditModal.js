@@ -140,7 +140,7 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
       formData.append("description", data.description)
       formData.append("title", data.title)
       formData.append("language", data.language)
-      formData.append("source", data.source)
+      // formData.append("source", data.source)
       formData.append("majorId", data?.major?.value)
       formData.append("typeId", data?.documentType?.value)
       formData.append("sourceId", data?.source?.value)
@@ -190,7 +190,7 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
       formData.append("description", data.description)
       formData.append("title", data.title)
       formData.append("language", data.language)
-      formData.append("source", data.source)
+      // formData.append("source", data.source)
       formData.append("majorId", data?.major?.value)
       formData.append("typeId", data?.documentType?.value)
       formData.append("sourceId", data?.source?.value)
@@ -329,7 +329,7 @@ const EditDocument = ({ open, handleModal, infoEdit, getData }) => {
           </Col>
           <Col sm={6} xs={12}>
             <Label className='form-label' for='language'>
-              Ngôn ngữ
+              Ngôn ngữ <span style={{ color: 'red' }}>(*)</span>
             </Label>
             <Controller
               defaultValue={infoEdit?.language ?? ''}

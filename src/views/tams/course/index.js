@@ -11,6 +11,7 @@ import {
     Col,
     FormFeedback,
     UncontrolledTooltip,
+    Spinner
 } from "reactstrap"
 import { Plus, X } from "react-feather"
 import { BarsOutlined, DeleteOutlined, EditOutlined, LockOutlined, UnlockOutlined, DownCircleFilled, FileDoneOutlined } from "@ant-design/icons"
@@ -27,6 +28,7 @@ import { deleteCourse, getCourse, toggleActiveCourse } from "../../../api/course
 import { toDateString, toDateTimeString } from "../../../utility/Utils"
 import { useNavigate } from "react-router-dom"
 import { supervisedCheckingDocument } from "../../../api/checking_document"
+import { downloadTemplateBaoCao, getCourseReport } from "../../../api/checking_document_version"
 const LIST_STATUS = [
     {
         value: 1,
@@ -186,35 +188,20 @@ const Course = () => {
             setIsActive()
         }
     }
-    
+
     // Note for Mr. Hiep
     const handleReport = (recordId, item) => {
-        if (item && item.key === "2") {
+        if (item && item.key === '1') {
             setLoadingReports((prev) => ({ ...prev, [recordId]: true }))
-            getSimilarityReport({
+            getCourseReport({
                 params: {
-                    checkingDocumentVersionId: Number(recordId)
+                    courseId: Number(recordId),
+                    type: 1
                 },
                 responseType: 'blob'
             })
                 .then(res => {
-                    downloadTemplateBaoCao(2, res, 'Bao_cao_DS_trung_lap_cao')
-                })
-                .catch(error => {
-                    console.log(error)
-                }).finally(() => {
-                    setLoadingReports((prev) => ({ ...prev, [recordId]: false }))
-                })
-        } else if (item && item.key === "3") {
-            setLoadingReports((prev) => ({ ...prev, [recordId]: true }))
-            getSimilarityReportSentence({
-                params: {
-                    checkingDocumentVersionId: Number(recordId)
-                },
-                responseType: 'blob'
-            })
-                .then(res => {
-                    downloadTemplateBaoCao(5, res, 'Bao_cao_DS_cau_trung_lap')
+                    downloadTemplateBaoCao(6, res, 'Bao_cao_kiem_tra_tuyet_doi')
                 })
                 .catch(error => {
                     console.log(error)
@@ -223,14 +210,15 @@ const Course = () => {
                 })
         } else {
             setLoadingReports((prev) => ({ ...prev, [recordId]: true }))
-            getSimilarityReportByCourse({
+            getCourseReport({
                 params: {
-                    checkingDocumentVersionId: Number(recordId)
+                    courseId: Number(recordId),
+                    type: 2
                 },
                 responseType: 'blob'
             })
                 .then(res => {
-                    downloadTemplateBaoCao(4, res, 'Bao_cao_DS_trung_lap_theo_dot')
+                    downloadTemplateBaoCao(6, res, 'Bao_cao_kiem_tra_xap_xi')
                 })
                 .catch(error => {
                     console.log(error)
@@ -238,18 +226,17 @@ const Course = () => {
                     setLoadingReports((prev) => ({ ...prev, [recordId]: false }))
                 })
         }
-
     }
     const items = [
 
         {
             label: 'Kiểm tra tuyệt đối',
-            key: '2',
+            key: 1,
             icon: <DownCircleFilled />,
         },
         {
             label: 'Kiểm tra xấp xỉ',
-            key: '1',
+            key: 2,
             icon: <DownCircleFilled />,
         }
     ]
@@ -345,7 +332,7 @@ const Course = () => {
                     {ability.can('update', 'DOT_KIEM_TRA') &&
                         <>
 
-                            <Tooltip placement="top" title="Kiểm tra trong khóa" >
+                            <Tooltip placement="top" title="Kiểm tra cùng đợt" >
                                 <BarsOutlined
                                     style={{ color: "#09A863", cursor: 'pointer', marginRight: '1rem' }}
                                     onClick={(e) => handleSupervisor(record)}
@@ -364,7 +351,7 @@ const Course = () => {
                     <Tooltip placement="top" title="Xuất báo cáo">
                         <Dropdown menu={menuProps(record?.id)}>
                             {
-                                loadingReports[record?.id] ? <Spinner color="#fff" style={{ width: '14px', height: '14px' }} /> : <FileDoneOutlined style={{ cursor: 'pointer', color: '#09A863', marginRight: '1rem' }} />
+                                loadingReports[record?.id] ? <Spinner color="#fff" style={{ width: '14px', height: '14px', marginRight: '1rem' }} /> : <FileDoneOutlined style={{ cursor: 'pointer', color: '#09A863', marginRight: '1rem' }} />
                             }
                         </Dropdown>
                     </Tooltip>

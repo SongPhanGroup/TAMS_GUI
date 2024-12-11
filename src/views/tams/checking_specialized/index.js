@@ -505,7 +505,7 @@ const CheckingDocument = () => {
             align: "center",
             render: (text, record, index) => {
                 const countVersion = (record.checkingDocumentVersion).length
-                if (record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) {
+                if (record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal !== null) {
                     if ((record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= thresholdValue.threshold_high_similarity || (record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= thresholdValue.threshold_high_similarity) {
                         return (
                             <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}</span>

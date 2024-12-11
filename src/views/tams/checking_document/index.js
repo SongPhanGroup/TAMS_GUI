@@ -534,7 +534,7 @@ const CheckingDocument = () => {
                 //     )
                 // }
                 const countVersion = (record.checkingDocumentVersion).length
-                if (record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) {
+                if (record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal !== null) {
                     const similarityType1 = record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal || 0
                     const similarityType2 = record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal || 0
 

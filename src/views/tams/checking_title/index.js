@@ -4,9 +4,8 @@ import { SearchOutlined } from "@ant-design/icons"
 import React, { useEffect, useState } from "react"
 import { Card, CardBody, CardHeader, CardTitle, Label } from "reactstrap"
 import moment from "moment"
-import { listAllscienceResearch } from "../../../../api/scienceResearch"
 import { render } from "react-dom"
-import { changeAlias } from "../../../../utility/utils/formatText"
+import { checkingTitle } from "../../../api/checking_document"
 
 const TimKiemTraCuu = () => {
     const [count, setCount] = useState(0)
@@ -18,20 +17,12 @@ const TimKiemTraCuu = () => {
 
     const getData = () => {
         const splitSearch = searchName?.split(" ").join("+")
-
-        listAllscienceResearch({
-            params: {
-                page: currentPage,
-                limit: rowsPerPage,
-                ...(splitSearch && splitSearch !== "" && { name: splitSearch }),
-            }
+        checkingTitle({
+            title: searchName
         }).then((res) => {
-
-            setCount(res.count)
-            setDataSource(res.data)
-
+            setCount(res?.length)
+            setDataSource(res)
         }).catch(err => {
-
             console.log(err)
         })
     }
@@ -45,83 +36,55 @@ const TimKiemTraCuu = () => {
         },
         {
             title: "Tên đề tài",
-            dataIndex: "name",
-            render: (value) => {
+            dataIndex: "title",
+            // render: (value) => {
 
-                const array = value?.split(" ")
+            //     const array = value?.split(" ")
 
-                if (Array.isArray(array)) {
-                    const newArray = array.map((item) => {
-                        // if (searchName && changeAlias(searchName).includes(changeAlias(item))) {
-                        if (searchName && searchName.toLowerCase().includes(item.toLowerCase())) {
+            //     if (Array.isArray(array)) {
+            //         const newArray = array.map((item) => {
+            //             if (searchName && searchName.toLowerCase().includes(item.toLowerCase())) {
+            //                 return <span style={{ backgroundColor: "yellow" }}>{item}  </span>
+            //             } else {
+            //                 return <span>{item}  </span>
+            //             }
+            //         })
+            //         return <p>{newArray}</p>
+            //         // return value
+            //     } else {
+            //         return <p>{value}</p>
+            //     }
 
-                            // return `<p style={{backgroundColor:"yellow"}}>${item}</p>`
-                            return <span style={{ backgroundColor: "yellow" }}>{item}  </span>
-
-                        } else {
-                            return <span>{item}  </span>
-                        }
-
-                    })
-                    return <p>{newArray}</p>
-                    // return value
-                } else {
-                    return <p>{value}</p>
-                }
-
-            }
+            // }
         },
         {
-            title: "Mã đề tài",
-            dataIndex: "code",
-            align: "center",
+            title: "Tác giả",
+            dataIndex: "author",
         },
         {
-            title: "Chủ nhiệm đề tài",
-            dataIndex: "leader",
-            align: "center",
-            width: "10%",
-            render: (value) => {
-                if (Array.isArray(value)) {
-                    return value[0]?.l_Name ? value[0]?.l_Name : value[0]?.staff_Name ? value[0]?.staff_Name : ""
-                } else return ""
-            }
-
+            title: "Người hướng dẫn",
+            dataIndex: "supervisor",
         },
         {
-            title: "Thời gian bắt đầu",
-            dataIndex: "timeStart",
+            title: "Thời gian công bố",
+            dataIndex: "publishDate",
             align: "center",
             render: (value) => moment(value).format('DD/MM/YYYY'),
             width: "12%"
         },
         {
-            title: "Cấp quản lý",
+            title: "Mức độ trùng lặp (%)",
+            dataIndex: "similarity",
             align: "center",
-            dataIndex: "topicLevel",
-            render: (value) => (value?.levelName ? value?.levelName : ""),
-            width: "10%"
-        },
-        {
-            title: "Trạng thái",
-            align: "center",
-            dataIndex: "statusTopicType",
-            render: (value) => <Tag color={value?.statusCode === "HUY" ? "red" : "green"} >{<div>{value?.statusName.split('/')[2]} </div>}</Tag>,
-            // render: (value) =>  <Tag color={value?.statusCode === "HUY" ? "red" : "green"} >{value?.statusName.split('/').map((item) => <div>{item}</div>)}</Tag>,     
-            width: "10%"
-        },
-
-        {
-            title: "Mô tả",
-            // align: "center",
-            dataIndex: "description",
-            width: "20%"
+            render: (value) => Number(value) * 100,
         },
     ]
 
 
     useEffect(() => {
-        getData()
+        if (searchName) {
+            getData()
+        }
     }, [rowsPerPage, currentPage, searchName])
     return (
         <Card>

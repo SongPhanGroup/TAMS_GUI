@@ -6,6 +6,7 @@ const CheckingDocument = lazy(() => import('../../views/tams/checking_document')
 const CheckingSpecialized = lazy(() => import('../../views/tams/checking_specialized'))
 const CheckingDocumentResult = lazy(() => import('../../views/tams/checking_document/CheckingResult'))
 const CheckingSpecializedResult = lazy(() => import('../../views/tams/checking_specialized/CheckingResult'))
+const CheckingTitle = lazy(() => import('../../views/tams/checking_title'))
 const Course = lazy(() => import('../../views/tams/course'))
 const Major = lazy(() => import('../../views/tams/major'))
 const DocumentType = lazy(() => import('../../views/tams/document_type'))
@@ -31,6 +32,10 @@ const TamsRoutes = [
     {
         path: '/tams/checking-specialized',
         element: <CheckingSpecialized />
+    },
+    {
+        path: '/tams/checking-title',
+        element: <CheckingTitle />
     },
     {
         path: '/tams/checking-document-result/:id',

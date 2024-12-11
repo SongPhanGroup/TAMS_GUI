@@ -29,13 +29,19 @@ export const editCheckingDocument = async (id, body) => {
 }
 
 export const detailCheckingDocument = async (id) => {
-    const uri = `/checking-document/${id}`
-    const res = await API_TAMS.get(uri)
-    return res
-  }
+  const uri = `/checking-document/${id}`
+  const res = await API_TAMS.get(uri)
+  return res
+}
 
 export const deleteCheckingDocument = async (id) => {
-    const uri = `/checking-document/${id}`
-    const res = await API_TAMS.delete(uri)
-    return res
-  }
+  const uri = `/checking-document/${id}`
+  const res = await API_TAMS.delete(uri)
+  return res
+}
+
+export const checkingTitle = async (body) => {
+  const uri = `/checking-document/check-title`
+  const res = await API_TAMS.post(uri, body)
+  return res
+}

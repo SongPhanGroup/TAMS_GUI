@@ -57,7 +57,7 @@ import { deleteCheckingDocument, getCheckingDocument } from "../../../api/checki
 import { getCheckingResult, getSimilarDocument, getTop3SimilarDocument } from "../../../api/checking_result"
 import { getCourse } from "../../../api/course"
 import { PAGE_DEFAULT, PER_PAGE_DEFAULT } from "../../../utility/constant"
-import { downloadFileCheckingDocumentVersion, downloadTemplateBaoCao, getDuplicateCheckingDocumentVersion, getDuplicateDocumentVersion, getSimilarityReport } from "../../../api/checking_document_version"
+import { downloadFileCheckingDocumentVersion, downloadTemplateBaoCao, downloadTemplateBaoCaoWord, getDuplicateCheckingDocumentVersion, getDuplicateDocumentVersion, getSimilarityReport } from "../../../api/checking_document_version"
 import SimilarityDocContentModal from "./modal/DocContentModal"
 import SimilarityCourseContentModal from "./modal/CourseContentModal"
 
@@ -511,7 +511,7 @@ const CheckingResult = () => {
             responseType: 'blob'
         })
             .then(res => {
-                downloadTemplateBaoCao(2, res)
+                downloadTemplateBaoCaoWord(2, res, 'Bao_cao_DS_trung_lap_cao')
             })
             .catch(error => {
                 console.log(error)

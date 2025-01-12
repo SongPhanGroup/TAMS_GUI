@@ -62,7 +62,7 @@ import VersionModal from "./modal/VersionModal"
 import { PAGE_DEFAULT, PER_PAGE_DEFAULT } from "../../../utility/constant"
 import { getCourse } from "../../../api/course"
 import dayjs from "dayjs"
-import { downloadTemplateBaoCao, getSimilarityReport, getSimilarityReportByCourse, getSimilarityReportSentence } from "../../../api/checking_document_version"
+import { downloadTemplateBaoCao, downloadTemplateBaoCaoWord, getSimilarityReport, getSimilarityReportByCourse, getSimilarityReportSentence } from "../../../api/checking_document_version"
 import { fetchSystemParameters } from "../../../redux/systemParameterSlice"
 import { useDispatch } from "react-redux"
 const { RangePicker } = DatePicker
@@ -360,7 +360,7 @@ const CheckingDocument = () => {
                 responseType: 'blob'
             })
                 .then(res => {
-                    downloadTemplateBaoCao(2, res, 'Bao_cao_DS_trung_lap_cao')
+                    downloadTemplateBaoCaoWord(2, res, 'Bao_cao_DS_trung_lap_cao')
                 })
                 .catch(error => {
                     console.log(error)
@@ -505,7 +505,7 @@ const CheckingDocument = () => {
             align: "center",
             render: (text, record, index) => {
                 const countVersion = (record.checkingDocumentVersion).length
-                if (record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) {
+                if (record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal !== null) {
                     if ((record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= thresholdValue.threshold_high_similarity || (record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= thresholdValue.threshold_high_similarity) {
                         return (
                             <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}</span>

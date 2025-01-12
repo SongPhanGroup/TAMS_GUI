@@ -41,6 +41,7 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
             value => value !== null && value !== ''
         ),
         title: yup.string().required("Yêu cầu nhập tiêu đề"),
+        supervisor: yup.string().nullable(),
         author: yup.string().required("Yêu cầu nhập tác giả"),
         course: yup.object().required("Yêu cầu nhập đợt kiểm tra").nullable()
     })
@@ -138,6 +139,7 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
             title: data.title,
             author: data.author,
             courseId: data.course.value,
+            supervisor: data.supervisor ?? "",
             description: data.description ?? ""
         }).then(result => {
             if (result.status === 'success') {
@@ -250,6 +252,19 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
                             )}
                         />
                         {errors.author && <FormFeedback>{errors.author.message}</FormFeedback>}
+                    </Col>
+                    <Col xs={12}>
+                        <Label className='form-label' for='supervisor'>
+                            Người hướng dẫn
+                        </Label>
+                        <Controller
+                            name='supervisor'
+                            control={control}
+                            render={({ field }) => (
+                                <Input {...field} id='supervisor' placeholder='Nhập người hướng dẫn' invalid={errors.supervisor && true} />
+                            )}
+                        />
+                        {errors.author && <FormFeedback>{errors.supervisor.message}</FormFeedback>}
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='description'>

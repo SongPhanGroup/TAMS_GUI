@@ -40,6 +40,7 @@ const EditCheckingDocument = ({ open, handleModal, infoEdit, getData }) => {
     const EditCheckingDocumentSchema = yup.object().shape({
         title: yup.string().required("Yêu cầu nhập tiêu đề"),
         author: yup.string().required("Yêu cầu nhập tác giả"),
+        supervisor: yup.string().nullable(),
         course: yup.object().required("Yêu cầu nhập đợt kiểm tra").nullable()
     })
 
@@ -111,6 +112,7 @@ const EditCheckingDocument = ({ open, handleModal, infoEdit, getData }) => {
             title: data.title,
             author: data.author,
             courseId: data.course.value,
+            supervisor: data.supervisor,
             description: data.description
         }).then(result => {
             if (result.status === 'success') {
@@ -210,6 +212,20 @@ const EditCheckingDocument = ({ open, handleModal, infoEdit, getData }) => {
                             )}
                         />
                         {errors.author && <FormFeedback>{errors.author.message}</FormFeedback>}
+                    </Col>
+                    <Col xs={12}>
+                        <Label className='form-label' for='supervisor'>
+                            Người hướng dẫn
+                        </Label>
+                        <Controller
+                            defaultValue={infoEdit?.supervisor}
+                            name='supervisor'
+                            control={control}
+                            render={({ field }) => (
+                                <Input  {...field} id='supervisor' placeholder='Nhập mô tả' invalid={errors.supervisor && true} />
+                            )}
+                        />
+                        {errors.supervisor && <FormFeedback>{errors.supervisor.message}</FormFeedback>}
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='description'>

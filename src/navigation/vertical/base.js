@@ -24,7 +24,7 @@ export default [
     header: "Kiểm tra tài liệu",
     role: 0,
     action: 'read',
-    resource: ['DOT_KIEM_TRA', 'KIEM_TRA_TRUNG_LAP_TUYET_DOI', 'KIEM_TRA_TRUNG_LAP_XAP_XI']
+    resource: ['DOT_KIEM_TRA', 'KIEM_TRA_TRUNG_LAP_TUYET_DOI', 'KIEM_TRA_TRUNG_LAP_XAP_XI, KIEM_TRA_TEN_DE_TAI']
   },
   {
     id: 'checking-document',
@@ -42,6 +42,15 @@ export default [
     navLink: '/tams/checking-specialized',
     action: 'read',
     resource: 'KIEM_TRA_TRUNG_LAP_XAP_XI',
+    role: 0
+  },
+  {
+    id: 'checking-title',
+    title: 'KT tên đề tài',
+    icon: <CheckOutlined size={12} />,
+    navLink: '/tams/checking-title',
+    action: 'read',
+    resource: 'KIEM_TRA_TEN_DE_TAI',
     role: 0
   },
   {

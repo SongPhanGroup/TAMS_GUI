@@ -56,7 +56,7 @@ import { useForm, Controller } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import classnames from "classnames"
 import AddNewCheckingDocumentVersion from "./AddNewVersionModal"
-import { deleteCheckingDocumentVersion, downloadTemplateBaoCao, getCheckingDocumentVersion, getSimilarityReport } from "../../../../api/checking_document_version"
+import { deleteCheckingDocumentVersion, downloadTemplateBaoCao, downloadTemplateBaoCaoWord, getCheckingDocumentVersion, getSimilarityReport } from "../../../../api/checking_document_version"
 import { detailCheckingDocument } from "../../../../api/checking_document"
 import EditCheckingDocumentVersion from "./EditVersionModal"
 import { toDateTimeString } from "../../../../utility/Utils"
@@ -190,7 +190,7 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate, thresholdValue }) =>
             responseType: 'blob'
         })
             .then(res => {
-                downloadTemplateBaoCao(2, res)
+                downloadTemplateBaoCaoWord(2, res, 'Bao_cao_DS_trung_lap_cao')
             })
             .catch(error => {
                 console.log(error)

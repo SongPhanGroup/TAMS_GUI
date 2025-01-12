@@ -58,7 +58,7 @@ import VersionModal from "./modal/VersionModal"
 import { PAGE_DEFAULT, PER_PAGE_DEFAULT } from "../../../utility/constant"
 import { getCourse } from "../../../api/course"
 import dayjs from "dayjs"
-import { downloadTemplateBaoCao, getSimilarityReport, getSimilarityReportByCourse, getSimilarityReportSentence } from "../../../api/checking_document_version"
+import { downloadTemplateBaoCao, downloadTemplateBaoCaoWord, getSimilarityReport, getSimilarityReportByCourse, getSimilarityReportSentence } from "../../../api/checking_document_version"
 import { useDispatch, useSelector } from "react-redux"
 import { fetchSystemParameters, systemParameterActions } from "../../../redux/systemParameterSlice"
 import { store } from "../../../redux/store"
@@ -379,7 +379,8 @@ const CheckingDocument = () => {
                 responseType: 'blob'
             })
                 .then(res => {
-                    downloadTemplateBaoCao(2, res, 'Bao_cao_DS_trung_lap_cao')
+                    console.log("downloadTemplateBaoCaoWord")
+                    downloadTemplateBaoCaoWord(2, res, 'Bao_cao_DS_trung_lap_cao')
                 })
                 .catch(error => {
                     console.log(error)

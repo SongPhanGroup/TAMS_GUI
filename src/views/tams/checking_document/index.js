@@ -311,7 +311,7 @@ const CheckingDocument = () => {
         deleteCheckingDocument(key)
             .then((res) => {
                 // MySwal.fire({
-                //     title: "Xóa kiểm tra tài liệu thành công",
+                //     title: "Xóa kiểm tra tài liệu thành  công",
                 //     icon: "success",
                 //     customClass: {
                 //         confirmButton: "btn btn-success",

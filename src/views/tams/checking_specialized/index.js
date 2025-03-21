@@ -62,7 +62,7 @@ import VersionModal from "./modal/VersionModal"
 import { PAGE_DEFAULT, PER_PAGE_DEFAULT } from "../../../utility/constant"
 import { getCourse } from "../../../api/course"
 import dayjs from "dayjs"
-import { downloadTemplateBaoCao, getSimilarityReport, getSimilarityReportByCourse, getSimilarityReportSentence } from "../../../api/checking_document_version"
+import { downloadTemplateBaoCao, downloadTemplateBaoCaoWord, getSimilarityReport, getSimilarityReportByCourse, getSimilarityReportSentence } from "../../../api/checking_document_version"
 import { fetchSystemParameters } from "../../../redux/systemParameterSlice"
 import { useDispatch } from "react-redux"
 const { RangePicker } = DatePicker
@@ -360,7 +360,7 @@ const CheckingDocument = () => {
                 responseType: 'blob'
             })
                 .then(res => {
-                    downloadTemplateBaoCao(2, res, 'Bao_cao_DS_trung_lap_cao')
+                    downloadTemplateBaoCaoWord(2, res, 'Bao_cao_DS_trung_lap_cao')
                 })
                 .catch(error => {
                     console.log(error)

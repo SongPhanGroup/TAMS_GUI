@@ -124,3 +124,40 @@ export const downloadTemplateBaoCao = async (id, body_, fileName) => {
     // Xử lý lỗi nếu cần
   }
 }
+export const downloadTemplateBaoCaoWord = async (id, body_, fileName) => {
+  const uri = `${process.env.REACT_APP_URL_REPORT}templater/docx/${id}/file`
+
+  try {
+    // Gửi yêu cầu POST với body và nhận phản hồi dưới dạng blob
+    const response = await fetch(uri, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // Thêm các header khác nếu cần thiết
+      },
+      body: body_ // Chuyển đổi body thành JSON nếu cần
+    })
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok')
+    }
+
+    const blob = await response.blob() // Nhận dữ liệu dưới dạng blob
+
+    // Tạo URL từ blob và tải file
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `${fileName}.xlsx`)// Đặt tên file cho việc tải xuống
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+
+    // Giải phóng URL blob
+    window.URL.revokeObjectURL(url)
+
+  } catch (error) {
+    console.error('Error downloading file:', error)
+    // Xử lý lỗi nếu cần
+  }
+}

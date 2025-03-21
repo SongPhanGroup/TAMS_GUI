@@ -264,7 +264,7 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
                                 <Input {...field} id='supervisor' placeholder='Nhập người hướng dẫn' invalid={errors.supervisor && true} />
                             )}
                         />
-                        {errors.author && <FormFeedback>{errors.supervisor.message}</FormFeedback>}
+                        {errors.supervisor && <FormFeedback>{errors.supervisor.message}</FormFeedback>}
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='description'>

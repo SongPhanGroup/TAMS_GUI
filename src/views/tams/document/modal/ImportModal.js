@@ -153,9 +153,11 @@ const ImportModal = ({ open, getData, handleModal, listImport, fileInputRef }) =
             title: 'Năm xuất bản',
             minWidth: '100px',
             // selector: row => dayjs(row.publish_date).format('DD-MM-YYYY'),
-            render: (text, record, index) => (
-                <span>{dayjs(record.publish_date).format('DD-MM-YYYY')}</span>
-            ),
+            render: (text, record, index) => {
+                const publishDate = record.publish_date
+                const formattedDate = publishDate ? (publishDate.toString().length === 4 ? `01-01-${publishDate}` : dayjs(publishDate).format('DD-MM-YYYY')) : ''
+                return <span>{formattedDate}</span>
+            },
         },
         {
             title: 'Nơi xuất bản',
@@ -268,7 +270,7 @@ const ImportModal = ({ open, getData, handleModal, listImport, fileInputRef }) =
                     Vitri: `${listColumn[5]}${index + 2}`
                 })
             } else {
-                infoOneRow.source = row[5]
+                infoOneRow.source = row[5].toString()
             }
             // Kiểm tra loại tài liệu
             if (row[6] === null) {
@@ -277,20 +279,20 @@ const ImportModal = ({ open, getData, handleModal, listImport, fileInputRef }) =
                     Vitri: `${listColumn[6]}${index + 2}`
                 })
             } else {
-                infoOneRow.source = row[6]
+                infoOneRow.documentType = row[6].toString()
             }
             // Kiểm tra lĩnh vực
             if (row[7] !== null) {
-                infoOneRow.supervisor = row[7]
+                infoOneRow.major = row[7].toString()
             }
             if (row[8] !== null) {
                 infoOneRow.publish_date = row[8]
             }
             if (row[9] !== null) {
-                infoOneRow.publish_place = row[9]
+                infoOneRow.publish_place = row[9].toString()
             }
             if (row[10] !== null) {
-                infoOneRow.description = row[10]
+                infoOneRow.description = row[10].toString()
             }
             if (row[11] === null) {
                 temp.push({

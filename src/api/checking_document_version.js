@@ -148,7 +148,7 @@ export const downloadTemplateBaoCaoWord = async (id, body_, fileName) => {
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.setAttribute('download', `${fileName}.xlsx`)// Đặt tên file cho việc tải xuống
+    link.setAttribute('download', `${fileName}.docx`)// Đặt tên file cho việc tải xuống
     document.body.appendChild(link)
     link.click()
     link.remove()

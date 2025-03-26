@@ -44,8 +44,8 @@ const AddNewCheckingDocument = ({ open, handleModal, getData, dataTable, onUpdat
         title: yup.string().required("Yêu cầu nhập tiêu đề"),
         supervisor: yup.string().nullable(),
         author: yup.string().required("Yêu cầu nhập tác giả"),
-        course: yup.object().required("Yêu cầu nhập đợt kiểm tra").nullable()
-        // major: yup.object().required("Yêu cầu ngành").nullable()
+        course: yup.object().required("Yêu cầu nhập đợt kiểm tra").nullable(),
+        major: yup.object().required("Yêu cầu ngành").nullable()
     })
 
     // ** Hooks
@@ -171,6 +171,7 @@ const AddNewCheckingDocument = ({ open, handleModal, getData, dataTable, onUpdat
             description: data.description ?? "",
             majorId: data.major.value
         }
+        console.log("newRecord", newRecord)
         setLoadingAdd(true)
         postCheckingDocument(newRecord).then(result => {
             if (result.status === 'success') {

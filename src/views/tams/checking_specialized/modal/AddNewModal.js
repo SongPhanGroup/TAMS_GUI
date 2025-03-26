@@ -27,6 +27,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import '@styles/react/libs/react-select/_react-select.scss'
 import Swal from 'sweetalert2'
 import { getCourse } from "../../../../api/course"
+import { getMajor } from "../../../../api/major"
 import classNames from "classnames"
 import { postCheckingDocumentVersion } from "../../../../api/checking_document_version_by_word"
 import toast from "react-hot-toast"
@@ -43,7 +44,8 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
         title: yup.string().required("Yêu cầu nhập tiêu đề"),
         supervisor: yup.string().nullable(),
         author: yup.string().required("Yêu cầu nhập tác giả"),
-        course: yup.object().required("Yêu cầu nhập đợt kiểm tra").nullable()
+        course: yup.object().required("Yêu cầu nhập đợt kiểm tra").nullable(),
+        major: yup.object().required("Yêu cầu ngành").nullable()
     })
 
     // ** Hooks
@@ -63,13 +65,14 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
     const navigate = useNavigate()
     const [file, setFile] = useState()
     const [listCourse, setListCourse] = useState([])
+    const [listMajor, setListMajor] = useState([])
     const [loadingAdd, setLoadingAdd] = useState(false)
     const [successMessage, setSuccessMessage] = useState('')
 
     const getAllDataPromises = async () => {
         const coursePromise = getCourse({ params: { page: 1, perPage: 10, search: '' } })
-
-        const promises = [coursePromise]
+        const majorPromise = getMajor({ params: { page: 1, perPage: 100, search: '' } })
+        const promises = [coursePromise, majorPromise]
         const results = await Promise.allSettled(promises)
         const responseData = promises.reduce((acc, promise, index) => {
             if (results[index].status === 'fulfilled') {
@@ -81,10 +84,12 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
         }, [])
 
         const courseRes = responseData[0]
+        const majorRes = responseData[1]
         const resCourse = courseRes?.data?.filter(item => item.isActive === 1)
         results.map((res) => {
             if (res.status !== 'fulfilled') {
                 setListCourse(null)
+                setListMajor(null)
             }
         })
         const courses = resCourse?.map((res) => {
@@ -97,8 +102,15 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
             if (b.value === 1) return 1 // Đưa phần tử có id = 1 lên đầu
             return 0 // Giữ nguyên thứ tự của các phần tử còn lại
         })
+        const majors = majorRes?.data?.map((res) => {
+            return {
+                value: res.id,
+                label: `${res.name}`
+            }
+        })
         // const courses2 = [{ value: 1, label: 'Đợt kiểm tra độc lập' }, ...courses]
         setListCourse(courses)
+        setListMajor(majors)
     }
 
     useEffect(() => {
@@ -252,6 +264,27 @@ const AddNewCheckingDocument = ({ open, handleModal, getData }) => {
                             )}
                         />
                         {errors.author && <FormFeedback>{errors.author.message}</FormFeedback>}
+                    </Col>
+                    <Col sm={12} xs={12}>
+                        <Label className='form-label' for='major'>
+                            Lĩnh vực <span style={{ color: 'red' }}>(*)</span>
+                        </Label>
+                        <Controller
+                            id='react-select'
+                            name='major'
+                            control={control}
+                            render={({ field }) => (
+                                <Select
+                                    placeholder="Chọn lĩnh vực"
+                                    classNamePrefix='select'
+                                    name='clear'
+                                    options={listMajor}
+                                    isClearable
+                                    className={classNames('react-select', { 'is-invalid': errors.major && true })}
+                                    {...field}
+                                />)}
+                        />
+                        {errors.major && <FormFeedback>{errors.major.message}</FormFeedback>}
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='supervisor'>

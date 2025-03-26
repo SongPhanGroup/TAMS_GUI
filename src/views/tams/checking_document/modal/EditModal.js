@@ -27,6 +27,7 @@ import Swal from 'sweetalert2'
 import { useEffect, useState } from "react"
 import { detailCheckingDocument, editCheckingDocument } from "../../../../api/checking_document"
 import { getCourse } from "../../../../api/course"
+import { getMajor } from "../../../../api/major"
 import classNames from "classnames"
 import { detailCheckingDocumentVersion, editCheckingDocumentVersion, getCheckingDocumentVersion } from "../../../../api/checking_document_version"
 import { PAGE_DEFAULT, PER_PAGE_DEFAULT } from "../../../../utility/constant"
@@ -41,7 +42,8 @@ const EditCheckingDocument = ({ open, handleModal, infoEdit, getData }) => {
         title: yup.string().required("Yêu cầu nhập tiêu đề"),
         author: yup.string().required("Yêu cầu nhập tác giả"),
         supervisor: yup.string().nullable(),
-        course: yup.object().required("Yêu cầu nhập đợt kiểm tra").nullable()
+        course: yup.object().required("Yêu cầu nhập đợt kiểm tra").nullable(),
+        major: yup.object().required("Yêu cầu ngành").nullable()
     })
 
     // ** Hooks
@@ -55,14 +57,15 @@ const EditCheckingDocument = ({ open, handleModal, infoEdit, getData }) => {
     })
 
     const [listCourse, setListCourse] = useState([])
+    const [listMajor, setListMajor] = useState([])
     const [listCheckingDocumentVersion, setListCheckingDocumentVersion] = useState([])
     const [loadingEdit, setLoadingEdit] = useState(false)
 
     const getAllDataPromises = async () => {
         const coursePromise = getCourse({ params: { page: PAGE_DEFAULT, perPage: PER_PAGE_DEFAULT, search: '' } })
         const checkingDocumentVersionPromise = detailCheckingDocument(infoEdit?.id)
-
-        const promises = [coursePromise, checkingDocumentVersionPromise]
+        const majorPromise = getMajor({ params: { page: 1, perPage: 100, search: '' } })
+        const promises = [coursePromise, checkingDocumentVersionPromise, majorPromise]
         const results = await Promise.allSettled(promises)
         const responseData = promises.reduce((acc, promise, index) => {
             if (results[index].status === 'fulfilled') {
@@ -75,9 +78,11 @@ const EditCheckingDocument = ({ open, handleModal, infoEdit, getData }) => {
 
         const courseRes = responseData[0]
         const checkingDocumentVersionRes = responseData[1]
+        const majorRes = responseData[2]
         results.map((res) => {
             if (res.status !== 'fulfilled') {
                 setListCourse(null)
+                setListMajor(null)
             }
         })
         const courses = courseRes?.data?.map((res) => {
@@ -90,9 +95,16 @@ const EditCheckingDocument = ({ open, handleModal, infoEdit, getData }) => {
             if (b.value === 1) return 1 // Đưa phần tử có id = 1 lên đầu
             return 0 // Giữ nguyên thứ tự của các phần tử còn lại
         })
+        const majors = majorRes?.data?.map((res) => {
+            return {
+                value: res.id,
+                label: `${res.name}`
+            }
+        })
         const checkingDocumentVersions = checkingDocumentVersionRes?.data?.checkingDocumentVersion
         setListCheckingDocumentVersion(checkingDocumentVersions)
         setListCourse(courses)
+        setListMajor(majors)
     }
 
 
@@ -113,7 +125,8 @@ const EditCheckingDocument = ({ open, handleModal, infoEdit, getData }) => {
             author: data.author,
             courseId: data.course.value,
             supervisor: data.supervisor,
-            description: data.description
+            description: data.description,
+            majorId: data.major.value
         }).then(result => {
             if (result.status === 'success') {
                 const id = listCheckingDocumentVersion[listCheckingDocumentVersion.length - 1]?.id
@@ -212,6 +225,28 @@ const EditCheckingDocument = ({ open, handleModal, infoEdit, getData }) => {
                             )}
                         />
                         {errors.author && <FormFeedback>{errors.author.message}</FormFeedback>}
+                    </Col>
+                    <Col sm={12} xs={12}>
+                        <Label className='form-label' for='major'>
+                            Lĩnh vực <span style={{ color: 'red' }}>(*)</span>
+                        </Label>
+                        <Controller
+                            id='react-select2'
+                            defaultValue={infoEdit?.major && { value: infoEdit?.major?.id, label: infoEdit?.major?.name }}
+                            name='major'
+                            control={control}
+                            render={({ field }) => (
+                                <Select
+                                    placeholder="Chọn lĩnh vực"
+                                    classNamePrefix='select'
+                                    name='clear'
+                                    options={listMajor}
+                                    isClearable
+                                    className={classNames('react-select', { 'is-invalid': errors.major && true })}
+                                    {...field}
+                                />)}
+                        />
+                        {errors.major && <FormFeedback>{errors.major.message}</FormFeedback>}
                     </Col>
                     <Col xs={12}>
                         <Label className='form-label' for='supervisor'>

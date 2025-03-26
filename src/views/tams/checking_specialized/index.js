@@ -251,6 +251,7 @@ const CheckingDocument = () => {
         <X className="cursor-pointer" size={15} onClick={handleModal} />
     )
     const handleEdit = (record) => {
+        console.log("record", record)
         setCheckingDocumentSelected(record)
         setIsEdit(true)
     }
@@ -611,6 +612,7 @@ const CheckingDocument = () => {
             width: 100,
             align: "center",
             render: (record) => {
+                
                 const dataVersion = record.checkingDocumentVersion
                 const recordLastVersion = dataVersion[dataVersion.length - 1]
                 return (

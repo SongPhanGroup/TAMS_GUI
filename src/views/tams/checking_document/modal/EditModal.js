@@ -35,7 +35,7 @@ import { PAGE_DEFAULT, PER_PAGE_DEFAULT } from "../../../../utility/constant"
 const EditCheckingDocument = ({ open, handleModal, infoEdit, getData }) => {
     if (!infoEdit) return
     useEffect(() => {
-
+        console.log("infoEdit", infoEdit)
     }, [infoEdit])
     // ** States
     const EditCheckingDocumentSchema = yup.object().shape({
@@ -232,7 +232,7 @@ const EditCheckingDocument = ({ open, handleModal, infoEdit, getData }) => {
                         </Label>
                         <Controller
                             id='react-select2'
-                            defaultValue={infoEdit?.major && { value: infoEdit?.major?.id, label: infoEdit?.major?.name }}
+                            defaultValue={infoEdit?.majorId && { value: infoEdit?.majorId, label: listMajor.find(item => item.value === infoEdit.majorId)?.label }}
                             name='major'
                             control={control}
                             render={({ field }) => (

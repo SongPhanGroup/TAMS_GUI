@@ -65,7 +65,7 @@ export const LIST_ROLE = [
         role: 0,
         description: '/tams/checking-document',
         action: "read",
-        resource: 'KIEM_TRA_TRUNG_LAP_TUYET_DOI'
+        resource: 'DAO_VAN'
     },
     {
         id: 'training',
@@ -74,7 +74,7 @@ export const LIST_ROLE = [
         role: 0,
         description: '/tams/checking-specialized',
         action: 'read',
-        resource: 'KIEM_TRA_TRUNG_LAP_XAP_XI'
+        resource: 'DAO_VAN'
     },
     {
         id: 'facilities',
@@ -83,7 +83,7 @@ export const LIST_ROLE = [
         role: 0,
         description: '/tams/document',
         action: 'read',
-        resource: 'QL_KHO_TAI_LIEU_MAU'
+        resource: 'DAO_VAN'
     },
     {
         id: 'science',

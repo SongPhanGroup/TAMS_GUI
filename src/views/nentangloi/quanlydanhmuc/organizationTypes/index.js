@@ -157,7 +157,7 @@ const ListOrganizationtypes = () => {
       align: "center",
       render: (record) => (
         <div style={{ display: "flex", justifyContent: "center" }}>
-          {ability.can('update', 'LOAI_DON_VI') &&
+          {ability.can('update', 'DAO_VAN') &&
             <>
               <EditOutlined
                 id={`tooltip_edit${record.ID}`}
@@ -168,7 +168,7 @@ const ListOrganizationtypes = () => {
                 Chỉnh sửa
               </UncontrolledTooltip>
             </>}
-          {ability.can('delete', 'LOAI_DON_VI') &&
+          {ability.can('delete', 'DAO_VAN') &&
             <Popconfirm
               title="Bạn chắc chắn xóa?"
               onConfirm={() => handleDelete(record.ID)}

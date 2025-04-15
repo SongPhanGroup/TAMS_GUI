@@ -329,7 +329,7 @@ const Course = () => {
                             }
                         </Popconfirm>
                     }
-                    {ability.can('update', 'DOT_KIEM_TRA') &&
+                    {ability.can('update', 'DAO_VAN') &&
                         <>
 
                             <Tooltip placement="top" title="Kiểm tra cùng đợt" >
@@ -339,7 +339,7 @@ const Course = () => {
                                 />
                             </Tooltip>
                         </>}
-                    {ability.can('update', 'DOT_KIEM_TRA') &&
+                    {ability.can('update', 'DAO_VAN') &&
                         <>
                             <Tooltip placement="top" title="Chỉnh sửa" >
                                 <EditOutlined
@@ -355,7 +355,7 @@ const Course = () => {
                             }
                         </Dropdown>
                     </Tooltip>
-                    {ability.can('delete', 'DOT_KIEM_TRA') &&
+                    {ability.can('delete', 'DAO_VAN') &&
                         <Popconfirm
                             title="Bạn chắc chắn xóa?"
                             onConfirm={() => handleDelete(record.id)}
@@ -430,7 +430,7 @@ const Course = () => {
                         />
                     </Col>
                 </Col>
-                {ability.can('create', 'DOT_KIEM_TRA') &&
+                {ability.can('create', 'DAO_VAN') &&
                     <Col sm="4" style={{ display: 'flex', justifyContent: 'flex-end' }}>
                         <Button
                             onClick={(e) => setIsAdd(true)}

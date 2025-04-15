@@ -252,7 +252,7 @@ const VersionModal = ({ checkingDocumentSelected, onUpdate, thresholdValue }) =>
                 const similarityTotal = checkingItem?.similarityTotal
                 if (similarityTotal === 0) {
                     return <span>0</span>
-                } else if (similarityTotal) {
+                } else if (similarityTotal !== null) {
                     return <span>{similarityTotal}</span>
                 } else {
                     return <span style={{ color: 'blue', fontWeight: '600' }}>Đang xử lý</span>

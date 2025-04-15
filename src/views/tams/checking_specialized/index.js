@@ -505,7 +505,7 @@ const CheckingDocument = () => {
             align: "center",
             render: (text, record, index) => {
                 const countVersion = (record.checkingDocumentVersion).length
-                if (record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) {
+                if (record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal !== null) {
                     if ((record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) >= thresholdValue.threshold_high_similarity || (record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal) >= thresholdValue.threshold_high_similarity) {
                         return (
                             <span style={{ whiteSpace: 'break-spaces', color: 'red', fontWeight: '600' }}>{record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal}</span>
@@ -641,7 +641,7 @@ const CheckingDocument = () => {
                                 }
                             </Dropdown>
                         </Tooltip>
-                        {ability.can('update', 'KIEM_TRA_TRUNG_LAP_XAP_XI') &&
+                        {ability.can('update', 'DAO_VAN') &&
                             <>
                                 <Tooltip placement="top" title="Chỉnh sửa" >
                                     <EditOutlined
@@ -650,7 +650,7 @@ const CheckingDocument = () => {
                                     />
                                 </Tooltip>
                             </>}
-                        {ability.can('delete', 'KIEM_TRA_TRUNG_LAP_XAP_XI') &&
+                        {ability.can('delete', 'DAO_VAN') &&
                             <Popconfirm
                                 title="Bạn chắc chắn xóa?"
                                 onConfirm={() => handleDelete(record._id)}
@@ -828,7 +828,7 @@ const CheckingDocument = () => {
                                 </Col>
                             </Col>
                             <Col md="2" style={{ display: "flex", justifyContent: "flex-end" }}>
-                                {ability.can('create', 'KIEM_TRA_TRUNG_LAP_XAP_XI') &&
+                                {ability.can('create', 'DAO_VAN') &&
                                     <Button
                                         onClick={(e) => setIsAdd(true)}
                                         color="primary"

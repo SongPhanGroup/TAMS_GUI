@@ -534,7 +534,7 @@ const CheckingDocument = () => {
                 //     )
                 // }
                 const countVersion = (record.checkingDocumentVersion).length
-                if (record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal) {
+                if (record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal !== null) {
                     const similarityType1 = record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 1)?.similarityTotal || 0
                     const similarityType2 = record?.checkingDocumentVersion[countVersion - 1]?.checkingResult?.find(item => item.typeCheckingId === 2)?.similarityTotal || 0
 
@@ -697,7 +697,7 @@ const CheckingDocument = () => {
                                 }
                             </Dropdown>
                         </Tooltip>
-                        {ability.can('update', 'KIEM_TRA_TRUNG_LAP_TUYET_DOI') &&
+                        {ability.can('update', 'DAO_VAN') &&
                             <>
                                 <Tooltip placement="top" title="Chỉnh sửa" >
                                     <EditOutlined
@@ -706,7 +706,7 @@ const CheckingDocument = () => {
                                     />
                                 </Tooltip>
                             </>}
-                        {ability.can('delete', 'KIEM_TRA_TRUNG_LAP_TUYET_DOI') &&
+                        {ability.can('delete', 'DAO_VAN') &&
                             <Popconfirm
                                 title="Bạn chắc chắn xóa?"
                                 onConfirm={() => handleDelete(record._id)}
@@ -883,7 +883,7 @@ const CheckingDocument = () => {
                                 </Col>
                             </Col>
                             <Col md="2" style={{ display: "flex", justifyContent: "flex-end" }}>
-                                {ability.can('create', 'KIEM_TRA_TRUNG_LAP_TUYET_DOI') &&
+                                {ability.can('create', 'DAO_VAN') &&
                                     <Button
                                         onClick={(e) => setIsAdd(true)}
                                         color="primary"

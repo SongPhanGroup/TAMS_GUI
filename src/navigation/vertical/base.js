@@ -24,7 +24,7 @@ export default [
     header: "Kiểm tra tài liệu",
     role: 0,
     action: 'read',
-    resource: ['DOT_KIEM_TRA', 'KIEM_TRA_TRUNG_LAP_TUYET_DOI', 'KIEM_TRA_TRUNG_LAP_XAP_XI']
+    resource: ['DAO_VAN', 'KIEM_TRA_TRUNG_LAP_TUYET_DOI', 'KIEM_TRA_TRUNG_LAP_XAP_XI']
   },
   {
     id: 'checking-document',
@@ -32,7 +32,7 @@ export default [
     icon: <CheckOutlined size={12} />,
     navLink: '/tams/checking-document',
     action: 'read',
-    resource: 'KIEM_TRA_TRUNG_LAP_TUYET_DOI',
+    resource: 'DAO_VAN',
     role: 0
   },
   {
@@ -41,7 +41,7 @@ export default [
     icon: <CheckOutlined size={12} />,
     navLink: '/tams/checking-specialized',
     action: 'read',
-    resource: 'KIEM_TRA_TRUNG_LAP_XAP_XI',
+    resource: 'DAO_VAN',
     role: 0
   },
   {
@@ -50,14 +50,14 @@ export default [
     icon: <DiffOutlined size={12} />,
     navLink: '/tams/course',
     action: 'read',
-    resource: 'DOT_KIEM_TRA',
+    resource: 'DAO_VAN',
     role: 0
   },
   {
     header: "Tài liệu mẫu",
     role: 0,
     action: 'read',
-    resource: ['QL_KHO_TAI_LIEU_MAU', 'THONG_KE_TAI_LIEU_MAU']
+    resource: ['DAO_VAN', 'DAO_VAN']
   },
   {
     id: 'document',
@@ -65,7 +65,7 @@ export default [
     icon: <FileText size={12} />,
     navLink: '/tams/document',
     action: 'read',
-    resource: 'QL_KHO_TAI_LIEU_MAU',
+    resource: 'DAO_VAN',
     role: 0
   },
   {
@@ -74,14 +74,14 @@ export default [
     icon: <BarChart size={12} />,
     navLink: '/tams/document-statistic',
     action: 'read',
-    resource: 'THONG_KE_TAI_LIEU_MAU',
+    resource: 'DAO_VAN',
     role: 0
   },
   {
     header: "Quản lý danh mục",
     role: 0,
     action: 'read',
-    resource: ['LOAI_TAI_LIEU', 'NGUON_TAI_LIEU', 'LINH_VUC_TAI_LIEU', 'LOAI_DON_VI']
+    resource: ['DAO_VAN']
   },
   {
     id: 'document-type',
@@ -89,7 +89,7 @@ export default [
     icon: <BookOutlined size={12} />,
     navLink: '/tams/document-type',
     action: 'read',
-    resource: 'LOAI_TAI_LIEU',
+    resource: 'DAO_VAN',
     role: 0
   },
   {
@@ -98,7 +98,7 @@ export default [
     icon: <GlobalOutlined size={12} />,
     navLink: '/tams/document-source',
     action: 'read',
-    resource: 'NGUON_TAI_LIEU',
+    resource: 'DAO_VAN',
     role: 0
   },
   {
@@ -107,7 +107,7 @@ export default [
     icon: <Sliders size={12} />,
     navLink: '/tams/major',
     action: 'read',
-    resource: 'LINH_VUC_TAI_LIEU',
+    resource: 'DAO_VAN',
     role: 0
   },
   {
@@ -116,14 +116,14 @@ export default [
     icon: <MenuOutlined size={12} />,
     navLink: '/tams/organization-type',
     action: 'read',
-    resource: 'LOAI_DON_VI',
+    resource: 'DAO_VAN',
     role: 0
   },
   {
     header: "Quản lý hệ thống",
     role: 0,
     action: 'read',
-    resource: ['DON_VI', 'QL_TAI_KHOAN', 'PHAN_QUYEN_VAI_TRO', 'QL_QUYEN_CO_BAN', 'CAU_HINH_THAM_SO'],
+    resource: ['DON_VI', 'QL_TAI_KHOAN', 'PHAN_QUYEN_VAI_TRO', 'QL_QUYEN_CO_BAN', 'DAO_VAN'],
   },
   {
     id: 'organization',
@@ -167,7 +167,7 @@ export default [
     icon: <Settings size={12} />,
     navLink: '/tams/config',
     action: 'read',
-    resource: 'CAU_HINH_THAM_SO',
+    resource: 'DAO_VAN',
     role: 0
   }
 
@@ -247,7 +247,7 @@ export default [
   //       icon: <Circle size={12} />,
   //       navLink: '/apps/categories/organizationTypes',
   //       action: 'read',
-  //       resource: 'DM_LOAI_DON_VI'
+  //       resource: 'DM_DAO_VAN'
   //     },
   //     // {
   //     //   id: 'organizationLevels',

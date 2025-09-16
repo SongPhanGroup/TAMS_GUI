@@ -88,6 +88,11 @@ const SelectCourseModal = ({ open, handleModal, getData }) => {
         reset()
     }
 
+    const handAddFile = (temp) => {
+        console.log("handAddFile", temp)
+        setListImport(temp)
+    }
+
     const handleChangeFile = (event) => {
         const file = event.target.files[0]
 
@@ -111,7 +116,7 @@ const SelectCourseModal = ({ open, handleModal, getData }) => {
         // Đọc file và xử lý sau đó
         readXlsxFile(file).then((rows) => {
             const temp = rows.slice(4) // Cắt mảng từ hàng bắt đầu
-            setListImport(temp) // Lưu danh sách sau khi xử lý
+            handAddFile(temp) // Lưu danh sách sau khi xử lý
             setModalImportFile(true) // Mở modal hiển thị kết quả import
 
         }).catch(error => {

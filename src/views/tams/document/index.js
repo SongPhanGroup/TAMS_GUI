@@ -303,6 +303,15 @@ const Document = () => {
             ),
         },
         {
+            title: "Trạng thái",
+            dataIndex: "is_import",
+            align: 'center',
+            width: 150,
+            render: (text, record, index) => (
+                <span>{record.isImport ? <Tag color="green">Đã nhập</Tag> : <Tag color="red">Chưa nhập</Tag>}</span>
+            ),
+        },
+        {
             title: "Thao tác",
             width: 100,
             align: "center",

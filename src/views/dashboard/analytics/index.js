@@ -1,5 +1,5 @@
 // ** React Imports
-import { useContext } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 // ** Icons Imports
 import { List } from 'react-feather'
@@ -31,6 +31,7 @@ import CountNumChecking from '../components/CountNumChecking'
 import DocumentByTime from '../components/DocumentByTime'
 import NumCheckingBySimilarity from '../components/NumCheckingBySimilarity'
 import DocumentByCategories from '../components/DocumentByCategories'
+import { getNotImportedCount, importNotImported } from '../../../api/import'
 
 // ** Images
 import jsonImg from '@src/assets/images/icons/json.png'
@@ -165,8 +166,33 @@ const AnalyticsDashboard = () => {
     "rgb(0, 0, 0)"
   ]
 
+  const [notImportedCount, setNotImportedCount] = useState(0)
+
+  useEffect(() => {
+    // Gọi API khi component được mount
+    const fetchData = async () => {
+      const notImportedCount = await getNotImportedCount()
+      setNotImportedCount(notImportedCount)
+      console.log('Not Imported Count:', notImportedCount)
+      if (notImportedCount > 0) {
+        const importRes = await importNotImported()
+        console.log('Import Response:', importRes)
+      }
+    }
+    fetchData()
+  }, [])
+
   return (
     <div id='dashboard-analytics'>
+      <Row className='match-height'>
+        <Col lg='12' sm='12'>
+          <Card>
+            <CardHeader>
+              <CardTitle tag='h4'>Tài liệu đang chờ đưa vào kho: {notImportedCount}</CardTitle>
+            </CardHeader>
+          </Card>
+        </Col>
+      </Row>
       <Row className='match-height'>
         <Col lg='5' md='12'>
           <DocumentByCategories colorForLabel={getColorForLabel} colors={rgb_colors} />
